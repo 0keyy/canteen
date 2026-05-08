@@ -1,16 +1,16 @@
 # 项目配置
 like:
-  upload-directory: /www/uploads/likeadmin-java/ # 上传目录
+  upload-directory: D:\javacode\zhongtang\upload\ # 上传目录
 
 # 框架配置
 spring:
   # 数据源配置
   datasource:
-    url: jdbc:mysql://localhost:3306/like_admin?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/like_admin?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
     type: com.zaxxer.hikari.HikariDataSource # 数据源类型
     driver-class-name: com.mysql.cj.jdbc.Driver # MySql的驱动
-    username: root # 数据库账号
-    password: root # 数据库密码
+    username: like_admin # 数据库账号
+    password: thd3DYmypyNBFbyP # 数据库密码
   # Redis配置
   redis:
     host: localhost   # Redis服务地址
