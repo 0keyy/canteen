@@ -10,7 +10,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource # 数据源类型
     driver-class-name: com.mysql.jdbc.Driver # MySql的驱动
     username: root # 数据库账号
-    password: 1234 # 数据库密码
+    password: root # 数据库密码
   # Redis配置
   redis:
     host: localhost   # Redis服务地址

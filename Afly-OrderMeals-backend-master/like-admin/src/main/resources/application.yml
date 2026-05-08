@@ -29,7 +29,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource # 数据源类型
     driver-class-name: com.mysql.jdbc.Driver # MySql的驱动
     username: root # 数据库账号
-    password: 1234 # 数据库密码
+    password: root # 数据库密码
     hikari:
       connection-timeout: 30000     # 等待连接分配连接的最大时长(毫秒),超出时长还没可用连接则发送SQLException,默认30秒
       minimum-idle: 5               # 最小连接数
