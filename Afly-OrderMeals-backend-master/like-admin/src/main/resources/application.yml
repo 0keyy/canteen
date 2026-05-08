@@ -1,6 +1,6 @@
 # 项目配置
 like:
-  upload-directory: /www/uploads/likeadmin-java/ # 上传目录
+  upload-directory: C:/uploads/likeadmin-java/ # 上传目录
   # 验证码配置
   captcha:
     # 是否开启验证码
