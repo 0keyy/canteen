@@ -30,12 +30,9 @@ public class LikeAdminApplication {
     public static void main(String[] args) throws UnknownHostException {
         SpringApplication app = new SpringApplication(LikeAdminApplication.class);
         app.run(args);
-        
-        String hostAddress = InetAddress.getLocalHost().getHostAddress();
+
         log.info("========================================");
-        log.info("应用启动成功！");
-        log.info("本地访问地址: http://localhost:8080");
-        log.info("外部访问地址: http://{}:8080", hostAddress);
+        log.info("点餐后台应用启动成功！！！");
         log.info("========================================");
     }
 
