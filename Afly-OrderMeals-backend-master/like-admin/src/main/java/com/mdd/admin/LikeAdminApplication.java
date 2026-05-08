@@ -1,6 +1,8 @@
 package com.mdd.admin;
 
 import org.mybatis.spring.annotation.MapperScan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;
@@ -9,6 +11,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * 启动器
@@ -20,8 +25,18 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 @SpringBootApplication(exclude = {RedisRepositoriesAutoConfiguration.class})
 public class LikeAdminApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(LikeAdminApplication.class, args);
+    private static final Logger log = LoggerFactory.getLogger(LikeAdminApplication.class);
+
+    public static void main(String[] args) throws UnknownHostException {
+        SpringApplication app = new SpringApplication(LikeAdminApplication.class);
+        app.run(args);
+        
+        String hostAddress = InetAddress.getLocalHost().getHostAddress();
+        log.info("========================================");
+        log.info("应用启动成功！");
+        log.info("本地访问地址: http://localhost:8080");
+        log.info("外部访问地址: http://{}:8080", hostAddress);
+        log.info("========================================");
     }
 
     @Bean
