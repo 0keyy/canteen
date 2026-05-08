@@ -6,7 +6,7 @@ like:
 spring:
   # 数据源配置
   datasource:
-    url: jdbc:mysql://146.56.199.215::3306/like_admin?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://146.56.199.215:3306/like_admin?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
     type: com.zaxxer.hikari.HikariDataSource # 数据源类型
     driver-class-name: com.mysql.cj.jdbc.Driver # MySql的驱动
     username: like_admin # 数据库账号
