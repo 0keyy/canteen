@@ -1,7 +1,8 @@
 import axios from 'ts-axios-new'
 const urlMap = {
-  development: 'http://127.0.0.1:8082/api/',
-  production: 'http://ustbhuangyi.com/sell/'
+  development: 'http://192.168.2.17:8082/api/',
+  // 与 H5 同域，由 8084 站点 Nginx 反代 /api/ -> 8082
+  production: '/api/'
 }
 const baseUrl = urlMap[process.env.NODE_ENV]
 const ERR_OK = 200

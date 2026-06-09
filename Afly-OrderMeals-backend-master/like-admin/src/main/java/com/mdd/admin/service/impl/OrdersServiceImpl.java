@@ -42,29 +42,34 @@ public class OrdersServiceImpl implements IOrdersServcice {
         MPJQueryWrapper<Orders> mpjQueryWrapper = new MPJQueryWrapper<Orders>()
                 .selectAll(Orders.class)
                 .select("ad.name as deskName")
-                .innerJoin("?_system_auth_dept ad ON ad.id=t.desk_id".replace("?_", GlobalConfig.tablePrefix))
+                .leftJoin("?_system_auth_dept ad ON ad.id=t.desk_id".replace("?_", GlobalConfig.tablePrefix))
                 .eq("t.aid",aid)
                 .orderByDesc("t.id");
 
         ordersMapper.setSearch(mpjQueryWrapper, searchValidate, new String[]{
                 "=:type@t.type:int",
+                "=:diningMode@t.dining_mode:int",
+                "=:source@t.source:int",
                 "=:status@t.status:int",
+                "=:payStatus@t.pay_status:int",
+                "like:contactMobile@t.contact_mobile:str",
                 "between:checkoutTime@t.checkout_time:long",
                 "between:createTime@t.create_time:long",
         });
 
-        IPage<OrdersListVo> iPage = ordersMapper.selectJoinPage(
+        IPage<Orders> iPage = ordersMapper.selectJoinPage(
                 new Page<>(pageNo, pageSize),
-                OrdersListVo.class,
+                Orders.class,
                 mpjQueryWrapper);
 
-
         List<OrdersListVo> list = new LinkedList<>();
-        for(OrdersListVo item : iPage.getRecords()) {
+        for (Orders item : iPage.getRecords()) {
             OrdersListVo vo = new OrdersListVo();
             BeanUtils.copyProperties(item, vo);
+            vo.setDeskName(item.getDeskName());
             vo.setCreateTime(TimeUtils.timestampToDate(item.getCreateTime()));
-            vo.setCheckoutTime(!item.getCheckoutTime().equals("0") ?TimeUtils.timestampToDate(item.getCreateTime()):"-");
+            vo.setCheckoutTime(item.getCheckoutTime() != null && item.getCheckoutTime() > 0
+                    ? TimeUtils.timestampToDate(item.getCheckoutTime()) : "-");
             list.add(vo);
         }
 
@@ -74,10 +79,11 @@ public class OrdersServiceImpl implements IOrdersServcice {
     @Override
     public List<OrdersDishListVo> dish(Integer id) {
         MPJQueryWrapper<OrdersDish> mpjQueryWrapper = new MPJQueryWrapper<OrdersDish>()
-                .selectAll(OrdersDish.class)
+                .select("t.amount as amount")
+                .select("t.quantity as number")
                 .select("ar.title as name")
                 .innerJoin("?_article ar ON t.dish_id=ar.id".replace("?_",GlobalConfig.tablePrefix))
-                .eq("t.id",id);
+                .eq("t.order_id", id);
         List<OrdersDishListVo> ordersDishListVos = ordersDishMapper.selectJoinList(OrdersDishListVo.class, mpjQueryWrapper);
 
         return ordersDishListVos;

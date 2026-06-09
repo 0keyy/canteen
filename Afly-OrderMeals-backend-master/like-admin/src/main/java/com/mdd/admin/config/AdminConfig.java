@@ -27,6 +27,7 @@ public class AdminConfig {
             "fr:dishDec",     //菜品-1
             "fr:toEmpty",     //清空菜品
             "fr:submit",      //下单
+            "internal:notify", // UniApp订单通知
 
     };
 

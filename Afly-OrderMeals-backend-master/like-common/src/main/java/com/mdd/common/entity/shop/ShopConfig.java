@@ -3,9 +3,10 @@ package com.mdd.common.entity.shop;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
-import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+
 @Data
 public class ShopConfig implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -19,6 +20,11 @@ public class ShopConfig implements Serializable {
     private String image;
     private Integer status;
     private Integer prePay;
+    private Integer takeoutEnable;
+    private Integer deliveryEnable;
+    private BigDecimal deliveryFee;
+    private BigDecimal minOrderAmount;
+    private BigDecimal deliveryRadius;
     private Long createTime;
     private Long updateTime;
 }

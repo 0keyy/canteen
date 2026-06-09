@@ -1,0 +1,133 @@
+/* 暖色市井风设计系统 */
+/* ===== 主色：暖橙 / 浅橘 / 正红 / 暖黄 ===== */
+/* ===== 背景 ===== */
+/* ===== 文字 ===== */
+/* ===== 边框 / 分割 ===== */
+/* ===== 圆角 12~14px → 24~28rpx ===== */
+/* ===== 阴影 ===== */
+/* ===== 字号 ===== */
+/* ===== 间距 ===== */
+/* ===== 动画 ===== */
+/* ===== 兼容旧变量 ===== */
+.detail-page.data-v-6b23c96c {
+  min-height: 100vh;
+  background: #FAF7F2;
+  display: flex;
+  flex-direction: column;
+}
+.detail-page__scroll.data-v-6b23c96c {
+  flex: 1;
+}
+.detail-page__status-card.data-v-6b23c96c {
+  background: #FF6B35;
+  margin: 16rpx 24rpx;
+  border-radius: 26rpx;
+  padding: 40rpx 32rpx;
+}
+.detail-page__status-text.data-v-6b23c96c {
+  display: block;
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+.detail-page__status-sub.data-v-6b23c96c {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.85);
+}
+.detail-page__card.data-v-6b23c96c {
+  background: #FFFFFF;
+  border-radius: 26rpx;
+  padding: 28rpx;
+  margin: 16rpx 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+}
+.detail-page__card-title.data-v-6b23c96c {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 16rpx;
+}
+.detail-page__row.data-v-6b23c96c {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+.detail-page__row--total.data-v-6b23c96c {
+  padding-top: 16rpx;
+  margin-top: 8rpx;
+  margin-bottom: 0;
+  border-top: 1rpx solid #F0F0F0;
+}
+.detail-page__label.data-v-6b23c96c {
+  font-size: 26rpx;
+  color: #666666;
+  flex-shrink: 0;
+}
+.detail-page__value.data-v-6b23c96c {
+  font-size: 26rpx;
+  color: #333333;
+  text-align: right;
+  max-width: 420rpx;
+}
+.detail-page__addr.data-v-6b23c96c {
+  line-height: 1.5;
+}
+.detail-page__dish-row.data-v-6b23c96c {
+  display: flex;
+  justify-content: space-between;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #F8F8F8;
+}
+.detail-page__dish-row.data-v-6b23c96c:last-of-type {
+  border-bottom: none;
+}
+.detail-page__dish-name.data-v-6b23c96c {
+  font-size: 26rpx;
+  color: #333333;
+}
+.detail-page__dish-price.data-v-6b23c96c {
+  font-size: 26rpx;
+  color: #333333;
+  font-weight: 500;
+}
+.detail-page__label-total.data-v-6b23c96c {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.detail-page__total-price.data-v-6b23c96c {
+  font-size: 38rpx;
+  font-weight: bold;
+  color: #E53935;
+}
+.detail-page__footer.data-v-6b23c96c {
+  background: #FFFFFF;
+  padding: 16rpx 24rpx;
+  border-top: 1rpx solid #F0F0F0;
+  display: flex;
+  gap: 16rpx;
+}
+.detail-page__btn.data-v-6b23c96c {
+  flex: 1;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+}
+.detail-page__btn--primary.data-v-6b23c96c {
+  background: #FF6B35;
+  color: #FFFFFF;
+}
+.detail-page__btn--primary.data-v-6b23c96c:active {
+  background: #D95420;
+}
+.detail-page__btn--secondary.data-v-6b23c96c {
+  background: #FFFFFF;
+  color: #666666;
+  border: 1rpx solid #EEEEEE;
+}
+.detail-page__bottom-space.data-v-6b23c96c {
+  height: 120rpx;
+}

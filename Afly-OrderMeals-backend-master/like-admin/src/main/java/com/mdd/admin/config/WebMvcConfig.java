@@ -1,6 +1,7 @@
 package com.mdd.admin.config;
 
 import com.mdd.admin.LikeAdminInterceptor;
+import com.mdd.admin.LikeAppInterceptor;
 import com.mdd.common.config.GlobalConfig;
 import com.mdd.common.util.YmlUtils;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Resource
     LikeAdminInterceptor likeAdminInterceptor;
 
+    @Resource
+    LikeAppInterceptor likeAppInterceptor;
+
     /**
      * 配置允许跨域
      */
@@ -38,8 +42,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(likeAppInterceptor)
+                .addPathPatterns("/api/front/**");
         registry.addInterceptor(likeAdminInterceptor)
-                .addPathPatterns("/**");
+                .addPathPatterns("/**")
+                .excludePathPatterns("/api/front/**");
     }
 
     /**

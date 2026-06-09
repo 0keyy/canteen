@@ -7,3 +7,7 @@ export function ordersList(params?: any) {
 export function getOrdersCurrent(params?: any) {
     return request.get({ url: '/orders/current', params })
 }
+
+export function ordersDish(params?: { id: number }) {
+    return request.get({ url: '/orders/dish', params })
+}

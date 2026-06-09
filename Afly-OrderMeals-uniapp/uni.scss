@@ -1,0 +1,61 @@
+/* 暖色市井风设计系统 */
+
+/* ===== 主色：暖橙 / 浅橘 / 正红 / 暖黄 ===== */
+$brand-primary: #FF6B35;
+$brand-red: #E53935;
+$brand-orange-light: #FF9F5A;
+$brand-yellow: #FFC107;
+$brand-primary-dark: #E85A24;
+$brand-primary-press: #D95420;
+
+/* ===== 背景 ===== */
+$bg-page: #FAF7F2;
+$bg-warm: #FFF3E8;
+$bg-surface: #FFFFFF;
+$bg-gray: #F5F3F0;
+$bg-input: #F0EEEB;
+$bg-category-active: #FFF0E6;
+
+/* ===== 文字 ===== */
+$text-primary: #333333;
+$text-secondary: #666666;
+$text-desc: #AAAAAA;
+$text-tertiary: #999999;
+$text-white: #FFFFFF;
+$text-price: #E53935;
+
+/* ===== 边框 / 分割 ===== */
+$border-light: #EEEEEE;
+$divider-color: #F0F0F0;
+
+/* ===== 圆角 12~14px → 24~28rpx ===== */
+$radius-card: 26rpx;
+$radius-btn: 999rpx;
+$radius-tag: 999rpx;
+$radius-sm: 16rpx;
+
+/* ===== 阴影 ===== */
+$shadow-card: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+$shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+
+/* ===== 字号 ===== */
+$font-size-desc: 22rpx;
+$font-size-base: 28rpx;
+$font-size-title: 30rpx;
+$font-size-price: 36rpx;
+$font-size-btn: 30rpx;
+
+/* ===== 间距 ===== */
+$spacing-page: 24rpx;
+$spacing-card: 20rpx;
+
+/* ===== 动画 ===== */
+$transition-fast: 0.15s ease;
+
+/* ===== 兼容旧变量 ===== */
+$brand-primary-light: $brand-orange-light;
+$brand-accent: $brand-yellow;
+$bg-primary: $bg-page;
+$primary: $brand-primary;
+$text: $text-primary;
+$gray: $text-tertiary;

@@ -16,8 +16,10 @@ import com.mdd.common.config.GlobalConfig;
 import com.mdd.common.core.PageResult;
 import com.mdd.common.entity.system.SystemAuthDept;
 import com.mdd.common.mapper.system.SystemAuthDeptMapper;
+import com.mdd.common.exception.OperateException;
 import com.mdd.common.util.QRCodeUtil;
 import com.mdd.common.util.TimeUtils;
+import com.mdd.common.util.YmlUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -221,13 +223,17 @@ class SystemAuthDeptServiceImpl implements ISystemAuthDeptService {
     @Override
     public String createQR(Integer id) {
         Integer aid = LikeAdminThreadLocal.getAdminId();
-        String imgUrl = "";
+        String baseUrl = YmlUtils.get("like.h5-base-url");
+        if (baseUrl == null || baseUrl.trim().isEmpty()) {
+            throw new OperateException("请配置 like.h5-base-url（H5 点餐页访问地址）");
+        }
+        baseUrl = baseUrl.trim().replaceAll("/+$", "");
+        String link = baseUrl + "?id=" + aid + "&did=" + id;
         try {
-            imgUrl = QRCodeUtil.createQRCode("http://localhost:8080?id=" + aid + "&did=" + id, 200, 200);
+            return QRCodeUtil.createQRCode(link, 200, 200);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return imgUrl;
     }
 
 }

@@ -1,0 +1,151 @@
+/* 暖色市井风设计系统 */
+/* ===== 主色：暖橙 / 浅橘 / 正红 / 暖黄 ===== */
+/* ===== 背景 ===== */
+/* ===== 文字 ===== */
+/* ===== 边框 / 分割 ===== */
+/* ===== 圆角 12~14px → 24~28rpx ===== */
+/* ===== 阴影 ===== */
+/* ===== 字号 ===== */
+/* ===== 间距 ===== */
+/* ===== 动画 ===== */
+/* ===== 兼容旧变量 ===== */
+.orders-page.data-v-456ecf67 {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #FAF7F2;
+}
+.orders-page__header.data-v-456ecf67 {
+  flex-shrink: 0;
+  background: #FAF7F2;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+.orders-page__title-wrap.data-v-456ecf67 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.orders-page__title.data-v-456ecf67 {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+  line-height: 1.2;
+}
+.orders-page__title-line.data-v-456ecf67 {
+  width: 48rpx;
+  height: 6rpx;
+  background: #FF6B35;
+  border-radius: 3rpx;
+  margin-top: 8rpx;
+}
+.orders-page__content.data-v-456ecf67 {
+  flex: 1;
+  height: 0;
+  padding-top: 8rpx;
+  overflow: hidden;
+}
+.orders-page__empty.data-v-456ecf67 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0 80rpx;
+}
+.orders-page__empty-icon.data-v-456ecf67 {
+  width: 160rpx;
+  height: 160rpx;
+  background: #F8F4F0;
+  border-radius: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32rpx;
+}
+.orders-page__empty-emoji.data-v-456ecf67 {
+  font-size: 72rpx;
+}
+.orders-page__empty-title.data-v-456ecf67 {
+  font-size: 30rpx;
+  color: #999999;
+  margin-bottom: 12rpx;
+}
+.orders-page__empty-desc.data-v-456ecf67 {
+  font-size: 24rpx;
+  color: #BBBBBB;
+}
+.orders-page__bottom-space.data-v-456ecf67 {
+  height: 24rpx;
+}
+.order-card.data-v-456ecf67 {
+  background: #FFFFFF;
+  border-radius: 26rpx;
+  margin: 20rpx 24rpx;
+  padding: 28rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.order-card.data-v-456ecf67:active {
+  opacity: 0.9;
+}
+.order-card__header.data-v-456ecf67 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+.order-card__store.data-v-456ecf67 {
+  display: flex;
+  align-items: center;
+}
+.order-card__store-name.data-v-456ecf67 {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.order-card__arrow.data-v-456ecf67 {
+  font-size: 30rpx;
+  color: #999999;
+  margin-left: 8rpx;
+}
+.order-card__status.data-v-456ecf67 {
+  font-size: 26rpx;
+  color: #E53935;
+  font-weight: 500;
+}
+.order-card__status--paid.data-v-456ecf67 {
+  color: #4CAF50;
+}
+.order-card__status--cancelled.data-v-456ecf67 {
+  color: #999999;
+}
+.order-card__body.data-v-456ecf67 {
+  padding-top: 20rpx;
+}
+.order-card__amount-row.data-v-456ecf67 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.order-card__amount-label.data-v-456ecf67 {
+  font-size: 24rpx;
+  color: #999999;
+}
+.order-card__amount.data-v-456ecf67 {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+}
+.order-card__time.data-v-456ecf67 {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #999999;
+}
+.order-card__pickup.data-v-456ecf67 {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #E53935;
+  font-weight: 500;
+}

@@ -12,10 +12,13 @@ public class OrdersDish implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(value="id", type= IdType.AUTO)
-    private Integer id;         // 主键
-    private Integer orderId;    //订单id
-    private Integer dishId;     //菜品id
-    private Integer quantity;   //菜品数量
-    private BigDecimal amount;  //金额
+    private Integer id;
+    private Integer orderId;
+    private Integer dishId;
+    private Integer quantity;
+    private BigDecimal amount;
+    private String dishName;
+    private String dishImage;
+    private String remark;
     private Long createTime;
 }

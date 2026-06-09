@@ -16,4 +16,9 @@ public class ShopConfigVo implements Serializable {
     private String image;
     private Integer status;
     private Integer prePay;
+    private Integer takeoutEnable;
+    private Integer deliveryEnable;
+    private java.math.BigDecimal deliveryFee;
+    private java.math.BigDecimal minOrderAmount;
+    private java.math.BigDecimal deliveryRadius;
 }

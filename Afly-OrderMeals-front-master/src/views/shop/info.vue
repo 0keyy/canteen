@@ -50,18 +50,48 @@
                 <el-form-item label="店铺状态" prop="status">
                     <el-switch v-model="formData.status" :active-value="1" :inactive-value="0" />
                 </el-form-item>
-                <!-- <el-form-item label="网站logo" prop="logo">
-                    <div>
-                        <material-picker v-model="formData.logo" :limit="1" />
-                        <div class="form-tips">建议尺寸：200*200像素，支持jpg，jpeg，png格式</div>
-                    </div>
+            </el-card>
+            <el-card shadow="never" class="!border-none mt-4">
+                <div class="text-xl font-medium mb-[20px]">外卖设置</div>
+                <el-form-item label="开启外卖" prop="deliveryEnable">
+                    <el-switch v-model="formData.deliveryEnable" :active-value="1" :inactive-value="0" />
+                    <div class="form-tips">开启后，小程序首页将显示「外卖配送」入口</div>
                 </el-form-item>
-                <el-form-item label="登录页广告图" prop="backdrop">
-                    <div>
-                        <material-picker v-model="formData.backdrop" :limit="1" />
-                        <div class="form-tips">建议尺寸：400*400像素，支持jpg，jpeg，png格式</div>
-                    </div>
-                </el-form-item> -->
+                <template v-if="formData.deliveryEnable === 1">
+                    <el-form-item label="配送费(元)" prop="deliveryFee">
+                        <div class="w-80">
+                            <el-input-number
+                                v-model="formData.deliveryFee"
+                                :precision="2"
+                                :min="0"
+                                :max="9999"
+                                controls-position="right"
+                            />
+                        </div>
+                    </el-form-item>
+                    <el-form-item label="起送价(元)" prop="minOrderAmount">
+                        <div class="w-80">
+                            <el-input-number
+                                v-model="formData.minOrderAmount"
+                                :precision="2"
+                                :min="0"
+                                :max="9999"
+                                controls-position="right"
+                            />
+                        </div>
+                    </el-form-item>
+                    <el-form-item label="配送半径(km)" prop="deliveryRadius">
+                        <div class="w-80">
+                            <el-input-number
+                                v-model="formData.deliveryRadius"
+                                :precision="2"
+                                :min="0"
+                                :max="100"
+                                controls-position="right"
+                            />
+                        </div>
+                    </el-form-item>
+                </template>
             </el-card>
             <!-- <el-card shadow="never" class="!border-none mt-4">
                 <div class="text-xl font-medium mb-[20px]">前台设置</div>
@@ -140,7 +170,11 @@ const formData = reactive({
     notice: '',
     image: '',
     status: '',
-    prePay: ''
+    prePay: '',
+    deliveryEnable: 0,
+    deliveryFee: 0,
+    minOrderAmount: 0,
+    deliveryRadius: 5
 })
 
 // 表单验证
@@ -217,6 +251,12 @@ const getData = async () => {
         //@ts-ignore
         formData[key] = data[key]
     }
+    if (formData.deliveryEnable === '' || formData.deliveryEnable == null) {
+        formData.deliveryEnable = 0
+    }
+    if (formData.deliveryFee == null) formData.deliveryFee = 0
+    if (formData.minOrderAmount == null) formData.minOrderAmount = 0
+    if (formData.deliveryRadius == null) formData.deliveryRadius = 5
 }
 
 // 保存店铺信息

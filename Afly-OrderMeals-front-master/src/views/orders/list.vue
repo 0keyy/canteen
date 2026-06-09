@@ -7,6 +7,9 @@
                         <el-option label="全部" value />
                         <el-option label="后台点单" value="0" />
                         <el-option label="扫码点单" value="1" />
+                        <el-option label="小程序堂食自取" value="2" />
+                        <el-option label="外带自取" value="3" />
+                        <el-option label="外卖配送" value="4" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="订单状态" class="w-[280px]">
@@ -57,7 +60,7 @@
                 <el-table-column
                     label="类型"
                     prop="type"
-                    :formatter="(row) => (row.type == 0 ? '后台点单' : '扫码点单')"
+                    :formatter="(row) => formatOrderType(row)"
                 ></el-table-column>
                 <el-table-column
                     label="状态"
@@ -69,22 +72,66 @@
                 ></el-table-column>
                 <el-table-column label="结账时间" prop="checkoutTime"></el-table-column>
                 <el-table-column label="创建时间" prop="createTime"></el-table-column>
-                <el-table-column label="操作" width="120" fixed="right"
-                    ><template #default="{ row }">
-                        <el-button type="primary" link :v-text="row.id"> 查看已点菜品 </el-button>
-                    </template></el-table-column
-                >
+                <el-table-column label="操作" width="120" fixed="right">
+                    <template #default="{ row }">
+                        <el-button type="primary" link @click="handleViewDishes(row)">
+                            查看已点菜品
+                        </el-button>
+                    </template>
+                </el-table-column>
             </el-table>
             <div class="flex justify-end mt-4">
                 <pagination v-model="pager" @change="getLists" />
             </div>
         </el-card>
+        <el-dialog v-model="dishDialogVisible" title="已点菜品" width="520px">
+            <el-table v-loading="dishLoading" :data="dishList" empty-text="暂无菜品">
+                <el-table-column label="菜品名称" prop="name" min-width="160" />
+                <el-table-column label="数量" prop="number" width="80" />
+                <el-table-column label="单价" prop="amount" width="100" />
+            </el-table>
+        </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ordersList } from '@/api/orders'
+import { ordersDish, ordersList } from '@/api/orders'
 import { usePaging } from '@/hooks/usePaging'
+
+const ORDER_TYPE_MAP: Record<number, string> = {
+    0: '后台点单',
+    1: '扫码点单',
+    2: '小程序堂食自取',
+    3: '外带自取',
+    4: '外卖配送'
+}
+
+const formatOrderType = (row: { type?: number; diningMode?: number; source?: number }) => {
+    if (row.type != null && ORDER_TYPE_MAP[row.type]) {
+        return ORDER_TYPE_MAP[row.type]
+    }
+    if (row.source === 2 || row.source === 3) {
+        if (row.diningMode === 3) return '外卖配送'
+        if (row.diningMode === 1) return '小程序堂食自取'
+        if (row.diningMode === 2) return '外带自取'
+    }
+    return '扫码点单'
+}
+
+const dishDialogVisible = ref(false)
+const dishLoading = ref(false)
+const dishList = ref<any[]>([])
+
+const handleViewDishes = async (row: { id: number }) => {
+    dishDialogVisible.value = true
+    dishLoading.value = true
+    dishList.value = []
+    try {
+        dishList.value = await ordersDish({ id: row.id })
+    } finally {
+        dishLoading.value = false
+    }
+}
 
 const createTime = ref()
 const checkoutTime = ref()

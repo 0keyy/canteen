@@ -27,6 +27,10 @@ module.exports = {
     }
   },
   devServer: {
+    // 监听所有网卡，局域网内其他设备可用 http://<本机局域网IP>:端口 访问
+    host: '0.0.0.0',
+    // Vue CLI 3 / webpack-dev-server：用 IP 访问时避免 Invalid Host header
+    disableHostCheck: true,
     before(app) {
       app.get('/api/seller', function (req, res) {
         res.json({

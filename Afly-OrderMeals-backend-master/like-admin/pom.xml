@@ -23,12 +23,12 @@
             <artifactId>like-common</artifactId>
         </dependency>
 
-        <!-- 代码生成 -->
-        <dependency>
-            <groupId>org.mdd</groupId>
-            <artifactId>like-generator</artifactId>
-            <version>1.0.0</version>
-        </dependency>
+<!--        &lt;!&ndash; 代码生成 &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.mdd</groupId>-->
+<!--            <artifactId>like-generator</artifactId>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
 
         <!-- 验证码 -->
         <dependency>

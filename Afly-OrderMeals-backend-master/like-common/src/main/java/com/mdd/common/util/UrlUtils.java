@@ -28,11 +28,20 @@ public class UrlUtils {
             return "";
         }
 
-        if(url.indexOf("/") != 0) {
+        url = url.trim();
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+            return url;
+        }
+
+        if (url.indexOf("/") != 0) {
             url = "/" + url;
         }
 
         if (url.startsWith("/api/static/")) {
+            return RequestUtils.uri() + url;
+        }
+
+        if (url.startsWith("/" + uploadPrefix + "/")) {
             return RequestUtils.uri() + url;
         }
 
@@ -63,6 +72,32 @@ public class UrlUtils {
             return "";
         }
 
+        url = url.trim();
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+            String marker = "/" + uploadPrefix + "/";
+            int idx = url.indexOf(marker);
+            if (idx >= 0) {
+                return url.substring(idx + marker.length());
+            }
+            idx = url.indexOf("/api/static/");
+            if (idx >= 0) {
+                return url.substring(idx + "/api/static/".length());
+            }
+            return url;
+        }
+
+        if (url.startsWith("/" + uploadPrefix + "/")) {
+            return url.substring(("/" + uploadPrefix + "/").length());
+        }
+
+        if (url.startsWith(uploadPrefix + "/")) {
+            return url.substring((uploadPrefix + "/").length());
+        }
+
+        if (url.startsWith("/api/static/")) {
+            return url.substring("/api/static/".length());
+        }
+
         String engine = ConfigUtils.get("storage", "default", "local");
         engine = engine.equals("") ? "local" : engine;
         if (engine.equals("local")) {
@@ -73,7 +108,7 @@ public class UrlUtils {
         Map<String, String> config = ConfigUtils.getMap("storage", engine);
         if (config != null) {
             return url.replace(config.getOrDefault("domain", ""), "")
-                    .replace( "/" + uploadPrefix + "/", "");
+                    .replace("/" + uploadPrefix + "/", "");
         }
 
         return url;

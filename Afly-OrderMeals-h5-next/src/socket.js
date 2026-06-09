@@ -1,4 +1,4 @@
-const url = 'ws://localhost:8082/clientSocket/'
+const url = 'ws://192.168.2.17:8082/clientSocket/'
 export let socketClient = {
     /** @type {WebSocket | null} 未 init 前为 null，禁止写成 ''，否则会被当成 string 误设 onmessage */
     socket: null,

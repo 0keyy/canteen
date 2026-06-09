@@ -1,0 +1,37 @@
+{
+  "name": "点餐小程序",
+  "appid": "__UNI__ORDERMEALS",
+  "description": "线上点餐",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "minified": true,
+      "ignoreDevUnusedFiles": false,
+      "ignoreUploadUnusedFiles": false,
+      "compileHotReLoad": false
+    },
+    "usingComponents": true,
+    "permission": {
+      "scope.userLocation": {
+        "desc": "用于外卖配送定位"
+      }
+    }
+  },
+  "mp-alipay": {
+    "usingComponents": true
+  },
+  "app-plus": {
+    "distribute": {
+      "android": {
+        "permissions": []
+      },
+      "ios": {}
+    }
+  },
+  "vueVersion": "3"
+}

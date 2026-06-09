@@ -15,6 +15,11 @@ public interface IDecoratePageService {
     DecoratePageVo detail(Integer id);
 
     /**
+     * 小程序页面装修详情（图片转绝对路径）
+     */
+    DecoratePageVo detailForApp(Integer id);
+
+    /**
      * 页面装修保存
      *
      * @author fzr

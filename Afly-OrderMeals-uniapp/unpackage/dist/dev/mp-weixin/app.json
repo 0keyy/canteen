@@ -1,0 +1,52 @@
+{
+  "pages": [
+    "pages/login/index",
+    "pages/index/index",
+    "pages/menu/index",
+    "pages/cart/confirm",
+    "pages/address/list",
+    "pages/address/edit",
+    "pages/order/list",
+    "pages/order/detail",
+    "pages/mine/index"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "点餐",
+    "navigationBarBackgroundColor": "#FAF7F2",
+    "backgroundColor": "#FAF7F2",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF6B35",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/tabbar/icon.png",
+        "selectedIconPath": "static/tabbar/icon-active.png"
+      },
+      {
+        "pagePath": "pages/order/list",
+        "text": "订单",
+        "iconPath": "static/tabbar/icon.png",
+        "selectedIconPath": "static/tabbar/icon-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "static/tabbar/icon.png",
+        "selectedIconPath": "static/tabbar/icon-active.png"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于外卖配送定位"
+    }
+  },
+  "usingComponents": {}
+}

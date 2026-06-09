@@ -154,12 +154,46 @@ const handleAdd = async (id?: number) => {
     editRef.value?.open('add')
 }
 
+/** data URL 过长时 window.open(data:...) 常见空白页，用 Blob URL 打开 */
+const openDataUrlInNewTab = (dataUrl: string) => {
+    const m = /^data:([^;]+);base64,(.+)$/.exec(dataUrl)
+    if (!m) {
+        const w = window.open()
+        if (w) {
+            w.document.write(
+                `<!DOCTYPE html><html><head><meta charset="utf-8"><title>二维码</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f5f5f5"><img src="${dataUrl.replace(/"/g, '&quot;')}" alt="二维码" style="max-width:100%;height:auto" /></body></html>`
+            )
+            w.document.close()
+        }
+        return
+    }
+    const bytes = Uint8Array.from(atob(m[2]), (c) => c.charCodeAt(0))
+    const blob = new Blob([bytes], { type: m[1] })
+    const url = URL.createObjectURL(blob)
+    const opened = window.open(url)
+    if (opened) {
+        opened.addEventListener('beforeunload', () => URL.revokeObjectURL(url))
+        setTimeout(() => URL.revokeObjectURL(url), 120_000)
+    } else {
+        URL.revokeObjectURL(url)
+        feedback.msgError('弹窗被拦截，请允许本站弹出窗口')
+    }
+}
+
 const handleCreate = (id?: number) => {
     feedback.loading('正在生成...')
-    createQr({ id: id }).then((res) => {
-        feedback.closeLoading()
-        window.open(res)
-    })
+    createQr({ id: id })
+        .then((res: string) => {
+            feedback.closeLoading()
+            if (!res) {
+                feedback.msgError('二维码生成失败')
+                return
+            }
+            openDataUrlInNewTab(res)
+        })
+        .catch(() => {
+            feedback.closeLoading()
+        })
     console.log('创建桌号二维码' + id)
 }
 

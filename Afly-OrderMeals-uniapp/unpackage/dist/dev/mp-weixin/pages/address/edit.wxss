@@ -1,0 +1,58 @@
+/* 暖色市井风设计系统 */
+/* ===== 主色：暖橙 / 浅橘 / 正红 / 暖黄 ===== */
+/* ===== 背景 ===== */
+/* ===== 文字 ===== */
+/* ===== 边框 / 分割 ===== */
+/* ===== 圆角 12~14px → 24~28rpx ===== */
+/* ===== 阴影 ===== */
+/* ===== 字号 ===== */
+/* ===== 间距 ===== */
+/* ===== 动画 ===== */
+/* ===== 兼容旧变量 ===== */
+.edit-page.data-v-dcb1f0d8 {
+  min-height: 100vh;
+  background: #FAF7F2;
+  padding: 16rpx 0 120rpx;
+}
+.edit-page__card.data-v-dcb1f0d8 {
+  background: #FFFFFF;
+  border-radius: 26rpx;
+  margin: 16rpx 24rpx;
+  padding: 8rpx 28rpx 28rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.edit-page__input.data-v-dcb1f0d8 {
+  padding: 28rpx 0;
+  border-bottom: 1rpx solid #F0F0F0;
+  font-size: 28rpx;
+  color: #333333;
+}
+.edit-page__default-row.data-v-dcb1f0d8 {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+.edit-page__default-text.data-v-dcb1f0d8 {
+  font-size: 28rpx;
+  color: #333333;
+}
+.edit-page__footer.data-v-dcb1f0d8 {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #FFFFFF;
+  padding: 16rpx 24rpx;
+  border-top: 1rpx solid #F0F0F0;
+}
+.edit-page__save-btn.data-v-dcb1f0d8 {
+  background: #FF6B35;
+  color: #FFFFFF;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+}
+.edit-page__save-btn.data-v-dcb1f0d8:active {
+  background: #D95420;
+}

@@ -34,7 +34,8 @@ public class ShopConfigServiceImpl implements IShopConfigService {
             shopConfigVo.setImage(UrlUtils.toAbsoluteUrl("/api/static/default_avatar.png"));
             return shopConfigVo;
         }
-        BeanUtils.copyProperties(shopConfig,shopConfigVo);
+        BeanUtils.copyProperties(shopConfig, shopConfigVo);
+        shopConfigVo.setImage(UrlUtils.toAbsoluteUrl(shopConfig.getImage()));
         return shopConfigVo;
     }
 
@@ -42,7 +43,10 @@ public class ShopConfigServiceImpl implements IShopConfigService {
     public void save(ShopConfigValidate shopConfigValidate) {
         ShopConfig shopConfig = new ShopConfig();
         shopConfig.setAid(LikeAdminThreadLocal.getAdminId());
-        BeanUtils.copyProperties(shopConfigValidate,shopConfig);
+        BeanUtils.copyProperties(shopConfigValidate, shopConfig);
+        if (shopConfigValidate.getImage() != null) {
+            shopConfig.setImage(UrlUtils.toRelativeUrl(shopConfigValidate.getImage()));
+        }
         shopConfig.setUpdateTime(TimeUtils.timestamp());
         shopConfigMapper.updateById(shopConfig);
     }

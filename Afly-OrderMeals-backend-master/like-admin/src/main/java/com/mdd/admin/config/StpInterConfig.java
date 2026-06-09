@@ -29,6 +29,9 @@ public class StpInterConfig implements StpInterface {
      */
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
+        if (StpUserUtil.TYPE.equals(loginType)) {
+            return Collections.emptyList();
+        }
         List<Integer> roleIds  = LikeAdminThreadLocal.getRoleId();
         List<String> perms = new LinkedList<>();
 
@@ -55,6 +58,9 @@ public class StpInterConfig implements StpInterface {
      */
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
+        if (StpUserUtil.TYPE.equals(loginType)) {
+            return Collections.emptyList();
+        }
         return null;
     }
 
