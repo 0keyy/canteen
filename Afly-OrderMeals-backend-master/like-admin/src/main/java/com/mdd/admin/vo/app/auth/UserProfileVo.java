@@ -12,4 +12,16 @@ public class UserProfileVo implements Serializable {
     private String nickname;
     private String avatar;
     private String mobile;
+
+    /** 是否已完成公司认证 */
+    private Boolean companyVerified;
+
+    /** 认证部门名称 */
+    private String companyDeptName;
+
+    /** 若依用户名 */
+    private String companyUserName;
+
+    /** 若依昵称 */
+    private String companyNickName;
 }

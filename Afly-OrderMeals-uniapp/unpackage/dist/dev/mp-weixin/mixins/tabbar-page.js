@@ -8,19 +8,23 @@ const tabbarPageMixin = {
     return {
       tabbarSelected: 0,
       tabbarDefaultColor: "#999999",
-      tabbarSelectedColor: "#FF6B35",
+      tabbarSelectedColor: "#B10A0F",
       tabbarList: utils_tabbar.getDefaultTabbar().list
     };
   },
   methods: {
     setupTabbar(selectedIndex) {
-      utils_tabbar.hideNativeTabBar();
+      var _a;
       this.tabbarSelected = selectedIndex;
+      if (!((_a = this.tabbarList) == null ? void 0 : _a.length)) {
+        this.applyTabbarConfig(utils_tabbar.getDefaultTabbar());
+      }
+      utils_tabbar.hideNativeTabBar();
       this.loadTabbar();
     },
     async loadTabbar() {
       var _a, _b;
-      const cached = common_vendor.index.getStorageSync("tabbarConfig");
+      const cached = utils_tabbar.readTabbarCache();
       if ((_a = cached == null ? void 0 : cached.list) == null ? void 0 : _a.length) {
         this.applyTabbarConfig(cached);
       }
@@ -32,7 +36,7 @@ const tabbarPageMixin = {
             style: (data == null ? void 0 : data.style) || {},
             list
           };
-          common_vendor.index.setStorageSync("tabbarConfig", config);
+          utils_tabbar.writeTabbarCache(config);
           this.applyTabbarConfig(config);
         }
       } catch (e) {
@@ -44,15 +48,14 @@ const tabbarPageMixin = {
     applyTabbarConfig(config) {
       const style = (config == null ? void 0 : config.style) || {};
       this.tabbarDefaultColor = style.defaultColor || "#999999";
-      this.tabbarSelectedColor = style.selectedColor || "#FF6B35";
+      this.tabbarSelectedColor = style.selectedColor || "#B10A0F";
       const list = config.list || utils_tabbar.getDefaultTabbar().list;
       this.tabbarList = list.map((item) => {
-        var _a, _b;
+        const normalized = utils_tabbar.normalizeTabbarItem(item);
         return {
-          ...item,
-          pagePath: utils_tabbar.normalizeTabPath(((_a = item == null ? void 0 : item.link) == null ? void 0 : _a.path) || ((_b = item == null ? void 0 : item.link) == null ? void 0 : _b.url) || (item == null ? void 0 : item.pagePath) || ""),
-          selected: utils_image.resolveImageUrl(item.selected),
-          unselected: utils_image.resolveImageUrl(item.unselected)
+          ...normalized,
+          selected: utils_image.resolveImageUrl(normalized.selected),
+          unselected: utils_image.resolveImageUrl(normalized.unselected)
         };
       });
     },

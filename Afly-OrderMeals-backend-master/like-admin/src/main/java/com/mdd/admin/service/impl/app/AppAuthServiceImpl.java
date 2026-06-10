@@ -18,9 +18,11 @@ import com.mdd.common.util.YmlUtils;
 import com.mdd.admin.config.StpUserUtil;
 import com.mdd.admin.enums.app.ClientEnum;
 import com.mdd.admin.service.app.IAppAuthService;
+import com.mdd.admin.service.app.IAppCompanyAuthService;
 import com.mdd.admin.validate.app.auth.*;
 import com.mdd.admin.vo.app.auth.LoginVo;
 import com.mdd.admin.vo.app.auth.UserProfileVo;
+import com.mdd.admin.vo.app.company.CompanyAuthVo;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,8 @@ public class AppAuthServiceImpl implements IAppAuthService {
     private UserAuthMapper userAuthMapper;
     @Resource
     private UserSessionMapper userSessionMapper;
+    @Resource
+    private IAppCompanyAuthService companyAuthService;
 
     @Override
     @Transactional
@@ -249,6 +253,11 @@ public class AppAuthServiceImpl implements IAppAuthService {
         }
         UserProfileVo vo = new UserProfileVo();
         BeanUtils.copyProperties(user, vo);
+        CompanyAuthVo companyAuth = companyAuthService.status(userId);
+        vo.setCompanyVerified(Boolean.TRUE.equals(companyAuth.getVerified()));
+        vo.setCompanyDeptName(companyAuth.getDeptName());
+        vo.setCompanyUserName(companyAuth.getUserName());
+        vo.setCompanyNickName(companyAuth.getNickName());
         return vo;
     }
 

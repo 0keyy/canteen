@@ -10,41 +10,36 @@ const _sfc_main = {
   data() {
     return {
       navMetrics: utils_navbar.getNavMetrics(),
+      menuButtonRight: 96,
       shop: null,
       aid: utils_config.DEFAULT_SHOP_ID,
       banners: [],
       recommendDishes: [],
       recommendLoading: false,
       shortcuts: [
-        { name: "积分商城", desc: "神秘好物等你来", icon: "🛍️" },
-        { name: "储值优惠", desc: "查看&绑定", icon: "🎁" },
-        { name: "优惠券包", desc: "享多重优惠", icon: "🎫" }
+        { name: "积分商城", desc: "神秘好物等你来", iconClass: "home__icon--points" },
+        { name: "储值优惠", desc: "查看&绑定", iconClass: "home__icon--wallet" },
+        { name: "优惠券包", desc: "享多重优惠", iconClass: "home__icon--coupon" }
       ]
     };
   },
   computed: {
-    headerStyle() {
-      const { headerHeight, statusBarHeight } = this.navMetrics;
+    heroPaddingStyle() {
+      const { statusBarHeight } = this.navMetrics;
       return {
-        height: `${headerHeight}px`,
-        paddingTop: `${statusBarHeight}px`,
-        boxSizing: "border-box"
+        paddingTop: `${statusBarHeight + 10}px`
       };
     },
-    storeBarStyle() {
-      return { height: `${this.navMetrics.navBarHeight}px` };
+    searchRowStyle() {
+      return { paddingRight: `${this.menuButtonRight}px` };
     },
-    storeName() {
-      var _a;
-      return ((_a = this.shop) == null ? void 0 : _a.name) || "粮兴坊";
-    },
-    bannerList() {
-      var _a;
+    displayBanners() {
       if (this.banners.length)
         return this.banners;
-      if ((_a = this.shop) == null ? void 0 : _a.image)
-        return [{ image: this.shop.image }];
-      return [];
+      return [{ image: "" }];
+    },
+    homeRecommendDishes() {
+      return this.recommendDishes.slice(0, 2);
     }
   },
   onLoad() {
@@ -56,13 +51,39 @@ const _sfc_main = {
   onShow() {
     this.updateNavPadding();
     this.setupTabbar(0);
-    this.loadShop();
-    this.loadDecoration();
-    this.loadRecommend();
+    this.loadPageContent();
   },
   methods: {
     updateNavPadding() {
       this.navMetrics = utils_navbar.getNavMetrics();
+      this.menuButtonRight = utils_navbar.getMenuButtonMarginRight(96);
+    },
+    async loadPageContent() {
+      await this.loadShop();
+      await this.loadDecoration();
+      this.loadRecommend();
+    },
+    parsePageWidgets(pageData) {
+      if (!pageData)
+        return [];
+      if (Array.isArray(pageData))
+        return pageData;
+      try {
+        const parsed = JSON.parse(pageData);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    },
+    isWidgetEnabled(enabled) {
+      if (enabled === void 0 || enabled === null)
+        return true;
+      return enabled !== 0 && enabled !== false && enabled !== "0";
+    },
+    normalizeBannerItem(item) {
+      const rawImage = (item == null ? void 0 : item.image) || (item == null ? void 0 : item.img) || (item == null ? void 0 : item.url) || "";
+      const image = utils_image.resolveImageUrl(rawImage);
+      return image ? { ...item, image } : null;
     },
     async loadShop() {
       try {
@@ -76,16 +97,14 @@ const _sfc_main = {
       }
     },
     async loadDecoration() {
-      var _a;
+      var _a, _b;
       try {
         const page = await api_index.decorateApi.page(1);
-        const widgets = JSON.parse((page == null ? void 0 : page.pageData) || "[]");
+        const widgets = this.parsePageWidgets(page == null ? void 0 : page.pageData);
         const bannerWidget = widgets.find((item) => item.name === "banner");
-        if (((_a = bannerWidget == null ? void 0 : bannerWidget.content) == null ? void 0 : _a.enabled) === 1 && Array.isArray(bannerWidget.content.data)) {
-          this.banners = bannerWidget.content.data.filter((item) => item.image).map((item) => ({
-            ...item,
-            image: utils_image.resolveImageUrl(item.image)
-          }));
+        const data = (_a = bannerWidget == null ? void 0 : bannerWidget.content) == null ? void 0 : _a.data;
+        if (bannerWidget && this.isWidgetEnabled((_b = bannerWidget.content) == null ? void 0 : _b.enabled) && Array.isArray(data)) {
+          this.banners = data.map((item) => this.normalizeBannerItem(item)).filter(Boolean);
         } else {
           this.banners = [];
         }
@@ -127,48 +146,59 @@ const _sfc_main = {
         common_vendor.index.navigateTo({ url: "/pages/address/list?select=1" });
         return;
       }
-      common_vendor.index.navigateTo({ url: "/pages/menu/index" });
+      common_vendor.index.switchTab({ url: "/pages/menu/index" });
     },
     goMenu() {
       common_vendor.index.setStorageSync("diningMode", 1);
-      common_vendor.index.navigateTo({ url: "/pages/menu/index" });
+      common_vendor.index.switchTab({ url: "/pages/menu/index" });
     },
     selectSpec() {
       this.goMenu();
     },
-    onShortcutTap() {
+    goSearch() {
+      common_vendor.index.showToast({ title: "搜索功能开发中", icon: "none" });
+    },
+    onShortcutTap(item) {
+      if ((item == null ? void 0 : item.name) === "储值优惠") {
+        common_vendor.index.showToast({ title: "储值功能开发中", icon: "none" });
+        return;
+      }
       common_vendor.index.showToast({ title: "功能开发中", icon: "none" });
     }
   }
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.t($options.storeName),
-    b: common_vendor.s($options.storeBarStyle),
-    c: common_vendor.s($options.headerStyle),
-    d: $options.bannerList.length
-  }, $options.bannerList.length ? {
-    e: common_vendor.f($options.bannerList, (item, index, i0) => {
-      return {
-        a: item.image,
-        b: index
-      };
-    })
-  } : {}, {
-    f: common_vendor.o(($event) => $options.selectMode(1), "2c"),
+    a: common_vendor.o((...args) => $options.goSearch && $options.goSearch(...args), "d0"),
+    b: common_vendor.s($options.searchRowStyle),
+    c: common_vendor.f($options.displayBanners, (item, index, i0) => {
+      return common_vendor.e({
+        a: item.image
+      }, item.image ? {
+        b: item.image
+      } : {}, {
+        c: index
+      });
+    }),
+    d: $options.displayBanners.length > 1,
+    e: $options.displayBanners.length > 0,
+    f: common_vendor.o(($event) => $options.selectMode(1), "0c"),
     g: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
-    h: common_vendor.o(($event) => $options.selectMode(3), "bb"),
-    i: common_vendor.f($data.shortcuts, (item, k0, i0) => {
+    h: common_vendor.o(($event) => $options.selectMode(3), "3e"),
+    i: common_vendor.s($options.heroPaddingStyle),
+    j: common_vendor.f($data.shortcuts, (item, k0, i0) => {
       return {
-        a: common_vendor.t(item.icon),
+        a: common_vendor.n(item.iconClass),
         b: common_vendor.t(item.name),
         c: common_vendor.t(item.desc),
         d: item.name,
         e: common_vendor.o(($event) => $options.onShortcutTap(item), item.name)
       };
     }),
-    j: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "ad"),
-    k: common_vendor.f($data.recommendDishes, (dish, k0, i0) => {
+    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "25"),
+    l: $options.homeRecommendDishes.length
+  }, $options.homeRecommendDishes.length ? {
+    m: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
       return common_vendor.e({
         a: dish.image,
         b: dish.badge
@@ -182,20 +212,20 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         h: dish.id,
         i: common_vendor.o(($event) => $options.selectSpec(dish), dish.id)
       });
-    }),
-    l: !$data.recommendLoading && $data.recommendDishes.length === 0
-  }, !$data.recommendLoading && $data.recommendDishes.length === 0 ? {} : {}, {
-    m: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
-      return common_vendor.e({
-        a: item.selected || item.unselected
-      }, item.selected || item.unselected ? {
-        b: _ctx.tabbarSelected === index ? item.selected : item.unselected
-      } : {}, {
-        c: common_vendor.t(item.name),
-        d: _ctx.tabbarSelected === index ? _ctx.tabbarSelectedColor : _ctx.tabbarDefaultColor,
-        e: index,
+    })
+  } : {}, {
+    n: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
+  }, !$data.recommendLoading && $options.homeRecommendDishes.length === 0 ? {} : {}, {
+    o: common_vendor.o(($event) => $options.onShortcutTap($data.shortcuts[1]), "3c"),
+    p: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+      return {
+        a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
+        b: common_vendor.t(item.name),
+        c: _ctx.tabbarSelected === index ? _ctx.tabbarSelectedColor : _ctx.tabbarDefaultColor,
+        d: index,
+        e: _ctx.tabbarSelected === index ? 1 : "",
         f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
-      });
+      };
     })
   });
 }

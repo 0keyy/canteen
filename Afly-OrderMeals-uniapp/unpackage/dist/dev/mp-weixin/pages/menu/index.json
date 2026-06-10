@@ -1,4 +1,6 @@
 {
   "navigationStyle": "custom",
-  "usingComponents": {}
+  "usingComponents": {
+    "menu-category-sidebar": "../../components/menu-category-sidebar/menu-category-sidebar"
+  }
 }

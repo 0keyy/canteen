@@ -1,25 +1,26 @@
-/* 暖色市井风设计系统 */
-/* ===== 主色：暖橙 / 浅橘 / 正红 / 暖黄 ===== */
+/* 粮兴坊风格设计系统 */
+/* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
-/* ===== 圆角 12~14px → 24~28rpx ===== */
+/* ===== 圆角 ===== */
 /* ===== 阴影 ===== */
 /* ===== 字号 ===== */
 /* ===== 间距 ===== */
 /* ===== 动画 ===== */
+/* 底部自定义 Tab 栏占位高度 */
 /* ===== 兼容旧变量 ===== */
 .edit-page.data-v-dcb1f0d8 {
   min-height: 100vh;
-  background: #FAF7F2;
+  background: #FFFCF8;
   padding: 16rpx 0 120rpx;
 }
 .edit-page__card.data-v-dcb1f0d8 {
   background: #FFFFFF;
-  border-radius: 26rpx;
+  border-radius: 32rpx;
   margin: 16rpx 24rpx;
   padding: 8rpx 28rpx 28rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4rpx 12rpx rgba(112, 21, 16, 0.06);
 }
 .edit-page__input.data-v-dcb1f0d8 {
   padding: 28rpx 0;
@@ -44,15 +45,15 @@
   bottom: 0;
   background: #FFFFFF;
   padding: 16rpx 24rpx;
-  border-top: 1rpx solid #F0F0F0;
+  border-top: 1rpx solid #E8DDD4;
 }
 .edit-page__save-btn.data-v-dcb1f0d8 {
-  background: #FF6B35;
+  background: #B10A0F;
   color: #FFFFFF;
   border-radius: 999rpx;
   font-size: 30rpx;
   font-weight: bold;
 }
 .edit-page__save-btn.data-v-dcb1f0d8:active {
-  background: #D95420;
+  background: #7A070A;
 }

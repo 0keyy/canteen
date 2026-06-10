@@ -56,7 +56,7 @@ export default {
       if (!this.selectMode) return
       uni.setStorageSync('diningMode', 3)
       uni.setStorageSync('addressId', item.id)
-      uni.navigateTo({ url: '/pages/menu/index' })
+      uni.switchTab({ url: '/pages/menu/index' })
     },
     edit(item) {
       const id = item?.id || ''

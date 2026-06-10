@@ -1,13 +1,18 @@
 <script>
 import { decorateApi } from './api/index'
-import { filterTabbarList, getDefaultTabbar } from './utils/tabbar'
+import {
+  filterTabbarList,
+  getDefaultTabbar,
+  readTabbarCache,
+  writeTabbarCache
+} from './utils/tabbar'
 
 async function preloadTabbar() {
   try {
     const data = await decorateApi.tabbar()
     const list = filterTabbarList(data?.list || [])
     if (list.length >= 2) {
-      uni.setStorageSync('tabbarConfig', {
+      writeTabbarCache({
         style: data?.style || getDefaultTabbar().style,
         list
       })
@@ -31,10 +36,10 @@ export default {
 
 <style lang="scss">
 page {
-  background-color: #FAF7F2;
-  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  background-color: $bg-page;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
   font-size: 28rpx;
-  color: #333333;
+  color: $text-primary;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
@@ -44,8 +49,8 @@ view, text, image, scroll-view, swiper {
 }
 
 .price {
-  color: #E53935;
-  font-weight: bold;
+  color: $text-price;
+  font-weight: 900;
   font-size: 36rpx;
 }
 
@@ -55,45 +60,55 @@ view, text, image, scroll-view, swiper {
 
 /* 主按钮 */
 .btn-primary {
-  background: #FF6B35;
-  color: #FFFFFF;
+  background: $brand-primary;
+  color: $text-white;
   border-radius: 999rpx;
-  font-weight: bold;
+  font-weight: 600;
   text-align: center;
-  transition: background 0.15s ease;
+  transition: background $transition-fast;
 }
 
 .btn-primary:active {
-  background: #D95420;
+  background: $brand-primary-press;
 }
 
 .btn-primary--disabled {
   background: #CCCCCC !important;
-  color: #FFFFFF;
+  color: $text-white;
 }
 
 /* 次按钮 */
 .btn-secondary {
-  background: #FFFFFF;
-  color: #666666;
-  border: 1rpx solid #EEEEEE;
+  background: $bg-surface;
+  color: $text-secondary;
+  border: 1rpx solid $border-light;
   border-radius: 999rpx;
   font-weight: 500;
   text-align: center;
 }
 
 .btn-secondary:active {
-  background: #FAFAFA;
+  background: $bg-gray;
+}
+
+.page-tabbar-spacer {
+  height: $tabbar-height;
+  flex-shrink: 0;
 }
 
 .app-tab-bar {
-  flex-shrink: 0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
   width: 100%;
-  height: calc(100rpx + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom);
+  height: $tabbar-height;
+  min-height: 100rpx;
+  padding: 8rpx 16rpx env(safe-area-inset-bottom);
   display: flex;
-  background: #FFFFFF;
-  border-top: 1rpx solid #F0F0F0;
+  background: #FFFCF8;
+  border-top: 1rpx solid $border-light;
   box-sizing: border-box;
 }
 
@@ -103,17 +118,27 @@ view, text, image, scroll-view, swiper {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100rpx;
+  gap: 4rpx;
+  min-height: 88rpx;
+}
+
+.app-tab-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 56rpx;
 }
 
 .app-tab-icon {
   width: 44rpx;
   height: 44rpx;
-  margin-bottom: 4rpx;
+  display: block;
 }
 
 .app-tab-text {
   font-size: 22rpx;
+  font-weight: 600;
   line-height: 1.2;
 }
 </style>

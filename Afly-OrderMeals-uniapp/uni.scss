@@ -1,42 +1,44 @@
-/* 暖色市井风设计系统 */
+/* 粮兴坊风格设计系统 */
 
-/* ===== 主色：暖橙 / 浅橘 / 正红 / 暖黄 ===== */
-$brand-primary: #FF6B35;
-$brand-red: #E53935;
-$brand-orange-light: #FF9F5A;
+/* ===== 主色：正红 / 暖橙 ===== */
+$brand-primary: #B10A0F;
+$brand-red: #B10A0F;
+$brand-orange-light: #FF8B1A;
 $brand-yellow: #FFC107;
-$brand-primary-dark: #E85A24;
-$brand-primary-press: #D95420;
+$brand-primary-dark: #8E080C;
+$brand-primary-press: #7A070A;
 
 /* ===== 背景 ===== */
-$bg-page: #FAF7F2;
-$bg-warm: #FFF3E8;
+$bg-page: #FFFCF8;
+$bg-warm: #FFF0E0;
 $bg-surface: #FFFFFF;
-$bg-gray: #F5F3F0;
-$bg-input: #F0EEEB;
-$bg-category-active: #FFF0E6;
+$bg-gray: #F5F0EA;
+$bg-input: #F5F0EA;
+$bg-category-active: #FFFFFF;
 
 /* ===== 文字 ===== */
-$text-primary: #333333;
-$text-secondary: #666666;
-$text-desc: #AAAAAA;
-$text-tertiary: #999999;
+$text-primary: #1A1410;
+$text-secondary: #7F7368;
+$text-desc: #7F7368;
+$text-tertiary: #A89B90;
 $text-white: #FFFFFF;
-$text-price: #E53935;
+$text-price: #1A1410;
 
 /* ===== 边框 / 分割 ===== */
-$border-light: #EEEEEE;
-$divider-color: #F0F0F0;
+$border-light: #E8DDD4;
+$divider-color: #E8DDD4;
 
-/* ===== 圆角 12~14px → 24~28rpx ===== */
-$radius-card: 26rpx;
+/* ===== 圆角 ===== */
+$radius-card: 32rpx;
+$radius-lg: 48rpx;
 $radius-btn: 999rpx;
 $radius-tag: 999rpx;
 $radius-sm: 16rpx;
 
 /* ===== 阴影 ===== */
-$shadow-card: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
-$shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+$shadow-card: 0 4rpx 12rpx rgba(112, 21, 16, 0.06);
+$shadow-sm: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
+$shadow-hero: 0 48rpx 160rpx -60rpx rgba(112, 21, 16, 0.22);
 
 /* ===== 字号 ===== */
 $font-size-desc: 22rpx;
@@ -52,9 +54,12 @@ $spacing-card: 20rpx;
 /* ===== 动画 ===== */
 $transition-fast: 0.15s ease;
 
+/* 底部自定义 Tab 栏占位高度 */
+$tabbar-height: calc(108rpx + env(safe-area-inset-bottom));
+
 /* ===== 兼容旧变量 ===== */
 $brand-primary-light: $brand-orange-light;
-$brand-accent: $brand-yellow;
+$brand-accent: $brand-orange-light;
 $bg-primary: $bg-page;
 $primary: $brand-primary;
 $text: $text-primary;

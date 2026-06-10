@@ -24,6 +24,26 @@
       "name": "like.captcha.token",
       "type": "java.lang.String",
       "description": "Description for like.captcha.token."
+    },
+    {
+      "name": "like.h5-base-url",
+      "type": "java.lang.String",
+      "description": "H5 ordering page base URL for desk QR codes."
+    },
+    {
+      "name": "like.admin-notify-url",
+      "type": "java.lang.String",
+      "description": "Internal URL for app order seller notifications."
+    },
+    {
+      "name": "like.app-mock-login",
+      "type": "java.lang.Boolean",
+      "description": "Enable mock phone login for app in development."
+    },
+    {
+      "name": "like.app-mock-login-mobile",
+      "type": "java.lang.String",
+      "description": "Default mobile for mock phone login."
     }
   ]
 }

@@ -27,6 +27,7 @@
 
         <mysql-connector.version>8.0.33</mysql-connector.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
+        <dynamic-datasource.version>3.6.1</dynamic-datasource.version>
         <mybatis-plus-join.version>1.2.4</mybatis-plus-join.version>
         <pagehelper.version>1.4.5</pagehelper.version>
 
@@ -53,6 +54,7 @@
 
         <weixin.version>4.4.0</weixin.version>
         <zxing.version>3.3.3</zxing.version>
+        <spring-security-crypto.version>5.5.5</spring-security-crypto.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -79,6 +81,13 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <!-- 动态数据源 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+                <version>${dynamic-datasource.version}</version>
             </dependency>
 
             <!-- MyBatis-Plus-Join -->
@@ -226,6 +235,13 @@
                 <groupId>com.github.binarywang</groupId>
                 <artifactId>weixin-java-miniapp</artifactId>
                 <version>${weixin.version}</version>
+            </dependency>
+
+            <!-- BCrypt 密码校验（若依库） -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-crypto</artifactId>
+                <version>${spring-security-crypto.version}</version>
             </dependency>
 
             <!-- 微信公众号 -->

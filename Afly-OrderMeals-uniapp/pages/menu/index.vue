@@ -1,39 +1,66 @@
 <template>
   <view class="order-page">
     <view class="order-page__header" :style="headerPaddingStyle">
-      <view class="order-page__nav-row" :style="navRowStyle">
-        <view class="order-page__back" @tap="goBack">
-          <text class="order-page__back-icon">‹</text>
-          <text class="order-page__back-text">返回</text>
+      <view class="order-page__search-row" :style="searchRowStyle">
+        <view class="order-page__search" @tap.stop="goSearch">
+          <view class="order-page__search-icon"></view>
+          <text class="order-page__search-text">点击搜索</text>
         </view>
-        <text class="order-page__nav-title">{{ shopName }}</text>
-        <view class="order-page__nav-spacer"></view>
       </view>
-      <view class="order-page__mode-row">
-        <view class="order-page__mode-tag order-page__mode-tag--active">
-          <text class="order-page__mode-text">{{ diningModeText }}</text>
+
+      <view class="order-page__store-row">
+        <view class="order-page__store-info">
+          <view class="order-page__store-name-row">
+            <view class="order-page__store-star"></view>
+            <text class="order-page__store-name">{{ shopName }}</text>
+            <text class="order-page__store-arrow">›</text>
+          </view>
+          <view class="order-page__store-distance">
+            <view class="order-page__pin-icon"></view>
+            <text class="order-page__distance-text">{{ distanceText }}</text>
+          </view>
         </view>
+        <view class="order-page__mode-switch">
+          <view
+            :class="['order-page__mode-btn', diningMode === 1 ? 'order-page__mode-btn--active' : '']"
+            @tap="switchMode(1)"
+          >
+            <text class="order-page__mode-btn-text">自取</text>
+          </view>
+          <view
+            :class="[
+              'order-page__mode-btn',
+              diningMode === 3 ? 'order-page__mode-btn--active' : '',
+              shop && shop.deliveryEnable !== 1 ? 'order-page__mode-btn--disabled' : ''
+            ]"
+            @tap="switchMode(3)"
+          >
+            <text class="order-page__mode-btn-text">外卖</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="order-page__notice">
+        <view class="order-page__notice-left">
+          <view class="order-page__bell-icon"></view>
+          <text class="order-page__notice-text">欢迎光临，很高兴为您服务</text>
+        </view>
+        <text class="order-page__notice-more">门店信息⌄</text>
       </view>
     </view>
 
     <view v-if="loading" class="order-page__loading">加载中...</view>
     <view v-else-if="menu.length === 0" class="order-page__empty">暂无菜品，请先在后台添加菜品分类和菜品</view>
     <view v-else class="order-page__main">
-      <scroll-view scroll-y class="order-page__categories" :show-scrollbar="false">
-        <view
-          v-for="(cate, index) in menu"
-          :key="index"
-          :class="['order-page__category-item', activeIndex === index ? 'order-page__category-item--active' : '']"
-          @click="activeIndex = index"
-        >
-          <text
-            :class="['order-page__category-name', activeIndex === index ? 'order-page__category-name--active' : '']"
-          >{{ cate.name }}</text>
-          <text v-if="cateCount(index) > 0" class="order-page__category-badge">{{ cateCount(index) }}</text>
-        </view>
-      </scroll-view>
+      <menu-category-sidebar
+        :menu="menu"
+        :active-index="activeIndex"
+        :cart-map="cartMap"
+        @select="selectCategory"
+      />
 
       <scroll-view scroll-y class="order-page__dishes" :show-scrollbar="false">
+        <text class="order-page__section-title">{{ currentCategoryName }}</text>
         <view class="order-page__dish-list">
           <view v-for="(food, idx) in currentFoods" :key="food.id" class="menu-card">
             <view class="menu-card__image-wrap">
@@ -51,7 +78,7 @@
                   <view
                     class="menu-card__btn menu-card__btn--minus"
                     v-if="getCount(food.id) > 0"
-                    @click="decFood(food)"
+                    @tap.stop="decFood(food)"
                   >
                     <text class="menu-card__btn-icon">−</text>
                   </view>
@@ -59,7 +86,7 @@
                   <view
                     class="menu-card__btn menu-card__btn--plus"
                     :class="{ 'menu-card__btn--disabled': cartBusy }"
-                    @click="addFood(food)"
+                    @tap.stop="addFood(food)"
                   >
                     <text class="menu-card__btn-icon menu-card__btn-icon--plus">+</text>
                   </view>
@@ -69,31 +96,51 @@
           </view>
         </view>
         <view v-if="currentFoods.length === 0" class="order-page__dish-empty">该分类暂无菜品</view>
+        <view class="order-page__dish-bottom-space"></view>
       </scroll-view>
     </view>
 
     <view
-      class="cart-bar safe-area-bottom"
+      class="cart-bar"
       :class="{ 'cart-bar--disabled': !cartReady || cartItemCount === 0 }"
+      @tap="goConfirm"
     >
-      <view class="cart-bar__left" @click="goConfirm">
-        <view class="cart-bar__icon-wrap">
-          <text class="cart-bar__icon">🛒</text>
-          <view class="cart-bar__badge" v-if="cartItemCount > 0">
-            <text class="cart-bar__badge-text">{{ cartItemCount }}</text>
-          </view>
-        </view>
-        <view class="cart-bar__price-wrap">
-          <text class="cart-bar__label">合计</text>
-          <text class="cart-bar__price">{{ cartSummary }}</text>
+      <view class="cart-bar__bag">
+        <view class="cart-bar__bag-icon"></view>
+        <view class="cart-bar__badge" v-if="cartItemCount > 0">
+          <text class="cart-bar__badge-text">{{ cartItemCount }}</text>
         </view>
       </view>
+      <text class="cart-bar__price">{{ cartSummary }}</text>
       <view
         class="cart-bar__btn"
         :class="{ 'cart-bar__btn--disabled': !cartReady || cartItemCount === 0 }"
-        @click="goConfirm"
       >
-        <text class="cart-bar__btn-text">结算</text>
+        <text class="cart-bar__btn-text">去结算</text>
+      </view>
+    </view>
+
+    <view class="app-tab-bar">
+      <view
+        v-for="(item, index) in tabbarList"
+        :key="index"
+        class="app-tab-item"
+        :class="{ 'app-tab-item--active': tabbarSelected === index }"
+        @tap.stop="switchTabbar(item, index)"
+      >
+        <view class="app-tab-icon-wrap">
+          <image
+            class="app-tab-icon"
+            :src="tabbarSelected === index ? item.selected : item.unselected"
+            mode="aspectFit"
+          />
+        </view>
+        <text
+          class="app-tab-text"
+          :style="{ color: tabbarSelected === index ? tabbarSelectedColor : tabbarDefaultColor }"
+        >
+          {{ item.name }}
+        </text>
       </view>
     </view>
   </view>
@@ -103,12 +150,15 @@
 import { orderApi } from '../../api/index'
 import { DEFAULT_SHOP_ID } from '../../utils/config'
 import { resolveImageUrl } from '../../utils/image'
-import navPageMixin from '../../mixins/nav-page'
+import tabbarPageMixin from '../../mixins/tabbar-page'
+import { getMenuButtonMarginRight, getNavMetrics } from '../../utils/navbar'
 
 export default {
-  mixins: [navPageMixin],
+  mixins: [tabbarPageMixin],
   data() {
     return {
+      navMetrics: getNavMetrics(),
+      menuButtonRight: 96,
       aid: DEFAULT_SHOP_ID,
       shop: null,
       diningMode: 1,
@@ -124,19 +174,23 @@ export default {
   },
   computed: {
     headerPaddingStyle() {
-      return { paddingTop: `${this.navMetrics.statusBarHeight}px` }
+      return { paddingTop: `${this.navMetrics.statusBarHeight + 8}px` }
     },
-    navRowStyle() {
-      return { height: `${this.navMetrics.navBarHeight}px` }
+    searchRowStyle() {
+      return { paddingRight: `${this.menuButtonRight}px` }
     },
     shopName() {
       return this.shop?.name || '粮兴坊'
     },
-    diningModeText() {
-      return { 1: '堂食', 3: '外卖配送' }[this.diningMode] || '堂食'
+    distanceText() {
+      if (this.shop?.distance) return `距离您${this.shop.distance}km`
+      return '欢迎到店用餐'
     },
     currentFoods() {
       return this.menu[this.activeIndex]?.foods || []
+    },
+    currentCategoryName() {
+      return this.menu[this.activeIndex]?.name || '推荐'
     },
     totalPrice() {
       let total = 0
@@ -149,38 +203,61 @@ export default {
       return Object.values(this.cartMap).reduce((sum, item) => sum + item.count, 0)
     },
     cartSummary() {
-      if (!this.cartReady) return '购物车准备中...'
+      if (!this.cartReady) return '¥0.00'
       if (this.cartItemCount === 0) return '¥0.00'
-      return `¥${this.totalPrice}`
+      return `¥ ${this.totalPrice}`
     }
   },
   onLoad() {
     this.diningMode = Number(uni.getStorageSync('diningMode') || 1)
-    this.updateNavMetrics()
+    this.updateNavPadding()
     this.loadShop()
     this.bootstrap()
   },
   onShow() {
-    this.updateNavMetrics()
+    this.updateNavPadding()
+    this.setupTabbar(1)
+    const mode = Number(uni.getStorageSync('diningMode') || 1)
+    if (mode !== this.diningMode) {
+      this.diningMode = mode
+      this.bootstrap()
+      return
+    }
     if (!this.loading && this.cartReady) {
       this.syncCart()
     }
   },
   methods: {
+    updateNavPadding() {
+      this.navMetrics = getNavMetrics()
+      this.menuButtonRight = getMenuButtonMarginRight(96)
+    },
+    selectCategory(index) {
+      this.activeIndex = index
+    },
+    goSearch() {
+      uni.showToast({ title: '搜索功能开发中', icon: 'none' })
+    },
+    async switchMode(mode) {
+      if (mode === this.diningMode) return
+      if (mode === 3 && this.shop && this.shop.deliveryEnable !== 1) {
+        uni.showToast({ title: '暂未开启外卖', icon: 'none' })
+        return
+      }
+      uni.setStorageSync('diningMode', mode)
+      this.diningMode = mode
+      if (mode === 3) {
+        uni.navigateTo({ url: '/pages/address/list?select=1' })
+        return
+      }
+      await this.bootstrap()
+    },
     async loadShop() {
       try {
         this.shop = await orderApi.shop(this.aid)
       } catch (e) {
         this.shop = null
       }
-    },
-    goBack() {
-      const pages = getCurrentPages()
-      if (pages.length > 1) {
-        uni.navigateBack()
-        return
-      }
-      uni.switchTab({ url: '/pages/index/index' })
     },
     foodTag(index) {
       const tags = ['热销', '新品', '特价']
@@ -191,10 +268,6 @@ export default {
     },
     getCount(dishId) {
       return this.cartMap[this.dishKey(dishId)]?.count || 0
-    },
-    cateCount(index) {
-      const foods = this.menu[index]?.foods || []
-      return foods.reduce((sum, food) => sum + this.getCount(food.id), 0)
     },
     findFood(dishId) {
       const targetId = Number(dishId)
@@ -410,87 +483,212 @@ export default {
   background: $bg-page;
 
   &__header {
-    background: $bg-page;
-    padding-bottom: 12rpx;
     flex-shrink: 0;
+    padding: 0 24rpx 24rpx;
+    background: $bg-surface;
     border-bottom: 1rpx solid $divider-color;
   }
 
-  &__nav-row {
+  &__search-row {
+    margin-bottom: 24rpx;
+  }
+
+  &__search {
     display: flex;
     align-items: center;
+    height: 64rpx;
     padding: 0 24rpx;
-    box-sizing: border-box;
+    border: 1rpx solid $border-light;
+    border-radius: 999rpx;
+    background: $bg-surface;
   }
 
-  &__back {
+  &__search-icon {
+    width: 28rpx;
+    height: 28rpx;
+    border: 3rpx solid $text-tertiary;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+    margin-right: 12rpx;
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: 10rpx;
+      height: 3rpx;
+      background: $text-tertiary;
+      border-radius: 2rpx;
+      bottom: -2rpx;
+      right: -6rpx;
+      transform: rotate(45deg);
+    }
+  }
+
+  &__search-text {
+    font-size: 24rpx;
+    font-weight: 600;
+    color: $text-secondary;
+  }
+
+  &__store-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16rpx;
+  }
+
+  &__store-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__store-name-row {
     display: flex;
     align-items: center;
-    min-width: 120rpx;
-    min-height: 64rpx;
-    padding: 0 8rpx;
+    gap: 8rpx;
   }
 
-  &__back:active {
-    opacity: 0.7;
+  &__store-star {
+    width: 28rpx;
+    height: 28rpx;
+    position: relative;
+    flex-shrink: 0;
+
+    &::before {
+      content: '★';
+      color: $brand-primary;
+      font-size: 28rpx;
+      line-height: 1;
+    }
   }
 
-  &__back-icon {
-    color: $text-primary;
-    font-size: 44rpx;
-    font-weight: bold;
-    line-height: 1;
-    margin-right: 4rpx;
-    margin-top: -4rpx;
-  }
-
-  &__back-text {
-    color: $text-secondary;
-    font-size: 28rpx;
-    line-height: 1;
-  }
-
-  &__nav-title {
-    flex: 1;
-    text-align: center;
-    font-size: 32rpx;
-    font-weight: bold;
+  &__store-name {
+    font-size: 36rpx;
+    font-weight: 900;
     color: $text-primary;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 0 16rpx;
   }
 
-  &__nav-spacer {
-    min-width: 120rpx;
+  &__store-arrow {
+    font-size: 28rpx;
+    color: $text-tertiary;
+    flex-shrink: 0;
   }
 
-  &__mode-row {
-    padding: 8rpx 24rpx 0;
+  &__store-distance {
+    display: flex;
+    align-items: center;
+    gap: 6rpx;
+    margin-top: 8rpx;
   }
 
-  &__mode-tag {
-    display: inline-flex;
-    padding: 6rpx 20rpx;
-    border-radius: $radius-tag;
-    background: $bg-surface;
-    border: 1rpx solid $border-light;
-
-    &--active {
-      background: $brand-primary;
-      border-color: $brand-primary;
-    }
+  &__pin-icon {
+    width: 20rpx;
+    height: 20rpx;
+    border: 3rpx solid $text-tertiary;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    flex-shrink: 0;
   }
 
-  &__mode-text {
+  &__distance-text {
     font-size: 22rpx;
     color: $text-secondary;
   }
 
-  &__mode-tag--active &__mode-text {
+  &__mode-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 256rpx;
+    flex-shrink: 0;
+    padding: 4rpx;
+    background: $bg-gray;
+    border-radius: $radius-card;
+  }
+
+  &__mode-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 64rpx;
+    border-radius: 24rpx;
+    transition: background $transition-fast;
+
+    &--active {
+      background: $brand-primary;
+      box-shadow: $shadow-sm;
+    }
+
+    &--disabled {
+      opacity: 0.45;
+    }
+  }
+
+  &__mode-btn-text {
+    font-size: 26rpx;
+    font-weight: 600;
+    color: $text-secondary;
+  }
+
+  &__mode-btn--active &__mode-btn-text {
     color: $text-white;
-    font-weight: bold;
+  }
+
+  &__notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24rpx;
+    padding: 16rpx 24rpx;
+    background: $bg-gray;
+    border-radius: $radius-card;
+  }
+
+  &__notice-left {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__bell-icon {
+    width: 24rpx;
+    height: 24rpx;
+    border: 3rpx solid $brand-primary;
+    border-radius: 4rpx 4rpx 2rpx 2rpx;
+    position: relative;
+    flex-shrink: 0;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -8rpx;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8rpx;
+      height: 8rpx;
+      border: 3rpx solid $brand-primary;
+      border-radius: 50%;
+    }
+  }
+
+  &__notice-text {
+    font-size: 22rpx;
+    color: $text-secondary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__notice-more {
+    font-size: 22rpx;
+    color: $text-secondary;
+    flex-shrink: 0;
+    margin-left: 12rpx;
   }
 
   &__loading,
@@ -513,62 +711,26 @@ export default {
     min-height: 0;
   }
 
-  &__categories {
-    width: 176rpx;
-    height: 100%;
-    background: $bg-gray;
-    flex-shrink: 0;
-  }
-
-  &__category-item {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 32rpx 12rpx;
-    transition: background $transition-fast;
-
-    &--active {
-      background: $bg-category-active;
-    }
-  }
-
-  &__category-name {
-    font-size: 24rpx;
-    color: $text-secondary;
-    text-align: center;
-    line-height: 1.4;
-
-    &--active {
-      color: $text-primary;
-      font-weight: bold;
-    }
-  }
-
-  &__category-badge {
-    position: absolute;
-    top: 10rpx;
-    right: 10rpx;
-    min-width: 28rpx;
-    height: 28rpx;
-    line-height: 28rpx;
-    padding: 0 6rpx;
-    border-radius: 14rpx;
-    background: $brand-red;
-    color: $text-white;
-    font-size: 18rpx;
-    text-align: center;
-  }
-
   &__dishes {
     flex: 1;
     height: 100%;
-    background: $bg-page;
+    background: $bg-surface;
+    padding: 24rpx;
+    box-sizing: border-box;
+  }
+
+  &__section-title {
+    display: block;
+    font-size: 36rpx;
+    font-weight: 900;
+    color: $text-primary;
+    margin-bottom: 24rpx;
   }
 
   &__dish-list {
-    padding: 16rpx 16rpx 8rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 24rpx;
   }
 
   &__dish-empty {
@@ -577,20 +739,22 @@ export default {
     color: $text-tertiary;
     font-size: 26rpx;
   }
+
+  &__dish-bottom-space {
+    height: calc(140rpx + #{$tabbar-height});
+  }
 }
 
 .menu-card {
   display: flex;
-  padding: 20rpx;
-  margin-bottom: 16rpx;
+  padding: 16rpx;
   background: $bg-surface;
   border-radius: $radius-card;
-  box-shadow: $shadow-card;
 
   &__image-wrap {
     position: relative;
-    width: 200rpx;
-    height: 150rpx;
+    width: 176rpx;
+    height: 132rpx;
     flex-shrink: 0;
     border-radius: $radius-sm;
     overflow: hidden;
@@ -618,17 +782,17 @@ export default {
 
   &__info {
     flex: 1;
-    margin-left: 20rpx;
+    margin-left: 16rpx;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 150rpx;
+    min-height: 132rpx;
     overflow: hidden;
   }
 
   &__name {
     font-size: $font-size-base;
-    font-weight: bold;
+    font-weight: 900;
     color: $text-primary;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -657,7 +821,7 @@ export default {
   &__price {
     color: $text-price;
     font-size: $font-size-price;
-    font-weight: bold;
+    font-weight: 900;
   }
 
   &__actions {
@@ -674,11 +838,6 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background $transition-fast;
-
-    &:active {
-      background: $bg-category-active;
-    }
 
     &--disabled {
       opacity: 0.5;
@@ -706,51 +865,68 @@ export default {
 }
 
 .cart-bar {
-  flex-shrink: 0;
+  position: fixed;
+  left: 32rpx;
+  right: 32rpx;
+  bottom: calc(#{$tabbar-height} + 12rpx);
+  z-index: 99;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 16rpx 24rpx;
-  background: $bg-surface;
-  border-top: 1rpx solid $divider-color;
+  gap: 24rpx;
+  padding: 16rpx 16rpx 16rpx 24rpx;
+  background: $text-primary;
+  border-radius: 999rpx;
+  box-shadow: $shadow-hero;
 
   &--disabled {
-    opacity: 0.85;
+    opacity: 0.75;
   }
 
-  &__left {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  &__icon-wrap {
+  &__bag {
     position: relative;
-    width: 72rpx;
-    height: 72rpx;
+    width: 96rpx;
+    height: 96rpx;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 252, 248, 0.1);
     flex-shrink: 0;
   }
 
-  &__icon {
-    font-size: 44rpx;
+  &__bag-icon {
+    width: 40rpx;
+    height: 36rpx;
+    border: 3rpx solid $text-white;
+    border-radius: 8rpx 8rpx 12rpx 12rpx;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -10rpx;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20rpx;
+      height: 10rpx;
+      border: 3rpx solid $text-white;
+      border-bottom: none;
+      border-radius: 10rpx 10rpx 0 0;
+    }
   }
 
   &__badge {
     position: absolute;
     top: 0;
     right: 0;
-    min-width: 32rpx;
-    height: 32rpx;
-    background: $brand-red;
-    border-radius: 16rpx;
+    min-width: 36rpx;
+    height: 36rpx;
+    background: $brand-primary;
+    border-radius: 18rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 6rpx;
+    padding: 0 8rpx;
   }
 
   &__badge-text {
@@ -759,54 +935,32 @@ export default {
     font-weight: bold;
   }
 
-  &__price-wrap {
-    margin-left: 12rpx;
-    display: flex;
-    align-items: baseline;
-    overflow: hidden;
-  }
-
-  &__label {
-    font-size: 24rpx;
-    color: $text-secondary;
-    margin-right: 8rpx;
-  }
-
   &__price {
-    color: $text-price;
-    font-size: 36rpx;
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex: 1;
+    color: $text-white;
+    font-size: 40rpx;
+    font-weight: 900;
   }
 
   &__btn {
     flex-shrink: 0;
-    min-width: 200rpx;
-    height: 80rpx;
-    padding: 0 48rpx;
+    height: 96rpx;
+    padding: 0 56rpx;
     background: $brand-primary;
-    border-radius: $radius-btn;
+    border-radius: 999rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 24rpx;
-    transition: background $transition-fast;
+  }
 
-    &:active {
-      background: $brand-primary-press;
-    }
-
-    &--disabled {
-      background: #CCCCCC;
-    }
+  &__btn--disabled {
+    background: #666666;
   }
 
   &__btn-text {
     color: $text-white;
-    font-size: $font-size-btn;
-    font-weight: bold;
+    font-size: 32rpx;
+    font-weight: 900;
   }
 }
 </style>

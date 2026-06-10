@@ -23,7 +23,7 @@ const _sfc_main = {
         return;
       common_vendor.index.setStorageSync("diningMode", 3);
       common_vendor.index.setStorageSync("addressId", item.id);
-      common_vendor.index.navigateTo({ url: "/pages/menu/index" });
+      common_vendor.index.switchTab({ url: "/pages/menu/index" });
     },
     edit(item) {
       const id = (item == null ? void 0 : item.id) || "";

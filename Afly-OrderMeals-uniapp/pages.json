@@ -23,7 +23,7 @@
       "path": "pages/cart/confirm",
       "style": {
         "navigationBarTitleText": "确认订单",
-        "navigationBarBackgroundColor": "#FAF7F2",
+        "navigationBarBackgroundColor": "#FFFCF8",
         "navigationBarTextStyle": "black"
       }
     },
@@ -31,7 +31,7 @@
       "path": "pages/address/list",
       "style": {
         "navigationBarTitleText": "收货地址",
-        "navigationBarBackgroundColor": "#FAF7F2",
+        "navigationBarBackgroundColor": "#FFFCF8",
         "navigationBarTextStyle": "black"
       }
     },
@@ -39,7 +39,7 @@
       "path": "pages/address/edit",
       "style": {
         "navigationBarTitleText": "编辑地址",
-        "navigationBarBackgroundColor": "#FAF7F2",
+        "navigationBarBackgroundColor": "#FFFCF8",
         "navigationBarTextStyle": "black"
       }
     },
@@ -53,7 +53,7 @@
       "path": "pages/order/detail",
       "style": {
         "navigationBarTitleText": "订单详情",
-        "navigationBarBackgroundColor": "#FAF7F2",
+        "navigationBarBackgroundColor": "#FFFCF8",
         "navigationBarTextStyle": "black"
       }
     },
@@ -62,24 +62,38 @@
       "style": {
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/mine/company-auth",
+      "style": {
+        "navigationBarTitleText": "公司认证",
+        "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black"
+      }
     }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "点餐",
-    "navigationBarBackgroundColor": "#FAF7F2",
-    "backgroundColor": "#FAF7F2",
+    "navigationBarBackgroundColor": "#FFFCF8",
+    "backgroundColor": "#FFFCF8",
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
     "color": "#999999",
-    "selectedColor": "#FF6B35",
+    "selectedColor": "#B10A0F",
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/index/index",
         "text": "首页",
+        "iconPath": "static/tabbar/icon.png",
+        "selectedIconPath": "static/tabbar/icon-active.png"
+      },
+      {
+        "pagePath": "pages/menu/index",
+        "text": "点单",
         "iconPath": "static/tabbar/icon.png",
         "selectedIconPath": "static/tabbar/icon-active.png"
       },

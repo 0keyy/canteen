@@ -13,13 +13,14 @@ if (!Math) {
   "./pages/order/list.js";
   "./pages/order/detail.js";
   "./pages/mine/index.js";
+  "./pages/mine/company-auth.js";
 }
 async function preloadTabbar() {
   try {
     const data = await api_index.decorateApi.tabbar();
     const list = utils_tabbar.filterTabbarList((data == null ? void 0 : data.list) || []);
     if (list.length >= 2) {
-      common_vendor.index.setStorageSync("tabbarConfig", {
+      utils_tabbar.writeTabbarCache({
         style: (data == null ? void 0 : data.style) || utils_tabbar.getDefaultTabbar().style,
         list
       });

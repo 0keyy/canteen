@@ -1,24 +1,35 @@
 import { decorateApi } from '../api/index'
 import { resolveImageUrl } from '../utils/image'
-import { filterTabbarList, getDefaultTabbar, hideNativeTabBar, normalizeTabPath } from '../utils/tabbar'
+import {
+  filterTabbarList,
+  getDefaultTabbar,
+  hideNativeTabBar,
+  normalizeTabPath,
+  normalizeTabbarItem,
+  readTabbarCache,
+  writeTabbarCache
+} from '../utils/tabbar'
 
 export default {
   data() {
     return {
       tabbarSelected: 0,
       tabbarDefaultColor: '#999999',
-      tabbarSelectedColor: '#FF6B35',
+      tabbarSelectedColor: '#B10A0F',
       tabbarList: getDefaultTabbar().list
     }
   },
   methods: {
     setupTabbar(selectedIndex) {
-      hideNativeTabBar()
       this.tabbarSelected = selectedIndex
+      if (!this.tabbarList?.length) {
+        this.applyTabbarConfig(getDefaultTabbar())
+      }
+      hideNativeTabBar()
       this.loadTabbar()
     },
     async loadTabbar() {
-      const cached = uni.getStorageSync('tabbarConfig')
+      const cached = readTabbarCache()
       if (cached?.list?.length) {
         this.applyTabbarConfig(cached)
       }
@@ -30,7 +41,7 @@ export default {
             style: data?.style || {},
             list
           }
-          uni.setStorageSync('tabbarConfig', config)
+          writeTabbarCache(config)
           this.applyTabbarConfig(config)
         }
       } catch (e) {
@@ -42,14 +53,16 @@ export default {
     applyTabbarConfig(config) {
       const style = config?.style || {}
       this.tabbarDefaultColor = style.defaultColor || '#999999'
-      this.tabbarSelectedColor = style.selectedColor || '#FF6B35'
+      this.tabbarSelectedColor = style.selectedColor || '#B10A0F'
       const list = config.list || getDefaultTabbar().list
-      this.tabbarList = list.map((item) => ({
-        ...item,
-        pagePath: normalizeTabPath(item?.link?.path || item?.link?.url || item?.pagePath || ''),
-        selected: resolveImageUrl(item.selected),
-        unselected: resolveImageUrl(item.unselected)
-      }))
+      this.tabbarList = list.map((item) => {
+        const normalized = normalizeTabbarItem(item)
+        return {
+          ...normalized,
+          selected: resolveImageUrl(normalized.selected),
+          unselected: resolveImageUrl(normalized.unselected)
+        }
+      })
     },
     switchTabbar(item, index) {
       const path = normalizeTabPath(item?.link?.path || item?.link?.url || item?.pagePath)

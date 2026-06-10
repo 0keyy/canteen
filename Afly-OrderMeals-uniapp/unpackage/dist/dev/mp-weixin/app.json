@@ -8,24 +8,31 @@
     "pages/address/edit",
     "pages/order/list",
     "pages/order/detail",
-    "pages/mine/index"
+    "pages/mine/index",
+    "pages/mine/company-auth"
   ],
   "window": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "点餐",
-    "navigationBarBackgroundColor": "#FAF7F2",
-    "backgroundColor": "#FAF7F2",
+    "navigationBarBackgroundColor": "#FFFCF8",
+    "backgroundColor": "#FFFCF8",
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
     "color": "#999999",
-    "selectedColor": "#FF6B35",
+    "selectedColor": "#B10A0F",
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/index/index",
         "text": "首页",
+        "iconPath": "static/tabbar/icon.png",
+        "selectedIconPath": "static/tabbar/icon-active.png"
+      },
+      {
+        "pagePath": "pages/menu/index",
+        "text": "点单",
         "iconPath": "static/tabbar/icon.png",
         "selectedIconPath": "static/tabbar/icon-active.png"
       },

@@ -11,6 +11,11 @@ const authApi = {
   profile: () => utils_request.get("/front/auth/profile"),
   logout: () => utils_request.post("/front/auth/logout")
 };
+const companyApi = {
+  deptList: () => utils_request.get("/front/company/dept/list"),
+  status: () => utils_request.get("/front/company/status"),
+  auth: (data) => utils_request.post("/front/company/auth", data)
+};
 const orderApi = {
   shop: (aid) => utils_request.get("/front/order/shop", { aid }),
   menu: (aid) => utils_request.get("/front/order/menu", { aid }),
@@ -44,6 +49,7 @@ const payApi = {
 };
 exports.addressApi = addressApi;
 exports.authApi = authApi;
+exports.companyApi = companyApi;
 exports.decorateApi = decorateApi;
 exports.orderApi = orderApi;
 exports.payApi = payApi;

@@ -3,11 +3,14 @@ const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const utils_config = require("../../utils/config.js");
 const utils_image = require("../../utils/image.js");
-const mixins_navPage = require("../../mixins/nav-page.js");
+const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
+const utils_navbar = require("../../utils/navbar.js");
 const _sfc_main = {
-  mixins: [mixins_navPage.navPageMixin],
+  mixins: [mixins_tabbarPage.tabbarPageMixin],
   data() {
     return {
+      navMetrics: utils_navbar.getNavMetrics(),
+      menuButtonRight: 96,
       aid: utils_config.DEFAULT_SHOP_ID,
       shop: null,
       diningMode: 1,
@@ -23,21 +26,28 @@ const _sfc_main = {
   },
   computed: {
     headerPaddingStyle() {
-      return { paddingTop: `${this.navMetrics.statusBarHeight}px` };
+      return { paddingTop: `${this.navMetrics.statusBarHeight + 8}px` };
     },
-    navRowStyle() {
-      return { height: `${this.navMetrics.navBarHeight}px` };
+    searchRowStyle() {
+      return { paddingRight: `${this.menuButtonRight}px` };
     },
     shopName() {
       var _a;
       return ((_a = this.shop) == null ? void 0 : _a.name) || "粮兴坊";
     },
-    diningModeText() {
-      return { 1: "堂食", 3: "外卖配送" }[this.diningMode] || "堂食";
+    distanceText() {
+      var _a;
+      if ((_a = this.shop) == null ? void 0 : _a.distance)
+        return `距离您${this.shop.distance}km`;
+      return "欢迎到店用餐";
     },
     currentFoods() {
       var _a;
       return ((_a = this.menu[this.activeIndex]) == null ? void 0 : _a.foods) || [];
+    },
+    currentCategoryName() {
+      var _a;
+      return ((_a = this.menu[this.activeIndex]) == null ? void 0 : _a.name) || "推荐";
     },
     totalPrice() {
       let total = 0;
@@ -51,39 +61,63 @@ const _sfc_main = {
     },
     cartSummary() {
       if (!this.cartReady)
-        return "购物车准备中...";
+        return "¥0.00";
       if (this.cartItemCount === 0)
         return "¥0.00";
-      return `¥${this.totalPrice}`;
+      return `¥ ${this.totalPrice}`;
     }
   },
   onLoad() {
     this.diningMode = Number(common_vendor.index.getStorageSync("diningMode") || 1);
-    this.updateNavMetrics();
+    this.updateNavPadding();
     this.loadShop();
     this.bootstrap();
   },
   onShow() {
-    this.updateNavMetrics();
+    this.updateNavPadding();
+    this.setupTabbar(1);
+    const mode = Number(common_vendor.index.getStorageSync("diningMode") || 1);
+    if (mode !== this.diningMode) {
+      this.diningMode = mode;
+      this.bootstrap();
+      return;
+    }
     if (!this.loading && this.cartReady) {
       this.syncCart();
     }
   },
   methods: {
+    updateNavPadding() {
+      this.navMetrics = utils_navbar.getNavMetrics();
+      this.menuButtonRight = utils_navbar.getMenuButtonMarginRight(96);
+    },
+    selectCategory(index) {
+      this.activeIndex = index;
+    },
+    goSearch() {
+      common_vendor.index.showToast({ title: "搜索功能开发中", icon: "none" });
+    },
+    async switchMode(mode) {
+      if (mode === this.diningMode)
+        return;
+      if (mode === 3 && this.shop && this.shop.deliveryEnable !== 1) {
+        common_vendor.index.showToast({ title: "暂未开启外卖", icon: "none" });
+        return;
+      }
+      common_vendor.index.setStorageSync("diningMode", mode);
+      this.diningMode = mode;
+      if (mode === 3) {
+        common_vendor.index.navigateTo({ url: "/pages/address/list?select=1" });
+        return;
+      }
+      await this.bootstrap();
+    },
     async loadShop() {
       try {
         this.shop = await api_index.orderApi.shop(this.aid);
       } catch (e) {
         this.shop = null;
       }
-    },
-    goBack() {
-      const pages = getCurrentPages();
-      if (pages.length > 1) {
-        common_vendor.index.navigateBack();
-        return;
-      }
-      common_vendor.index.switchTab({ url: "/pages/index/index" });
     },
     foodTag(index) {
       const tags = ["热销", "新品", "特价"];
@@ -95,11 +129,6 @@ const _sfc_main = {
     getCount(dishId) {
       var _a;
       return ((_a = this.cartMap[this.dishKey(dishId)]) == null ? void 0 : _a.count) || 0;
-    },
-    cateCount(index) {
-      var _a;
-      const foods = ((_a = this.menu[index]) == null ? void 0 : _a.foods) || [];
-      return foods.reduce((sum, food) => sum + this.getCount(food.id), 0);
     },
     findFood(dishId) {
       const targetId = Number(dishId);
@@ -309,29 +338,36 @@ const _sfc_main = {
     }
   }
 };
+if (!Array) {
+  const _easycom_menu_category_sidebar2 = common_vendor.resolveComponent("menu-category-sidebar");
+  _easycom_menu_category_sidebar2();
+}
+const _easycom_menu_category_sidebar = () => "../../components/menu-category-sidebar/menu-category-sidebar.js";
+if (!Math) {
+  _easycom_menu_category_sidebar();
+}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "f6"),
-    b: common_vendor.t($options.shopName),
-    c: common_vendor.s($options.navRowStyle),
-    d: common_vendor.t($options.diningModeText),
-    e: common_vendor.s($options.headerPaddingStyle),
-    f: $data.loading
+    a: common_vendor.o((...args) => $options.goSearch && $options.goSearch(...args), "a3"),
+    b: common_vendor.s($options.searchRowStyle),
+    c: common_vendor.t($options.shopName),
+    d: common_vendor.t($options.distanceText),
+    e: common_vendor.n($data.diningMode === 1 ? "order-page__mode-btn--active" : ""),
+    f: common_vendor.o(($event) => $options.switchMode(1), "88"),
+    g: common_vendor.n($data.diningMode === 3 ? "order-page__mode-btn--active" : ""),
+    h: common_vendor.n($data.shop && $data.shop.deliveryEnable !== 1 ? "order-page__mode-btn--disabled" : ""),
+    i: common_vendor.o(($event) => $options.switchMode(3), "32"),
+    j: common_vendor.s($options.headerPaddingStyle),
+    k: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    h: common_vendor.f($data.menu, (cate, index, i0) => {
-      return common_vendor.e({
-        a: common_vendor.t(cate.name),
-        b: common_vendor.n($data.activeIndex === index ? "order-page__category-name--active" : ""),
-        c: $options.cateCount(index) > 0
-      }, $options.cateCount(index) > 0 ? {
-        d: common_vendor.t($options.cateCount(index))
-      } : {}, {
-        e: index,
-        f: common_vendor.n($data.activeIndex === index ? "order-page__category-item--active" : ""),
-        g: common_vendor.o(($event) => $data.activeIndex = index, index)
-      });
+    m: common_vendor.o($options.selectCategory, "bd"),
+    n: common_vendor.p({
+      menu: $data.menu,
+      ["active-index"]: $data.activeIndex,
+      ["cart-map"]: $data.cartMap
     }),
-    i: common_vendor.f($options.currentFoods, (food, idx, i0) => {
+    o: common_vendor.t($options.currentCategoryName),
+    p: common_vendor.f($options.currentFoods, (food, idx, i0) => {
       return common_vendor.e({
         a: food.image,
         b: $options.foodTag(idx)
@@ -356,19 +392,28 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         m: food.id
       });
     }),
-    j: $data.cartBusy ? 1 : "",
-    k: $options.currentFoods.length === 0
+    q: $data.cartBusy ? 1 : "",
+    r: $options.currentFoods.length === 0
   }, $options.currentFoods.length === 0 ? {} : {}), {
-    g: $data.menu.length === 0,
-    l: $options.cartItemCount > 0
+    l: $data.menu.length === 0,
+    s: $options.cartItemCount > 0
   }, $options.cartItemCount > 0 ? {
-    m: common_vendor.t($options.cartItemCount)
+    t: common_vendor.t($options.cartItemCount)
   } : {}, {
-    n: common_vendor.t($options.cartSummary),
-    o: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "1f"),
-    p: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    q: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "08"),
-    r: !$data.cartReady || $options.cartItemCount === 0 ? 1 : ""
+    v: common_vendor.t($options.cartSummary),
+    w: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
+    x: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
+    y: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "f8"),
+    z: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+      return {
+        a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
+        b: common_vendor.t(item.name),
+        c: _ctx.tabbarSelected === index ? _ctx.tabbarSelectedColor : _ctx.tabbarDefaultColor,
+        d: index,
+        e: _ctx.tabbarSelected === index ? 1 : "",
+        f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
+      };
+    })
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-1f245baa"]]);

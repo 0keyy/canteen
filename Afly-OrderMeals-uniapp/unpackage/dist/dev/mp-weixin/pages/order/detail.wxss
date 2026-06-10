@@ -1,17 +1,18 @@
-/* 暖色市井风设计系统 */
-/* ===== 主色：暖橙 / 浅橘 / 正红 / 暖黄 ===== */
+/* 粮兴坊风格设计系统 */
+/* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
-/* ===== 圆角 12~14px → 24~28rpx ===== */
+/* ===== 圆角 ===== */
 /* ===== 阴影 ===== */
 /* ===== 字号 ===== */
 /* ===== 间距 ===== */
 /* ===== 动画 ===== */
+/* 底部自定义 Tab 栏占位高度 */
 /* ===== 兼容旧变量 ===== */
 .detail-page.data-v-6b23c96c {
   min-height: 100vh;
-  background: #FAF7F2;
+  background: #FFFCF8;
   display: flex;
   flex-direction: column;
 }
@@ -19,9 +20,9 @@
   flex: 1;
 }
 .detail-page__status-card.data-v-6b23c96c {
-  background: #FF6B35;
+  background: #B10A0F;
   margin: 16rpx 24rpx;
-  border-radius: 26rpx;
+  border-radius: 32rpx;
   padding: 40rpx 32rpx;
 }
 .detail-page__status-text.data-v-6b23c96c {
@@ -38,10 +39,10 @@
 }
 .detail-page__card.data-v-6b23c96c {
   background: #FFFFFF;
-  border-radius: 26rpx;
+  border-radius: 32rpx;
   padding: 28rpx;
   margin: 16rpx 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+  box-shadow: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
 }
 .detail-page__card-title.data-v-6b23c96c {
   font-size: 28rpx;
@@ -101,12 +102,12 @@
 .detail-page__total-price.data-v-6b23c96c {
   font-size: 38rpx;
   font-weight: bold;
-  color: #E53935;
+  color: #1A1410;
 }
 .detail-page__footer.data-v-6b23c96c {
   background: #FFFFFF;
   padding: 16rpx 24rpx;
-  border-top: 1rpx solid #F0F0F0;
+  border-top: 1rpx solid #E8DDD4;
   display: flex;
   gap: 16rpx;
 }
@@ -117,16 +118,16 @@
   font-weight: bold;
 }
 .detail-page__btn--primary.data-v-6b23c96c {
-  background: #FF6B35;
+  background: #B10A0F;
   color: #FFFFFF;
 }
 .detail-page__btn--primary.data-v-6b23c96c:active {
-  background: #D95420;
+  background: #7A070A;
 }
 .detail-page__btn--secondary.data-v-6b23c96c {
   background: #FFFFFF;
-  color: #666666;
-  border: 1rpx solid #EEEEEE;
+  color: #7F7368;
+  border: 1rpx solid #E8DDD4;
 }
 .detail-page__bottom-space.data-v-6b23c96c {
   height: 120rpx;

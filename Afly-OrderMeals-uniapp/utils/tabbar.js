@@ -1,16 +1,25 @@
 const TAB_PAGES = [
   'pages/index/index',
+  'pages/menu/index',
   'pages/order/list',
   'pages/mine/index'
 ]
 
+const TAB_NAME_PATH_MAP = {
+  首页: 'pages/index/index',
+  点单: 'pages/menu/index',
+  订单: 'pages/order/list',
+  我的: 'pages/mine/index'
+}
+
 const DEFAULT_TABBAR = {
   style: {
     defaultColor: '#999999',
-    selectedColor: '#FF6B35'
+    selectedColor: '#B10A0F'
   },
   list: [
     { name: '首页', selected: '', unselected: '', link: { path: '/pages/index/index' } },
+    { name: '点单', selected: '', unselected: '', link: { path: '/pages/menu/index' } },
     { name: '订单', selected: '', unselected: '', link: { path: '/pages/order/list' } },
     { name: '我的', selected: '', unselected: '', link: { path: '/pages/mine/index' } }
   ]
@@ -22,15 +31,39 @@ export function normalizeTabPath(path) {
   return raw.startsWith('/') ? raw.slice(1) : raw
 }
 
+export function resolveTabPagePath(item) {
+  const fromLink = normalizeTabPath(item?.link?.path || item?.link?.url || item?.pagePath || '')
+  if (fromLink) return fromLink
+  return TAB_NAME_PATH_MAP[item?.name] || ''
+}
+
 export function filterTabbarList(list) {
   if (!Array.isArray(list)) return DEFAULT_TABBAR.list
-  const filtered = list
+
+  const mapped = list
     .map((item) => ({
       ...item,
-      pagePath: normalizeTabPath(item?.link?.path || item?.link?.url || '')
+      pagePath: resolveTabPagePath(item)
     }))
     .filter((item) => TAB_PAGES.includes(item.pagePath))
-  return filtered.length >= 2 ? filtered : DEFAULT_TABBAR.list
+
+  if (mapped.length >= 2) {
+    TAB_PAGES.forEach((pagePath, index) => {
+      if (mapped.some((item) => item.pagePath === pagePath)) return
+      const fallback = DEFAULT_TABBAR.list.find(
+        (item) => normalizeTabPath(item.link.path) === pagePath
+      )
+      if (fallback) {
+        mapped.splice(index, 0, {
+          ...fallback,
+          pagePath
+        })
+      }
+    })
+    return mapped
+  }
+
+  return DEFAULT_TABBAR.list
 }
 
 export function getDefaultTabbar() {
@@ -42,4 +75,34 @@ export function getDefaultTabbar() {
 
 export function hideNativeTabBar() {
   uni.hideTabBar({ animation: false, fail: () => {} })
+}
+
+export function normalizeTabbarItem(item) {
+  const link = item?.link || {}
+  const pagePath = resolveTabPagePath(item)
+  return {
+    ...item,
+    pagePath,
+    link: {
+      ...link,
+      path: link.path || link.url || (pagePath ? `/${pagePath}` : '')
+    },
+    selected: item?.selected || item?.selectedIcon || '',
+    unselected: item?.unselected || item?.unselectedIcon || ''
+  }
+}
+
+export const TABBAR_CACHE_VERSION = 2
+
+export function readTabbarCache() {
+  const cached = uni.getStorageSync('tabbarConfig')
+  if (!cached || cached.version !== TABBAR_CACHE_VERSION) return null
+  return cached
+}
+
+export function writeTabbarCache(config) {
+  uni.setStorageSync('tabbarConfig', {
+    version: TABBAR_CACHE_VERSION,
+    ...config
+  })
 }

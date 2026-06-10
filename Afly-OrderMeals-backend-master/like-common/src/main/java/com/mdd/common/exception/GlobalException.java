@@ -7,6 +7,7 @@ import com.mdd.common.enums.HttpEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -47,6 +48,23 @@ public class GlobalException {
     @ResponseBody
     public AjaxResult<Object> handleNoHandlerFoundException(NoHandlerFoundException e){
         return AjaxResult.failed(HttpEnum.REQUEST_404_ERROR.getCode(), e.getMessage());
+    }
+
+    /**
+     * 拦截数据库唯一键冲突
+     */
+    @ResponseStatus(HttpStatus.OK)
+    @ExceptionHandler(DuplicateKeyException.class)
+    @ResponseBody
+    public AjaxResult<Object> handleDuplicateKeyException(DuplicateKeyException e) {
+        String raw = e.getMessage() == null ? "" : e.getMessage();
+        if (raw.contains("uk_ruoyi_user_id")) {
+            return AjaxResult.failed(HttpEnum.FAILED.getCode(), "该若依账号已被其他用户认证，请更换账号");
+        }
+        if (raw.contains("uk_user_id")) {
+            return AjaxResult.failed(HttpEnum.FAILED.getCode(), "您已完成公司认证，无需重复认证");
+        }
+        return AjaxResult.failed(HttpEnum.FAILED.getCode(), "数据已存在，请勿重复操作");
     }
 
     /**

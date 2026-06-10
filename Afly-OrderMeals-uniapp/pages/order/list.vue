@@ -1,42 +1,51 @@
 <template>
   <view class="orders-page">
-    <view class="orders-page__header" :style="headerStyle">
-      <view class="orders-page__title-wrap" :style="titleBarStyle">
-        <text class="orders-page__title">我的订单</text>
-        <view class="orders-page__title-line"></view>
-      </view>
-    </view>
-
     <scroll-view class="orders-page__content" scroll-y :show-scrollbar="false">
-      <view v-if="list.length > 0">
+      <view class="orders-page__header-card">
+        <text class="orders-page__store">{{ shopName }}</text>
+        <text class="orders-page__title">我的订单</text>
+
+        <view v-if="pendingTotal > 0" class="orders-page__pending">
+          <text class="orders-page__pending-title">待提交订单</text>
+          <text class="orders-page__pending-desc">已选菜品合计 ¥ {{ pendingTotal.toFixed(2) }}，可继续确认取餐方式。</text>
+          <view class="orders-page__pending-btn" @tap="goMenu">
+            <text class="orders-page__pending-btn-text">去提交</text>
+            <text class="orders-page__pending-arrow">›</text>
+          </view>
+        </view>
+      </view>
+
+      <view v-if="list.length > 0" class="orders-page__list">
         <view v-for="item in list" :key="item.id" class="order-card" @click="goDetail(item.id)">
-          <view class="order-card__header">
-            <view class="order-card__store">
-              <text class="order-card__store-name">{{ modeText(item.diningMode) }}</text>
-              <text class="order-card__arrow">›</text>
-            </view>
-            <text
-              class="order-card__status"
-              :class="{
-                'order-card__status--paid': item.payStatus === 1,
-                'order-card__status--cancelled': item.status === 3
-              }"
-            >{{ statusText(item) }}</text>
+          <view class="order-card__icon-wrap">
+            <view class="order-card__icon"></view>
           </view>
           <view class="order-card__body">
-            <view class="order-card__amount-row">
-              <text class="order-card__amount-label">订单金额</text>
-              <text class="order-card__amount">¥{{ item.amount || '0.00' }}</text>
+            <view class="order-card__top">
+              <text class="order-card__title">{{ orderTitle(item) }}</text>
+              <text
+                class="order-card__status"
+                :class="{
+                  'order-card__status--paid': item.payStatus === 1,
+                  'order-card__status--cancelled': item.status === 3
+                }"
+              >{{ statusText(item) }}</text>
             </view>
-            <text class="order-card__time">{{ item.createTime }}</text>
-            <text class="order-card__pickup" v-if="item.pickupCode">取餐码：{{ item.pickupCode }}</text>
+            <text class="order-card__meta">{{ item.createTime }} · #{{ item.id }}</text>
+            <view class="order-card__bottom">
+              <text class="order-card__amount">¥{{ item.amount || '0.00' }}</text>
+              <view class="order-card__reorder" @click.stop="reorder(item)">
+                <text class="order-card__reorder-icon">↻</text>
+                <text class="order-card__reorder-text">再来一单</text>
+              </view>
+            </view>
           </view>
         </view>
       </view>
 
       <view class="orders-page__empty" v-else>
         <view class="orders-page__empty-icon">
-          <text class="orders-page__empty-emoji">📋</text>
+          <view class="orders-page__empty-icon-inner"></view>
         </view>
         <text class="orders-page__empty-title">暂无订单</text>
         <text class="orders-page__empty-desc">下单后可在此查看订单状态</text>
@@ -50,14 +59,16 @@
         v-for="(item, index) in tabbarList"
         :key="index"
         class="app-tab-item"
+        :class="{ 'app-tab-item--active': tabbarSelected === index }"
         @tap.stop="switchTabbar(item, index)"
       >
-        <image
-          v-if="item.selected || item.unselected"
-          class="app-tab-icon"
-          :src="tabbarSelected === index ? item.selected : item.unselected"
-          mode="aspectFit"
-        />
+        <view class="app-tab-icon-wrap">
+          <image
+            class="app-tab-icon"
+            :src="tabbarSelected === index ? item.selected : item.unselected"
+            mode="aspectFit"
+          />
+        </view>
         <text
           class="app-tab-text"
           :style="{ color: tabbarSelected === index ? tabbarSelectedColor : tabbarDefaultColor }"
@@ -71,35 +82,49 @@
 
 <script>
 import { orderApi } from '../../api/index'
+import { DEFAULT_SHOP_ID } from '../../utils/config'
 import tabbarPageMixin from '../../mixins/tabbar-page'
-import navPageMixin from '../../mixins/nav-page'
 
 export default {
-  mixins: [tabbarPageMixin, navPageMixin],
+  mixins: [tabbarPageMixin],
   data() {
     return {
-      list: []
-    }
-  },
-  computed: {
-    headerStyle() {
-      const { headerHeight, statusBarHeight } = this.navMetrics
-      return {
-        height: `${headerHeight}px`,
-        paddingTop: `${statusBarHeight}px`,
-        boxSizing: 'border-box'
-      }
-    },
-    titleBarStyle() {
-      return { height: `${this.navMetrics.navBarHeight}px` }
+      list: [],
+      shopName: '粮兴坊',
+      pendingTotal: 0
     }
   },
   onShow() {
-    this.updateNavMetrics()
-    this.setupTabbar(1)
+    this.setupTabbar(2)
+    this.loadShop()
     this.loadList()
+    this.loadPendingCart()
   },
   methods: {
+    async loadShop() {
+      try {
+        const shop = await orderApi.shop(DEFAULT_SHOP_ID)
+        if (shop?.name) this.shopName = shop.name
+      } catch (e) {
+        // keep default
+      }
+    },
+    async loadPendingCart() {
+      try {
+        const has = await orderApi.cartHas(DEFAULT_SHOP_ID)
+        if (!has?.oid || !Array.isArray(has.dish) || has.dish.length === 0) {
+          this.pendingTotal = 0
+          return
+        }
+        let total = 0
+        has.dish.forEach((item) => {
+          total += Number(item.price || 0) * (Number(item.count) || 0)
+        })
+        this.pendingTotal = total
+      } catch (e) {
+        this.pendingTotal = 0
+      }
+    },
     modeText(mode) {
       return { 1: '堂食', 3: '外卖' }[mode] || '订单'
     },
@@ -110,6 +135,9 @@ export default {
       if (item.status === 3) return '已取消'
       return '未知'
     },
+    orderTitle(item) {
+      return `${this.modeText(item.diningMode)}订单`
+    },
     async loadList() {
       try {
         this.list = await orderApi.list()
@@ -119,6 +147,12 @@ export default {
     },
     goDetail(orderId) {
       uni.navigateTo({ url: `/pages/order/detail?orderId=${orderId}` })
+    },
+    goMenu() {
+      uni.switchTab({ url: '/pages/menu/index' })
+    },
+    reorder() {
+      uni.switchTab({ url: '/pages/menu/index' })
     }
   }
 }
@@ -129,42 +163,86 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: $bg-page;
-
-  &__header {
-    flex-shrink: 0;
-    background: $bg-page;
-    border-bottom: 1rpx solid $divider-color;
-  }
-
-  &__title-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-  }
-
-  &__title {
-    font-size: 34rpx;
-    font-weight: bold;
-    color: #333333;
-    line-height: 1.2;
-  }
-
-  &__title-line {
-    width: 48rpx;
-    height: 6rpx;
-    background: $brand-primary;
-    border-radius: 3rpx;
-    margin-top: 8rpx;
-  }
+  background: $bg-gray;
 
   &__content {
     flex: 1;
     height: 0;
-    padding-top: 8rpx;
-    overflow: hidden;
+    padding: 24rpx;
+    box-sizing: border-box;
+  }
+
+  &__header-card {
+    background: $bg-surface;
+    border-radius: $radius-card;
+    padding: 24rpx;
+    box-shadow: $shadow-sm;
+  }
+
+  &__store {
+    display: block;
+    font-size: 22rpx;
+    color: $text-secondary;
+  }
+
+  &__title {
+    display: block;
+    margin-top: 4rpx;
+    font-size: 40rpx;
+    font-weight: 900;
+    color: $text-primary;
+  }
+
+  &__pending {
+    margin-top: 24rpx;
+    padding: 24rpx;
+    border-radius: $radius-card;
+    background: linear-gradient(135deg, $brand-primary 0%, $brand-orange-light 100%);
+  }
+
+  &__pending-title {
+    display: block;
+    font-size: 32rpx;
+    font-weight: 900;
+    color: $text-white;
+  }
+
+  &__pending-desc {
+    display: block;
+    margin-top: 8rpx;
+    font-size: 22rpx;
+    color: rgba(255, 252, 248, 0.9);
+    line-height: 1.5;
+  }
+
+  &__pending-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4rpx;
+    margin-top: 16rpx;
+    padding: 0 32rpx;
+    height: 64rpx;
+    background: $bg-surface;
+    border-radius: 999rpx;
+  }
+
+  &__pending-btn-text {
+    font-size: 24rpx;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  &__pending-arrow {
+    font-size: 28rpx;
+    color: $text-primary;
+    line-height: 1;
+  }
+
+  &__list {
+    margin-top: 24rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 20rpx;
   }
 
   &__empty {
@@ -177,118 +255,163 @@ export default {
   &__empty-icon {
     width: 160rpx;
     height: 160rpx;
-    background: #F8F4F0;
+    background: $bg-surface;
     border-radius: 80rpx;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 32rpx;
+    box-shadow: $shadow-sm;
   }
 
-  &__empty-emoji {
-    font-size: 72rpx;
+  &__empty-icon-inner {
+    width: 48rpx;
+    height: 56rpx;
+    border: 4rpx solid $text-tertiary;
+    border-radius: 6rpx;
+
+    &::before {
+      content: '';
+      display: block;
+      margin: 12rpx auto 0;
+      width: 28rpx;
+      height: 4rpx;
+      background: $text-tertiary;
+      box-shadow: 0 10rpx 0 $text-tertiary, 0 20rpx 0 $text-tertiary;
+    }
   }
 
   &__empty-title {
     font-size: 30rpx;
-    color: #999999;
+    color: $text-secondary;
     margin-bottom: 12rpx;
   }
 
   &__empty-desc {
     font-size: 24rpx;
-    color: #BBBBBB;
+    color: $text-tertiary;
   }
 
   &__bottom-space {
-    height: 24rpx;
+    height: $tabbar-height;
   }
 }
 
 .order-card {
-  background: #FFFFFF;
+  display: flex;
+  gap: 24rpx;
+  background: $bg-surface;
   border-radius: $radius-card;
-  margin: 20rpx 24rpx;
-  padding: 28rpx;
-  box-shadow: $shadow-card;
+  padding: 24rpx;
+  box-shadow: $shadow-sm;
 
   &:active {
-    opacity: 0.9;
+    opacity: 0.92;
   }
 
-  &__header {
+  &__icon-wrap {
+    width: 80rpx;
+    height: 80rpx;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(177, 10, 15, 0.1);
+    border-radius: $radius-card;
+  }
+
+  &__icon {
+    width: 36rpx;
+    height: 44rpx;
+    border: 3rpx solid $brand-primary;
+    border-radius: 4rpx;
+
+    &::before {
+      content: '';
+      display: block;
+      margin: 8rpx auto 0;
+      width: 22rpx;
+      height: 3rpx;
+      background: $brand-primary;
+      box-shadow: 0 8rpx 0 $brand-primary, 0 16rpx 0 $brand-primary;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 20rpx;
-    border-bottom: 1rpx solid #F0F0F0;
+    gap: 12rpx;
   }
 
-  &__store {
-    display: flex;
-    align-items: center;
-  }
-
-  &__store-name {
+  &__title {
+    flex: 1;
     font-size: 30rpx;
-    font-weight: bold;
-    color: #333333;
-  }
-
-  &__arrow {
-    font-size: 30rpx;
-    color: #999999;
-    margin-left: 8rpx;
+    font-weight: 900;
+    color: $text-primary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &__status {
-    font-size: 26rpx;
-    color: $text-price;
-    font-weight: 500;
+    font-size: 22rpx;
+    font-weight: 600;
+    color: $brand-primary;
+    flex-shrink: 0;
 
     &--paid {
       color: #4CAF50;
     }
 
     &--cancelled {
-      color: #999999;
+      color: $text-tertiary;
     }
   }
 
-  &__body {
-    padding-top: 20rpx;
+  &__meta {
+    display: block;
+    margin-top: 8rpx;
+    font-size: 22rpx;
+    color: $text-secondary;
   }
 
-  &__amount-row {
+  &__bottom {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
-  }
-
-  &__amount-label {
-    font-size: 24rpx;
-    color: #999999;
+    margin-top: 16rpx;
   }
 
   &__amount {
-    font-size: 34rpx;
-    font-weight: bold;
-    color: #333333;
+    font-size: 32rpx;
+    font-weight: 900;
+    color: $text-primary;
   }
 
-  &__time {
-    display: block;
-    margin-top: 12rpx;
-    font-size: 24rpx;
-    color: #999999;
+  &__reorder {
+    display: flex;
+    align-items: center;
+    gap: 6rpx;
+    padding: 8rpx 24rpx;
+    border: 1rpx solid $border-light;
+    border-radius: 999rpx;
   }
 
-  &__pickup {
-    display: block;
-    margin-top: 8rpx;
-    font-size: 24rpx;
-    color: $text-price;
-    font-weight: 500;
+  &__reorder-icon {
+    font-size: 22rpx;
+    color: $text-secondary;
+  }
+
+  &__reorder-text {
+    font-size: 22rpx;
+    font-weight: 600;
+    color: $text-secondary;
   }
 }
 </style>

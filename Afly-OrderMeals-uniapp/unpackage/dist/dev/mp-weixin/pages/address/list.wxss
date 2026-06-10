@@ -1,17 +1,18 @@
-/* 暖色市井风设计系统 */
-/* ===== 主色：暖橙 / 浅橘 / 正红 / 暖黄 ===== */
+/* 粮兴坊风格设计系统 */
+/* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
-/* ===== 圆角 12~14px → 24~28rpx ===== */
+/* ===== 圆角 ===== */
 /* ===== 阴影 ===== */
 /* ===== 字号 ===== */
 /* ===== 间距 ===== */
 /* ===== 动画 ===== */
+/* 底部自定义 Tab 栏占位高度 */
 /* ===== 兼容旧变量 ===== */
 .address-page.data-v-90a3874e {
   min-height: 100vh;
-  background: #FAF7F2;
+  background: #FFFCF8;
   display: flex;
   flex-direction: column;
 }
@@ -36,27 +37,27 @@
 .address-page__footer.data-v-90a3874e {
   background: #FFFFFF;
   padding: 16rpx 24rpx;
-  border-top: 1rpx solid #F0F0F0;
+  border-top: 1rpx solid #E8DDD4;
 }
 .address-page__add-btn.data-v-90a3874e {
-  background: #FF6B35;
+  background: #B10A0F;
   color: #FFFFFF;
   border-radius: 999rpx;
   font-size: 30rpx;
   font-weight: bold;
 }
 .address-page__add-btn.data-v-90a3874e:active {
-  background: #D95420;
+  background: #7A070A;
 }
 .address-page__bottom-space.data-v-90a3874e {
   height: 120rpx;
 }
 .address-card.data-v-90a3874e {
   background: #FFFFFF;
-  border-radius: 26rpx;
+  border-radius: 32rpx;
   padding: 28rpx;
   margin: 16rpx 24rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4rpx 12rpx rgba(112, 21, 16, 0.06);
 }
 .address-card.data-v-90a3874e:active {
   opacity: 0.9;
@@ -76,8 +77,8 @@
   color: #666666;
 }
 .address-card__tag.data-v-90a3874e {
-  background: #FFF0E6;
-  color: #FF6B35;
+  background: #FFFFFF;
+  color: #B10A0F;
   font-size: 20rpx;
   padding: 4rpx 12rpx;
   border-radius: 8rpx;
@@ -101,5 +102,5 @@
   color: #999999;
 }
 .address-card__action--danger .address-card__action-text.data-v-90a3874e {
-  color: #E53935;
+  color: #1A1410;
 }

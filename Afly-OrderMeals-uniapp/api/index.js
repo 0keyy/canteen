@@ -12,6 +12,12 @@ export const authApi = {
   logout: () => post('/front/auth/logout')
 }
 
+export const companyApi = {
+  deptList: () => get('/front/company/dept/list'),
+  status: () => get('/front/company/status'),
+  auth: (data) => post('/front/company/auth', data)
+}
+
 export const orderApi = {
   shop: (aid) => get('/front/order/shop', { aid }),
   menu: (aid) => get('/front/order/menu', { aid }),
