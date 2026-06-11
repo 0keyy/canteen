@@ -13,9 +13,15 @@ export function ordersDish(params?: { id: number }) {
 }
 
 export function ordersCall(orderId: number) {
-    return request.post({ url: '/orders/call', params: { orderId } })
+    return request.post(
+        { url: '/orders/call', params: { orderId } },
+        { isParamsToData: false }
+    )
 }
 
 export function ordersComplete(orderId: number) {
-    return request.post({ url: '/orders/complete', params: { orderId } })
+    return request.post(
+        { url: '/orders/complete', params: { orderId } },
+        { isParamsToData: false }
+    )
 }

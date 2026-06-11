@@ -1,0 +1,63 @@
+/* 粮兴坊风格设计系统 */
+/* ===== 主色：正红 / 暖橙 ===== */
+/* ===== 背景 ===== */
+/* ===== 文字 ===== */
+/* ===== 边框 / 分割 ===== */
+/* ===== 圆角 ===== */
+/* ===== 阴影 ===== */
+/* ===== 字号 ===== */
+/* ===== 间距 ===== */
+/* ===== 动画 ===== */
+/* 底部自定义 Tab 栏占位高度 */
+/* ===== 兼容旧变量 ===== */
+.sidebar.data-v-75257acb {
+  width: 172rpx;
+  height: 100%;
+  background: rgba(245, 240, 234, 0.7);
+  flex-shrink: 0;
+}
+.sidebar__item.data-v-75257acb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 112rpx;
+  padding: 16rpx 12rpx;
+}
+.sidebar__item--active.data-v-75257acb {
+  background: #FFFFFF;
+}
+.sidebar__indicator.data-v-75257acb {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8rpx;
+  height: 48rpx;
+  background: #B10A0F;
+  border-radius: 0 8rpx 8rpx 0;
+}
+.sidebar__name.data-v-75257acb {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #7F7368;
+  text-align: center;
+  line-height: 1.4;
+}
+.sidebar__name--active.data-v-75257acb {
+  color: #B10A0F;
+}
+.sidebar__badge.data-v-75257acb {
+  position: absolute;
+  top: 10rpx;
+  right: 10rpx;
+  min-width: 28rpx;
+  height: 28rpx;
+  line-height: 28rpx;
+  padding: 0 6rpx;
+  border-radius: 14rpx;
+  background: #B10A0F;
+  color: #FFFFFF;
+  font-size: 18rpx;
+  text-align: center;
+}
