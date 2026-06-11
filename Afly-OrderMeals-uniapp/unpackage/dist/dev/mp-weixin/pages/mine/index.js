@@ -27,6 +27,7 @@ const _sfc_main = {
       mobile: "",
       companyVerified: false,
       companyDeptName: "",
+      balance: 0,
       primaryActions: PRIMARY_ACTIONS,
       secondaryActions: SECONDARY_ACTIONS
     };
@@ -52,6 +53,7 @@ const _sfc_main = {
           this.mobile = profile.mobile || this.mobile;
           this.companyVerified = !!profile.companyVerified;
           this.companyDeptName = profile.companyDeptName || "";
+          this.balance = profile.balance != null ? profile.balance : 0;
           common_vendor.index.setStorageSync("companyVerified", this.companyVerified);
           common_vendor.index.setStorageSync("companyDeptName", this.companyDeptName);
         }
@@ -102,9 +104,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.companyVerified && $data.companyDeptName ? {
     e: common_vendor.t($data.companyDeptName)
   } : {}, {
-    f: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "e1"),
-    g: common_vendor.s($options.heroPaddingStyle),
-    h: common_vendor.f($data.primaryActions, (item, k0, i0) => {
+    f: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "61"),
+    g: common_vendor.t($data.balance),
+    h: common_vendor.s($options.heroPaddingStyle),
+    i: common_vendor.f($data.primaryActions, (item, k0, i0) => {
       return {
         a: common_vendor.n(`profile-page__action-icon--${item.icon}`),
         b: common_vendor.t(item.title),
@@ -112,7 +115,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       };
     }),
-    i: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
+    j: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
       return {
         a: common_vendor.n(`profile-page__action-icon--${item.icon}`),
         b: common_vendor.t(item.title),
@@ -120,7 +123,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       };
     }),
-    j: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    k: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),

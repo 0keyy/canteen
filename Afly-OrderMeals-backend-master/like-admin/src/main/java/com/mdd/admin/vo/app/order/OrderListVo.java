@@ -15,5 +15,6 @@ public class OrderListVo implements Serializable {
     private Integer payStatus;
     private String amount;
     private String pickupCode;
+    private Long calledTime;
     private String createTime;
 }

@@ -348,19 +348,19 @@ if (!Math) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.o((...args) => $options.goSearch && $options.goSearch(...args), "a3"),
+    a: common_vendor.o((...args) => $options.goSearch && $options.goSearch(...args), "bd"),
     b: common_vendor.s($options.searchRowStyle),
     c: common_vendor.t($options.shopName),
     d: common_vendor.t($options.distanceText),
     e: common_vendor.n($data.diningMode === 1 ? "order-page__mode-btn--active" : ""),
-    f: common_vendor.o(($event) => $options.switchMode(1), "88"),
+    f: common_vendor.o(($event) => $options.switchMode(1), "d5"),
     g: common_vendor.n($data.diningMode === 3 ? "order-page__mode-btn--active" : ""),
     h: common_vendor.n($data.shop && $data.shop.deliveryEnable !== 1 ? "order-page__mode-btn--disabled" : ""),
-    i: common_vendor.o(($event) => $options.switchMode(3), "32"),
+    i: common_vendor.o(($event) => $options.switchMode(3), "82"),
     j: common_vendor.s($options.headerPaddingStyle),
     k: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    m: common_vendor.o($options.selectCategory, "bd"),
+    m: common_vendor.o($options.selectCategory, "e2"),
     n: common_vendor.p({
       menu: $data.menu,
       ["active-index"]: $data.activeIndex,
@@ -403,7 +403,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     v: common_vendor.t($options.cartSummary),
     w: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
     x: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    y: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "f8"),
+    y: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "5e"),
     z: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,

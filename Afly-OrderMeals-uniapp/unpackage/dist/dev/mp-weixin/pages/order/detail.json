@@ -2,5 +2,7 @@
   "navigationBarTitleText": "订单详情",
   "navigationBarBackgroundColor": "#FFFCF8",
   "navigationBarTextStyle": "black",
-  "usingComponents": {}
+  "usingComponents": {
+    "pay-method-picker": "../../components/pay-method-picker/pay-method-picker"
+  }
 }

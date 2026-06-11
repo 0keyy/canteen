@@ -49,8 +49,10 @@ const _sfc_main = {
     statusText(item) {
       if (item.payStatus === 0 || item.status === 4)
         return "待支付";
+      if (item.status === 1 && Number(item.calledTime) > 0)
+        return "请取餐";
       if (item.status === 1)
-        return "进行中";
+        return "制作中";
       if (item.status === 2)
         return "已完成";
       if (item.status === 3)
@@ -84,7 +86,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: $data.pendingTotal > 0
   }, $data.pendingTotal > 0 ? {
     c: common_vendor.t($data.pendingTotal.toFixed(2)),
-    d: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "4f")
+    d: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "3a")
   } : {}, {
     e: $data.list.length > 0
   }, $data.list.length > 0 ? {

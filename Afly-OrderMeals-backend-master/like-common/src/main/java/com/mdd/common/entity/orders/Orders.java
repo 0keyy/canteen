@@ -40,6 +40,7 @@ public class Orders implements Serializable {
     private String amount;
     private Long createTime;
     private Long checkoutTime;
+    private Long calledTime;
 
     @TableField(exist = false)
     private String deskName;

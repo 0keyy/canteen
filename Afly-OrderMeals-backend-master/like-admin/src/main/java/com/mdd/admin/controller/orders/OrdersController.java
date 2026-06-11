@@ -10,6 +10,7 @@ import com.mdd.common.core.AjaxResult;
 import com.mdd.common.core.PageResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,5 +54,23 @@ public class OrdersController {
     public AjaxResult<List<OrdersDishListVo>> dish(@RequestParam Integer id){
         List<OrdersDishListVo> dishList = ordersServcice.dish(id);
         return AjaxResult.success(dishList);
+    }
+
+    /**
+     * 小程序订单叫号
+     */
+    @PostMapping("/call")
+    public AjaxResult<Object> call(@RequestParam Integer orderId) {
+        ordersServcice.callNumber(orderId);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 小程序订单完成
+     */
+    @PostMapping("/complete")
+    public AjaxResult<Object> complete(@RequestParam Integer orderId) {
+        ordersServcice.complete(orderId);
+        return AjaxResult.success();
     }
 }

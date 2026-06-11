@@ -43,6 +43,7 @@ const decorateApi = {
   page: (id = 1) => utils_request.get("/front/decorate/page", { id })
 };
 const payApi = {
+  methods: (orderId) => utils_request.get("/front/pay/methods", { orderId }),
   create: (data) => utils_request.post("/front/pay/create", data),
   mockSuccess: (outTradeNo) => utils_request.post("/front/pay/mock/success", null, { outTradeNo }),
   status: (outTradeNo) => utils_request.get("/front/pay/status", { outTradeNo })

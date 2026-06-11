@@ -130,7 +130,8 @@ export default {
     },
     statusText(item) {
       if (item.payStatus === 0 || item.status === 4) return '待支付'
-      if (item.status === 1) return '进行中'
+      if (item.status === 1 && Number(item.calledTime) > 0) return '请取餐'
+      if (item.status === 1) return '制作中'
       if (item.status === 2) return '已完成'
       if (item.status === 3) return '已取消'
       return '未知'

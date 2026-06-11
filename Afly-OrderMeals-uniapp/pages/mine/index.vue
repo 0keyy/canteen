@@ -20,16 +20,12 @@
 
         <view class="profile-page__stats">
           <view class="profile-page__stat-item">
-            <text class="profile-page__stat-value">0.00</text>
-            <text class="profile-page__stat-label">积分</text>
+            <text class="profile-page__stat-value">{{ balance }}</text>
+            <text class="profile-page__stat-label">余额</text>
           </view>
           <view class="profile-page__stat-item">
             <text class="profile-page__stat-value">0</text>
             <text class="profile-page__stat-label">优惠券</text>
-          </view>
-          <view class="profile-page__stat-item">
-            <text class="profile-page__stat-value">0</text>
-            <text class="profile-page__stat-label">余额</text>
           </view>
         </view>
 
@@ -146,6 +142,7 @@ export default {
       mobile: '',
       companyVerified: false,
       companyDeptName: '',
+      balance: 0,
       primaryActions: PRIMARY_ACTIONS,
       secondaryActions: SECONDARY_ACTIONS
     }
@@ -171,6 +168,7 @@ export default {
           this.mobile = profile.mobile || this.mobile
           this.companyVerified = !!profile.companyVerified
           this.companyDeptName = profile.companyDeptName || ''
+          this.balance = profile.balance != null ? profile.balance : 0
           uni.setStorageSync('companyVerified', this.companyVerified)
           uni.setStorageSync('companyDeptName', this.companyDeptName)
         }
@@ -330,9 +328,17 @@ export default {
 
   &__stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24rpx;
     margin-top: 32rpx;
     text-align: center;
+  }
+
+  &__stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   &__stat-value {

@@ -24,6 +24,7 @@ public class OrderDetailVo implements Serializable {
     private String contactMobile;
     private String addressSnapshot;
     private String pickupCode;
+    private Long calledTime;
     private Integer deskId;
     private String deskName;
     private String createTime;

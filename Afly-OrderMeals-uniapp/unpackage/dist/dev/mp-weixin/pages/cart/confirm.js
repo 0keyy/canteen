@@ -2,14 +2,18 @@
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const utils_pay_index = require("../../utils/pay/index.js");
+const utils_pay_channels = require("../../utils/pay/channels.js");
+const PayMethodPicker = () => "../../components/pay-method-picker/pay-method-picker.js";
 const _sfc_main = {
+  components: { PayMethodPicker },
   data() {
     return {
       orderId: 0,
       order: null,
       remark: "",
       loading: false,
-      diningMode: 1
+      diningMode: 1,
+      payChannel: utils_pay_channels.DEFAULT_PAY_CHANNEL
     };
   },
   computed: {
@@ -66,10 +70,10 @@ const _sfc_main = {
           orderId: this.orderId,
           remark: this.remark,
           addressId,
-          payChannel: "wxpay",
+          payChannel: this.payChannel,
           payScene: "mp"
         });
-        await utils_pay_index.payOrder(this.orderId, "wxpay", "mp");
+        await utils_pay_index.payOrder(this.orderId, this.payChannel, "mp");
         common_vendor.index.showToast({ title: "支付成功", icon: "success" });
         setTimeout(() => {
           common_vendor.index.redirectTo({ url: `/pages/order/detail?orderId=${this.orderId}` });
@@ -82,6 +86,14 @@ const _sfc_main = {
     }
   }
 };
+if (!Array) {
+  const _easycom_pay_method_picker2 = common_vendor.resolveComponent("pay-method-picker");
+  _easycom_pay_method_picker2();
+}
+const _easycom_pay_method_picker = () => "../../components/pay-method-picker/pay-method-picker.js";
+if (!Math) {
+  _easycom_pay_method_picker();
+}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   var _a;
   return common_vendor.e({
@@ -106,11 +118,16 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       };
     }),
     i: common_vendor.t($options.totalAmount),
-    j: $data.remark,
-    k: common_vendor.o(($event) => $data.remark = $event.detail.value, "5a"),
-    l: common_vendor.t($options.totalAmount),
-    m: common_vendor.t($data.loading ? "提交中..." : "提交并支付"),
-    n: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "3e")
+    j: common_vendor.o(($event) => $data.payChannel = $event, "5b"),
+    k: common_vendor.p({
+      ["order-id"]: $data.orderId,
+      modelValue: $data.payChannel
+    }),
+    l: $data.remark,
+    m: common_vendor.o(($event) => $data.remark = $event.detail.value, "c1"),
+    n: common_vendor.t($options.totalAmount),
+    o: common_vendor.t($data.loading ? "提交中..." : "提交并支付"),
+    p: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "cb")
   }) : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-aaa7ef6e"]]);

@@ -24,4 +24,7 @@ public class UserProfileVo implements Serializable {
 
     /** 若依昵称 */
     private String companyNickName;
+
+    /** 用户余额（认证/月度发放累计） */
+    private Integer balance;
 }

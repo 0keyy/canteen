@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoCo
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
@@ -22,6 +23,7 @@ import java.net.UnknownHostException;
 @ComponentScan(basePackages = {"com.mdd"})
 @MapperScan(basePackages = {"com.mdd.*.mapper"})
 @EnableTransactionManagement
+@EnableScheduling
 @SpringBootApplication(exclude = {RedisRepositoriesAutoConfiguration.class})
 public class LikeAdminApplication {
 

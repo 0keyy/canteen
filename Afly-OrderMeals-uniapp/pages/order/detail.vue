@@ -3,7 +3,12 @@
     <scroll-view class="detail-page__scroll" scroll-y :show-scrollbar="false">
       <view class="detail-page__status-card">
         <text class="detail-page__status-text">{{ statusText }}</text>
-        <text class="detail-page__status-sub" v-if="order.pickupCode">取餐码 {{ order.pickupCode }}</text>
+        <text
+          class="detail-page__status-sub"
+          :class="{ 'detail-page__status-sub--call': isCalled }"
+          v-if="order.pickupCode"
+        >取餐码 {{ order.pickupCode }}</text>
+        <text class="detail-page__status-hint" v-if="isCalled">餐品已备好，请尽快取餐</text>
       </view>
 
       <view class="detail-page__card">
@@ -15,6 +20,13 @@
           <text class="detail-page__label">地址</text>
           <text class="detail-page__value detail-page__addr">{{ formatAddress(order.addressSnapshot) }}</text>
         </view>
+      </view>
+
+      <view
+        v-if="order.payStatus === 0 || order.status === 4"
+        class="detail-page__card"
+      >
+        <pay-method-picker :order-id="orderId" v-model="payChannel" />
       </view>
 
       <view class="detail-page__card">
@@ -49,20 +61,27 @@
 
 <script>
 import { orderApi } from '../../api/index'
-import { payOrder } from '../../utils/pay/index'
+import { payOrder, DEFAULT_PAY_CHANNEL } from '../../utils/pay/index'
+import PayMethodPicker from '../../components/pay-method-picker/pay-method-picker.vue'
 
 export default {
+  components: { PayMethodPicker },
   data() {
     return {
       orderId: 0,
-      order: null
+      order: null,
+      payChannel: DEFAULT_PAY_CHANNEL
     }
   },
   computed: {
+    isCalled() {
+      return this.order && Number(this.order.calledTime) > 0
+    },
     statusText() {
       if (!this.order) return ''
       if (this.order.payStatus === 0 || this.order.status === 4) return '待支付'
-      if (this.order.status === 1) return '进行中'
+      if (this.order.status === 1 && this.isCalled) return '请取餐'
+      if (this.order.status === 1) return '制作中'
       if (this.order.status === 2) return '已完成'
       if (this.order.status === 3) return '已取消'
       return '未知'
@@ -71,6 +90,9 @@ export default {
   onLoad(options) {
     this.orderId = Number(options.orderId)
     this.loadDetail()
+  },
+  onShow() {
+    if (this.orderId) this.loadDetail()
   },
   methods: {
     formatAddress(snapshot) {
@@ -85,8 +107,13 @@ export default {
       this.order = await orderApi.detail(this.orderId)
     },
     async payNow() {
-      await payOrder(this.orderId, 'wxpay', 'mp')
-      this.loadDetail()
+      try {
+        await payOrder(this.orderId, this.payChannel, 'mp')
+        uni.showToast({ title: '支付成功', icon: 'success' })
+        this.loadDetail()
+      } catch (e) {
+        uni.showToast({ title: e.message || e, icon: 'none' })
+      }
     },
     async cancelOrder() {
       await orderApi.cancel(this.orderId, '用户取消')
@@ -126,6 +153,19 @@ export default {
     margin-top: 12rpx;
     font-size: 28rpx;
     color: rgba(255, 255, 255, 0.85);
+
+    &--call {
+      font-size: 40rpx;
+      font-weight: bold;
+      letter-spacing: 4rpx;
+    }
+  }
+
+  &__status-hint {
+    display: block;
+    margin-top: 12rpx;
+    font-size: 24rpx;
+    color: rgba(255, 255, 255, 0.9);
   }
 
   &__card {

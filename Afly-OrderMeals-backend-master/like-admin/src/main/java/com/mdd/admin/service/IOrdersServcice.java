@@ -28,4 +28,14 @@ public interface IOrdersServcice {
      * @return
      */
     List<OrdersCurrentVo> current();
+
+    /**
+     * 小程序订单叫号
+     */
+    void callNumber(Integer orderId);
+
+    /**
+     * 小程序订单完成（取餐完成）
+     */
+    void complete(Integer orderId);
 }

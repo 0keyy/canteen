@@ -42,6 +42,10 @@
       </view>
 
       <view class="checkout__section">
+        <pay-method-picker :order-id="orderId" v-model="payChannel" />
+      </view>
+
+      <view class="checkout__section">
         <view class="checkout__section-title-row">
           <text class="checkout__section-title">备注信息</text>
         </view>
@@ -72,16 +76,19 @@
 
 <script>
 import { orderApi } from '../../api/index'
-import { payOrder } from '../../utils/pay/index'
+import { payOrder, DEFAULT_PAY_CHANNEL } from '../../utils/pay/index'
+import PayMethodPicker from '../../components/pay-method-picker/pay-method-picker.vue'
 
 export default {
+  components: { PayMethodPicker },
   data() {
     return {
       orderId: 0,
       order: null,
       remark: '',
       loading: false,
-      diningMode: 1
+      diningMode: 1,
+      payChannel: DEFAULT_PAY_CHANNEL
     }
   },
   computed: {
@@ -136,10 +143,10 @@ export default {
           orderId: this.orderId,
           remark: this.remark,
           addressId,
-          payChannel: 'wxpay',
+          payChannel: this.payChannel,
           payScene: 'mp'
         })
-        await payOrder(this.orderId, 'wxpay', 'mp')
+        await payOrder(this.orderId, this.payChannel, 'mp')
         uni.showToast({ title: '支付成功', icon: 'success' })
         setTimeout(() => {
           uni.redirectTo({ url: `/pages/order/detail?orderId=${this.orderId}` })

@@ -20,6 +20,12 @@
                         <el-option label="已完成" value="2" />
                     </el-select>
                 </el-form-item>
+                <el-alert
+                    class="mb-4"
+                    type="info"
+                    :closable="false"
+                    title="本页仅显示收银台/扫码桌台订单。小程序订单请前往「小程序订单」页面处理叫号与完成。"
+                />
                 <el-form-item label="创建时间" class="w-[280px]">
                     <el-date-picker
                         v-model="createTime"
@@ -136,6 +142,7 @@ const handleViewDishes = async (row: { id: number }) => {
 const createTime = ref()
 const checkoutTime = ref()
 const queryParams = reactive({
+    channel: 'cashier',
     type: '',
     status: '',
     checkoutTime: '',

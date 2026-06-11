@@ -48,6 +48,7 @@ export const decorateApi = {
 }
 
 export const payApi = {
+  methods: (orderId) => get('/front/pay/methods', { orderId }),
   create: (data) => post('/front/pay/create', data),
   mockSuccess: (outTradeNo) => post('/front/pay/mock/success', null, { outTradeNo }),
   status: (outTradeNo) => get('/front/pay/status', { outTradeNo })

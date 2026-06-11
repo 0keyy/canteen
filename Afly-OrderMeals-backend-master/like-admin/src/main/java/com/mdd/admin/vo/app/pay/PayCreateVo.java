@@ -21,4 +21,7 @@ public class PayCreateVo implements Serializable {
     private String signType;
     private String paySign;
     private String tradeNo;
+
+    /** 是否已完成支付（余额等同步支付渠道） */
+    private Boolean completed;
 }

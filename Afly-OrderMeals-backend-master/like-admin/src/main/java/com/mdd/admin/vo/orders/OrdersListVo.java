@@ -27,6 +27,9 @@ public class OrdersListVo implements Serializable {
     private String remark;
     private String amount;
     private String createTime;
+    private String submitTime;
+    private String payTime;
+    private String calledTime;
     private String checkoutTime;
 
 }
