@@ -95,15 +95,15 @@ public class CompanyManageServiceImpl implements ICompanyManageService {
     }
 
     @Override
-    public PointsGrantResultVo grantPoints(Integer userId) {
+    public PointsGrantResultVo grantPoints(Integer userId, Integer amount) {
         UserCompany company = userCompanyMapper.selectOne(new QueryWrapper<UserCompany>()
                 .eq("user_id", userId)
                 .last("limit 1"));
         if (company == null) {
             throw new OperateException("用户未完成公司认证");
         }
-        int amount = userPointsService.grantManualPoints(company.getUserId(), company.getRuoyiUserId());
-        if (amount <= 0) {
+        int granted = userPointsService.grantManualPoints(company.getUserId(), company.getRuoyiUserId(), amount);
+        if (granted <= 0) {
             throw new OperateException("积分发放失败，请稍后重试");
         }
 
@@ -111,23 +111,23 @@ public class CompanyManageServiceImpl implements ICompanyManageService {
         vo.setUserId(company.getUserId());
         vo.setNickName(company.getNickName());
         vo.setDeptName(company.getDeptName());
-        vo.setAmount(amount);
+        vo.setAmount(granted);
         vo.setBalanceAfter(userPointsService.getBalance(company.getUserId()));
         return vo;
     }
 
     @Override
-    public PointsGrantBatchVo grantPointsAll() {
+    public PointsGrantBatchVo grantPointsAll(Integer amount) {
         List<UserCompany> companies = userCompanyMapper.selectList(new QueryWrapper<UserCompany>()
                 .gt("ruoyi_user_id", 0));
         int successCount = 0;
         int totalAmount = 0;
         for (UserCompany company : companies) {
             try {
-                int amount = userPointsService.grantManualPoints(company.getUserId(), company.getRuoyiUserId());
-                if (amount > 0) {
+                int granted = userPointsService.grantManualPoints(company.getUserId(), company.getRuoyiUserId(), amount);
+                if (granted > 0) {
                     successCount++;
-                    totalAmount += amount;
+                    totalAmount += granted;
                 }
             } catch (Exception ignored) {
                 // 单个用户失败不影响批量发放

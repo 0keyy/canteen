@@ -36,7 +36,7 @@
                         show-icon
                         title="发放规则：根据若依账号角色自动计算，总监/副总监/管理员等高级角色 500 积分，其余角色 200 积分。"
                     />
-                    <el-button type="primary" :loading="grantAllLoading" @click="handleGrantAll">
+                    <el-button type="primary" @click="handleGrantAll">
                         全部认证用户发放积分
                     </el-button>
                 </div>
@@ -176,6 +176,37 @@
                 <pagination v-model="pointsPager" @change="getPointsLists" />
             </div>
         </el-card>
+
+        <el-dialog
+            v-model="grantDialogVisible"
+            :title="grantScope === 'batch' ? '批量发放积分' : '发放积分'"
+            width="440px"
+            @closed="resetGrantForm"
+        >
+            <div v-if="grantScope === 'single' && grantTarget" class="company-manage__grant-user">
+                用户：{{ grantTarget.nickName || grantTarget.nickname || grantTarget.deptName || grantTarget.userId }}
+                <span class="company-manage__grant-user-sub">（ID {{ grantTarget.userId }}）</span>
+            </div>
+            <div v-else class="company-manage__grant-user">
+                将为全部已认证用户发放积分
+            </div>
+            <el-radio-group v-model="grantForm.mode" class="company-manage__grant-mode">
+                <el-radio label="auto">按角色自动发放（总监及以上 500，其他 200）</el-radio>
+                <el-radio label="custom">自定义积分</el-radio>
+            </el-radio-group>
+            <div v-if="grantForm.mode === 'custom'" class="company-manage__grant-custom">
+                <span class="company-manage__grant-label">
+                    {{ grantScope === 'batch' ? '每人积分' : '积分数量' }}
+                </span>
+                <el-input-number v-model="grantForm.amount" :min="1" :max="999999" :step="1" step-strictly />
+            </div>
+            <template #footer>
+                <el-button @click="grantDialogVisible = false">取消</el-button>
+                <el-button type="primary" :loading="grantSubmitLoading" @click="submitGrant">
+                    {{ grantScope === 'batch' ? '确认批量发放' : '确认发放' }}
+                </el-button>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
@@ -187,8 +218,15 @@ import feedback from '@/utils/feedback'
 const activeTab = ref('auth')
 const authTimeRange = ref()
 const pointsTimeRange = ref()
-const grantAllLoading = ref(false)
 const grantingUserId = ref<number | null>(null)
+const grantDialogVisible = ref(false)
+const grantSubmitLoading = ref(false)
+const grantScope = ref<'single' | 'batch'>('single')
+const grantTarget = ref<{ userId: number; nickName?: string; nickname?: string; deptName?: string } | null>(null)
+const grantForm = reactive({
+    mode: 'auto' as 'auto' | 'custom',
+    amount: 200
+})
 
 const authParams = reactive({
     deptName: '',
@@ -239,33 +277,69 @@ const setPointsTime = (range: Date[] | null) => {
     pointsParams.createTime = `${Math.round(range[0].getTime() / 1000)},${Math.round(range[1].getTime() / 1000)}`
 }
 
-const handleGrantOne = async (row: { userId: number; nickName?: string; deptName?: string }) => {
-    await feedback.confirm(
-        `确定为「${row.nickName || row.deptName || row.userId}」发放积分吗？\n系统将按若依角色自动发放（总监及以上 500，其他 200）。`
-    )
-    grantingUserId.value = row.userId
+const handleGrantOne = (row: { userId: number; nickName?: string; nickname?: string; deptName?: string }) => {
+    grantScope.value = 'single'
+    grantTarget.value = row
+    grantForm.mode = 'auto'
+    grantForm.amount = 200
+    grantDialogVisible.value = true
+}
+
+const handleGrantAll = () => {
+    grantScope.value = 'batch'
+    grantTarget.value = null
+    grantForm.mode = 'auto'
+    grantForm.amount = 200
+    grantDialogVisible.value = true
+}
+
+const resetGrantForm = () => {
+    grantScope.value = 'single'
+    grantTarget.value = null
+    grantForm.mode = 'auto'
+    grantForm.amount = 200
+}
+
+const getGrantAmount = () => (grantForm.mode === 'custom' ? grantForm.amount : undefined)
+
+const submitGrant = async () => {
+    if (grantForm.mode === 'custom' && (!grantForm.amount || grantForm.amount < 1)) {
+        feedback.msgError('请输入大于 0 的积分数量')
+        return
+    }
+
+    const amount = getGrantAmount()
+    grantSubmitLoading.value = true
+
+    if (grantScope.value === 'batch') {
+        try {
+            const result = await companyGrantPointsAll(amount)
+            feedback.notifySuccess(
+                `批量发放完成：共 ${result.totalUsers} 人，成功 ${result.successCount} 人，合计 +${result.totalAmount} 积分`
+            )
+            grantDialogVisible.value = false
+            getAuthLists()
+        } finally {
+            grantSubmitLoading.value = false
+        }
+        return
+    }
+
+    if (!grantTarget.value) {
+        grantSubmitLoading.value = false
+        return
+    }
+
+    const userId = grantTarget.value.userId
+    grantingUserId.value = userId
     try {
-        const result = await companyGrantPoints(row.userId)
+        const result = await companyGrantPoints(userId, amount)
         feedback.notifySuccess(`发放成功：+${result.amount}，当前余额 ${result.balanceAfter}`)
+        grantDialogVisible.value = false
         getAuthLists()
     } finally {
         grantingUserId.value = null
-    }
-}
-
-const handleGrantAll = async () => {
-    await feedback.confirm(
-        '确定为全部已认证用户发放积分吗？\n每位用户按若依角色发放（总监及以上 500，其他 200）。'
-    )
-    grantAllLoading.value = true
-    try {
-        const result = await companyGrantPointsAll()
-        feedback.notifySuccess(
-            `批量发放完成：共 ${result.totalUsers} 人，成功 ${result.successCount} 人，合计 +${result.totalAmount} 积分`
-        )
-        getAuthLists()
-    } finally {
-        grantAllLoading.value = false
+        grantSubmitLoading.value = false
     }
 }
 
@@ -379,5 +453,38 @@ getAuthLists()
 .text-danger {
     color: #f56c6c;
     font-weight: 600;
+}
+
+.company-manage__grant-user {
+    margin-bottom: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #303133;
+}
+
+.company-manage__grant-user-sub {
+    margin-left: 4px;
+    font-size: 13px;
+    font-weight: 400;
+    color: #909399;
+}
+
+.company-manage__grant-mode {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.company-manage__grant-custom {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.company-manage__grant-label {
+    font-size: 14px;
+    color: #606266;
 }
 </style>

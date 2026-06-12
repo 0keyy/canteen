@@ -15,7 +15,7 @@ public interface ICompanyManageService {
 
     PageResult<UserPointsLogListVo> pointsLogList(PageValidate pageValidate, UserPointsLogSearchValidate searchValidate);
 
-    PointsGrantResultVo grantPoints(Integer userId);
+    PointsGrantResultVo grantPoints(Integer userId, Integer amount);
 
-    PointsGrantBatchVo grantPointsAll();
+    PointsGrantBatchVo grantPointsAll(Integer amount);
 }

@@ -32,9 +32,10 @@ public interface IUserPointsService {
     void deductForOrder(Integer userId, Integer orderId, String outTradeNo, java.math.BigDecimal payAmount);
 
     /**
-     * 后台手工发放积分（总监及以上500，其他200）
+     * 后台手工发放积分
      *
+     * @param customAmount 自定义积分数，为 null 时按若依角色自动计算（总监及以上500，其他200）
      * @return 实际发放积分数
      */
-    int grantManualPoints(Integer userId, Long ruoyiUserId);
+    int grantManualPoints(Integer userId, Long ruoyiUserId, Integer customAmount);
 }

@@ -2,6 +2,8 @@ package com.mdd.admin.controller.company;
 
 import com.mdd.admin.service.ICompanyManageService;
 import com.mdd.admin.validate.commons.PageValidate;
+import com.mdd.admin.validate.company.PointsGrantBatchValidate;
+import com.mdd.admin.validate.company.PointsGrantValidate;
 import com.mdd.admin.validate.company.UserCompanySearchValidate;
 import com.mdd.admin.validate.company.UserPointsLogSearchValidate;
 import com.mdd.admin.vo.company.PointsGrantBatchVo;
@@ -14,7 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -39,12 +41,13 @@ public class CompanyManageController {
     }
 
     @PostMapping("/points/grant")
-    public AjaxResult<PointsGrantResultVo> grantPoints(@RequestParam Integer userId) {
-        return AjaxResult.success(companyManageService.grantPoints(userId));
+    public AjaxResult<PointsGrantResultVo> grantPoints(@Validated @RequestBody PointsGrantValidate validate) {
+        return AjaxResult.success(companyManageService.grantPoints(validate.getUserId(), validate.getAmount()));
     }
 
     @PostMapping("/points/grant/all")
-    public AjaxResult<PointsGrantBatchVo> grantPointsAll() {
-        return AjaxResult.success(companyManageService.grantPointsAll());
+    public AjaxResult<PointsGrantBatchVo> grantPointsAll(@Validated @RequestBody(required = false) PointsGrantBatchValidate validate) {
+        Integer amount = validate == null ? null : validate.getAmount();
+        return AjaxResult.success(companyManageService.grantPointsAll(amount));
     }
 }

@@ -72,7 +72,7 @@ public class UserPointsServiceImpl implements IUserPointsService {
     }
 
     @Override
-    public int grantManualPoints(Integer userId, Long ruoyiUserId) {
+    public int grantManualPoints(Integer userId, Long ruoyiUserId, Integer customAmount) {
         if (userId == null || userId <= 0) {
             throw new BaseException(500, "用户ID无效");
         }
@@ -81,13 +81,15 @@ public class UserPointsServiceImpl implements IUserPointsService {
         }
 
         List<RuoyiSysRole> roles = ruoyiSysService.selectRolesByUserId(ruoyiUserId);
-        int amount = RolePointsUtils.calcMonthlyPoints(roles);
+        RuoyiSysRole highestRole = RolePointsUtils.getHighestRole(roles);
+        int amount = customAmount != null ? customAmount : RolePointsUtils.calcMonthlyPoints(roles);
         if (amount <= 0) {
             throw new BaseException(500, "未匹配到可发放积分");
         }
-        RuoyiSysRole highestRole = RolePointsUtils.getHighestRole(roles);
-        String grantMonth = "MANUAL:" + System.currentTimeMillis();
-        return creditPoints(userId, amount, UserPointsLog.SOURCE_MANUAL, grantMonth, 0,
+        // grant_month 列为 varchar(7)，仅存 yyyy-MM；手工发放用秒级时间戳作为 order_id 保证唯一
+        String grantMonth = YearMonth.now().format(MONTH_FORMAT);
+        int manualOrderId = (int) (System.currentTimeMillis() / 1000);
+        return creditPoints(userId, amount, UserPointsLog.SOURCE_MANUAL, grantMonth, manualOrderId,
                 highestRole == null ? null : highestRole.getRoleId(),
                 highestRole == null ? "" : highestRole.getRoleName());
     }
