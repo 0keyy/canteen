@@ -1,7 +1,7 @@
 import { authApi } from '../../api/index'
 
 // #ifdef MP-WEIXIN
-import { weixinPhoneLogin } from './weixin'
+import { weixinLogin } from './weixin'
 // #endif
 
 // #ifdef MP-ALIPAY
@@ -14,7 +14,7 @@ import { appSmsLogin } from './app'
 
 export async function loginWithPhone() {
   // #ifdef MP-WEIXIN
-  return weixinPhoneLogin()
+  return weixinLogin()
   // #endif
 
   // #ifdef MP-ALIPAY

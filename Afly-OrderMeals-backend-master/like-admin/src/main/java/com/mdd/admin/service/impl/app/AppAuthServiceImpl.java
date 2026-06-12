@@ -53,6 +53,12 @@ public class AppAuthServiceImpl implements IAppAuthService {
     public LoginVo wxLogin(WxLoginValidate validate) {
         try {
             WxMaService wxMaService = WeChatUtils.mnp();
+            String appId = wxMaService.getWxMaConfig().getAppid();
+            String appSecret = wxMaService.getWxMaConfig().getSecret();
+            if (appId == null || appId.isEmpty() || appSecret == null || appSecret.isEmpty()) {
+                throw new BaseException(500, "微信小程序未配置 AppID/AppSecret，请在管理后台【渠道设置 → 微信小程序】中填写");
+            }
+
             WxMaJscode2SessionResult session = wxMaService.getUserService().getSessionInfo(validate.getCode());
             String openid = session.getOpenid();
             String sessionKey = session.getSessionKey();
@@ -62,23 +68,23 @@ public class AppAuthServiceImpl implements IAppAuthService {
                     .eq("client", ClientEnum.MP_WEIXIN)
                     .last("limit 1"));
 
-            Integer userId = 0;
-            if (userAuth != null) {
+            Integer userId;
+            if (userAuth != null && userAuth.getUserId() != null && userAuth.getUserId() > 0) {
                 userId = userAuth.getUserId();
+                updateLoginTime(userId);
+            } else {
+                userId = createUserByOpenid(openid, userAuth);
             }
 
             saveSession(userId, openid, sessionKey, ClientEnum.MP_WEIXIN);
 
+            StpUserUtil.login(userId);
             LoginVo vo = new LoginVo();
             vo.setOpenid(openid);
             vo.setUserId(userId);
-            boolean needBindPhone = userId == 0 || getUserMobile(userId).isEmpty();
-            vo.setNeedBindPhone(needBindPhone);
-            if (userId > 0 && !needBindPhone) {
-                fillUserInfo(vo, userId);
-                StpUserUtil.login(userId);
-                vo.setToken(StpUserUtil.getTokenValue());
-            }
+            vo.setNeedBindPhone(false);
+            vo.setToken(StpUserUtil.getTokenValue());
+            fillUserInfo(vo, userId);
             return vo;
         } catch (WxErrorException e) {
             throw new BaseException(500, "微信登录失败: " + e.getError().getErrorMsg());
@@ -348,6 +354,38 @@ public class AppAuthServiceImpl implements IAppAuthService {
             }
         }
         return createUser(mobile, client);
+    }
+
+    private Integer createUserByOpenid(String openid, UserAuth existingAuth) {
+        User user = new User();
+        user.setSn(generateSn());
+        user.setMobile("");
+        String suffix = openid.length() >= 4 ? openid.substring(openid.length() - 4) : openid;
+        user.setNickname("微信用户" + suffix);
+        user.setChannel(ClientEnum.MP_WEIXIN);
+        user.setIsDisable(0);
+        user.setIsDelete(0);
+        long now = TimeUtils.timestamp();
+        user.setCreateTime(now);
+        user.setUpdateTime(now);
+        user.setLastLoginTime(now);
+        userMapper.insert(user);
+
+        Integer userId = user.getId();
+        if (existingAuth == null) {
+            UserAuth auth = new UserAuth();
+            auth.setUserId(userId);
+            auth.setOpenid(openid);
+            auth.setClient(ClientEnum.MP_WEIXIN);
+            auth.setCreateTime(now);
+            auth.setUpdateTime(now);
+            userAuthMapper.insert(auth);
+        } else {
+            existingAuth.setUserId(userId);
+            existingAuth.setUpdateTime(now);
+            userAuthMapper.updateById(existingAuth);
+        }
+        return userId;
     }
 
     private Integer createUser(String mobile, int channel) {

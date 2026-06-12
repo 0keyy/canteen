@@ -3,7 +3,7 @@ like:
 #  upload-directory: /www/uploads/
   upload-directory: D:\www\uploads\
   admin-notify-url: http://localhost:8082/api/internal/notify
-  app-mock-login: true
+  app-mock-login: false
   app-mock-login-mobile: "13800138000"
 
   captcha:
@@ -42,7 +42,7 @@ spring:
         connection-init-sql: SELECT 1
       datasource:
         master:
-          url: jdbc:mysql://localhost:3306/like_admin?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+          url: jdbc:mysql://146.56.199.215:3306/like_admin?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8&allowMultiQueries=true
           username: like_admin
           password: thd3DYmypyNBFbyP
           driver-class-name: com.mysql.cj.jdbc.Driver

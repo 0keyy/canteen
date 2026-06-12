@@ -22,8 +22,8 @@ public class WeChatUtils {
 
         WxMaService service = new WxMaServiceImpl();
         WxMaDefaultConfigImpl wxConfig = new WxMaDefaultConfigImpl();
-        wxConfig.setAppid(config.getOrDefault("appId", ""));
-        wxConfig.setSecret(config.getOrDefault("appSecret", ""));
+        wxConfig.setAppid(config.getOrDefault("appId", "").trim());
+        wxConfig.setSecret(config.getOrDefault("appSecret", "").trim());
         service.setWxMaConfig(wxConfig);
         return service;
     }

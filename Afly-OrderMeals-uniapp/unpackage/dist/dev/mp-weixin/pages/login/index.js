@@ -2,13 +2,11 @@
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const utils_auth_index = require("../../utils/auth/index.js");
-const utils_config = require("../../utils/config.js");
 const _sfc_main = {
   data() {
     return {
       loading: false,
-      mockLogin: utils_config.MOCK_LOGIN,
-      mobile: utils_config.DEFAULT_MOCK_MOBILE,
+      mobile: "",
       smsCode: "",
       countdown: 0,
       timer: null
@@ -18,39 +16,19 @@ const _sfc_main = {
     goHome() {
       common_vendor.index.switchTab({ url: "/pages/index/index" });
     },
-    async handleMockLogin() {
-      if (!/^1\d{10}$/.test(this.mobile)) {
-        common_vendor.index.showToast({ title: "请输入正确手机号", icon: "none" });
-        return;
-      }
-      this.loading = true;
-      try {
-        const result = await api_index.authApi.mockPhoneLogin(this.mobile);
-        utils_auth_index.saveLoginResult(result);
-        this.goHome();
-      } catch (e) {
-        common_vendor.index.showToast({ title: e.message || e, icon: "none" });
-      } finally {
-        this.loading = false;
-      }
-    },
-    async handleWxOneClickLogin(e) {
-      if (!e.detail.code) {
-        common_vendor.index.showToast({ title: "用户取消授权", icon: "none" });
-        return;
-      }
+    async handleWxLogin() {
       this.loading = true;
       try {
         const loginRes = await new Promise((resolve, reject) => {
           common_vendor.index.login({ provider: "weixin", success: resolve, fail: reject });
         });
-        const wxLogin = await api_index.authApi.wxLogin(loginRes.code);
-        if (wxLogin.token && !wxLogin.needBindPhone) {
-          utils_auth_index.saveLoginResult(wxLogin);
-          this.goHome();
-          return;
+        if (!loginRes.code) {
+          throw new Error("微信授权失败，请重试");
         }
-        const result = await api_index.authApi.wxPhone(wxLogin.openid, e.detail.code);
+        const result = await api_index.authApi.wxLogin(loginRes.code);
+        if (!result.token) {
+          throw new Error("登录失败，请检查小程序 AppID 与后端配置是否一致");
+        }
         utils_auth_index.saveLoginResult(result);
         this.goHome();
       } catch (err) {
@@ -116,17 +94,10 @@ const _sfc_main = {
   }
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return common_vendor.e({
-    a: $data.mockLogin
-  }, $data.mockLogin ? {
-    b: $data.mobile,
-    c: common_vendor.o(($event) => $data.mobile = $event.detail.value, "88"),
-    d: $data.loading,
-    e: common_vendor.o((...args) => $options.handleMockLogin && $options.handleMockLogin(...args), "62")
-  } : {
-    f: $data.loading,
-    g: common_vendor.o((...args) => $options.handleWxOneClickLogin && $options.handleWxOneClickLogin(...args), "34")
-  });
+  return {
+    a: $data.loading,
+    b: common_vendor.o((...args) => $options.handleWxLogin && $options.handleWxLogin(...args), "87")
+  };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-d08ef7d4"]]);
 wx.createPage(MiniProgramPage);

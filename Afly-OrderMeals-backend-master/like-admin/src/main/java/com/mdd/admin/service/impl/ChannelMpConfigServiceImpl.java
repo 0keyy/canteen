@@ -56,9 +56,17 @@ public class ChannelMpConfigServiceImpl implements IChannelMpConfigService {
     public void save(ChannelMpValidate channelMpValidate) {
         ConfigUtils.set("mp_channel", "name", channelMpValidate.getName());
         ConfigUtils.set("mp_channel", "primaryId", channelMpValidate.getPrimaryId());
-        ConfigUtils.set("mp_channel", "appId", channelMpValidate.getAppId());
-        ConfigUtils.set("mp_channel", "appSecret", channelMpValidate.getAppSecret());
+        if (!isMasked(channelMpValidate.getAppId())) {
+            ConfigUtils.set("mp_channel", "appId", channelMpValidate.getAppId());
+        }
+        if (!isMasked(channelMpValidate.getAppSecret())) {
+            ConfigUtils.set("mp_channel", "appSecret", channelMpValidate.getAppSecret());
+        }
         ConfigUtils.set("mp_channel", "qrCode", UrlUtils.toRelativeUrl(channelMpValidate.getQrCode()));
+    }
+
+    private boolean isMasked(String value) {
+        return "******".equals(value);
     }
 
 }

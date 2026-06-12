@@ -3,23 +3,16 @@
     <view class="login-page__status-bar"></view>
     <view class="login-page__header">
       <text class="login-page__title">欢迎点餐</text>
-      <text class="login-page__sub">手机号一键登录，快速下单</text>
+      <text class="login-page__sub">微信一键登录，快速下单</text>
     </view>
 
     <!-- #ifdef MP-WEIXIN -->
-    <view v-if="mockLogin" class="login-page__form">
-      <input v-model="mobile" class="login-page__input" type="number" maxlength="11" placeholder="开发模拟手机号" />
-      <button class="login-page__btn" :loading="loading" @click="handleMockLogin">模拟一键登录</button>
-      <text class="login-page__tip">开发环境专用，无需微信授权</text>
-    </view>
     <button
-      v-else
       class="login-page__btn"
-      open-type="getPhoneNumber"
       :loading="loading"
-      @getphonenumber="handleWxOneClickLogin"
+      @click="handleWxLogin"
     >
-      手机号一键登录
+      微信一键登录
     </button>
     <!-- #endif -->
 
@@ -43,14 +36,12 @@
 <script>
 import { authApi } from '../../api/index'
 import { saveLoginResult } from '../../utils/auth/index'
-import { MOCK_LOGIN, DEFAULT_MOCK_MOBILE } from '../../utils/config'
 
 export default {
   data() {
     return {
       loading: false,
-      mockLogin: MOCK_LOGIN,
-      mobile: MOCK_LOGIN ? DEFAULT_MOCK_MOBILE : '',
+      mobile: '',
       smsCode: '',
       countdown: 0,
       timer: null
@@ -60,39 +51,19 @@ export default {
     goHome() {
       uni.switchTab({ url: '/pages/index/index' })
     },
-    async handleMockLogin() {
-      if (!/^1\d{10}$/.test(this.mobile)) {
-        uni.showToast({ title: '请输入正确手机号', icon: 'none' })
-        return
-      }
-      this.loading = true
-      try {
-        const result = await authApi.mockPhoneLogin(this.mobile)
-        saveLoginResult(result)
-        this.goHome()
-      } catch (e) {
-        uni.showToast({ title: e.message || e, icon: 'none' })
-      } finally {
-        this.loading = false
-      }
-    },
-    async handleWxOneClickLogin(e) {
-      if (!e.detail.code) {
-        uni.showToast({ title: '用户取消授权', icon: 'none' })
-        return
-      }
+    async handleWxLogin() {
       this.loading = true
       try {
         const loginRes = await new Promise((resolve, reject) => {
           uni.login({ provider: 'weixin', success: resolve, fail: reject })
         })
-        const wxLogin = await authApi.wxLogin(loginRes.code)
-        if (wxLogin.token && !wxLogin.needBindPhone) {
-          saveLoginResult(wxLogin)
-          this.goHome()
-          return
+        if (!loginRes.code) {
+          throw new Error('微信授权失败，请重试')
         }
-        const result = await authApi.wxPhone(wxLogin.openid, e.detail.code)
+        const result = await authApi.wxLogin(loginRes.code)
+        if (!result.token) {
+          throw new Error('登录失败，请检查小程序 AppID 与后端配置是否一致')
+        }
         saveLoginResult(result)
         this.goHome()
       } catch (err) {

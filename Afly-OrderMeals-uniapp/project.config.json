@@ -1,0 +1,22 @@
+{
+  "description": "微信小程序项目配置，appid 需与 config/weixin.js、manifest.json 保持一致",
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "postcss": false,
+    "minified": true,
+    "newFeature": true,
+    "bigPackageSizeSupport": true,
+    "ignoreDevUnusedFiles": false,
+    "ignoreUploadUnusedFiles": false,
+    "compileHotReLoad": false
+  },
+  "compileType": "miniprogram",
+  "appid": "wx05421f029390b075",
+  "projectname": "点餐小程序",
+  "condition": {}
+}

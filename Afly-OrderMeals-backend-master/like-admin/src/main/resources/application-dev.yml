@@ -2,7 +2,7 @@
 like:
   upload-directory: D:\www\uploads\
   h5-base-url: http://121.196.171.219:8084 # H5 点餐页地址（桌号二维码）
-  app-mock-login: true
+  app-mock-login: false
   app-mock-login-mobile: "13800138000"
 
 # 框架配置
@@ -11,9 +11,9 @@ spring:
     dynamic:
       datasource:
         master:
-          url: jdbc:mysql://localhost:3306/like_admin?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8&allowMultiQueries=true
-          username: root
-          password: 1234
+          url: jdbc:mysql://146.56.199.215:3306/like_admin?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+          username: like_admin
+          password: thd3DYmypyNBFbyP
           driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
     host: localhost
