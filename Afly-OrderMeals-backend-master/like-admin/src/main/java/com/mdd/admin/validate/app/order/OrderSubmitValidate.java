@@ -18,4 +18,5 @@ public class OrderSubmitValidate implements Serializable {
     private String contactMobile;
     private String payChannel;
     private String payScene;
+    private Integer couponId;
 }

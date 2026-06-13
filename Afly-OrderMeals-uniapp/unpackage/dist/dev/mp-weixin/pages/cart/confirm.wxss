@@ -158,6 +158,13 @@
   font-weight: bold;
   color: #1A1410;
 }
+.checkout__submit-saved.data-v-aaa7ef6e {
+  display: block;
+  font-size: 20rpx;
+  color: #34C759;
+  font-weight: 600;
+  margin-top: 2rpx;
+}
 .checkout__submit-btn.data-v-aaa7ef6e {
   background: #B10A0F;
   padding: 24rpx 48rpx;
@@ -174,4 +181,37 @@
 }
 .checkout__bottom-space.data-v-aaa7ef6e {
   height: 120rpx;
+}
+.checkout__coupon-link.data-v-aaa7ef6e {
+  font-size: 24rpx;
+  color: #B10A0F;
+  font-weight: 600;
+}
+.checkout__coupon-applied.data-v-aaa7ef6e {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  margin-top: 8rpx;
+  background: rgba(52, 199, 89, 0.06);
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+}
+.checkout__coupon-name.data-v-aaa7ef6e {
+  font-size: 26rpx;
+  color: #34C759;
+  font-weight: 600;
+}
+.checkout__coupon-discount.data-v-aaa7ef6e {
+  font-size: 28rpx;
+  color: #1A1410;
+  font-weight: 700;
+}
+.checkout__coupon-empty.data-v-aaa7ef6e {
+  padding: 16rpx 0;
+  margin-top: 8rpx;
+}
+.checkout__coupon-empty-text.data-v-aaa7ef6e {
+  font-size: 24rpx;
+  color: #7F7368;
 }

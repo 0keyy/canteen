@@ -53,3 +53,11 @@ export const payApi = {
   mockSuccess: (outTradeNo) => post('/front/pay/mock/success', null, { outTradeNo }),
   status: (outTradeNo) => get('/front/pay/status', { outTradeNo })
 }
+
+export const couponApi = {
+  center: () => get('/front/coupon/center'),
+  claim: (templateId) => post('/front/coupon/claim', { templateId }),
+  myCoupons: (status) => get('/front/coupon/my', { status }),
+  bestForOrder: (orderId) => get('/front/coupon/bestForOrder', { orderId }),
+  verifyCode: (userCouponId) => get('/front/coupon/verifyCode', { userCouponId })
+}

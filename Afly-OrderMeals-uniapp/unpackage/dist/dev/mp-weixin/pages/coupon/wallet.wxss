@@ -1,0 +1,169 @@
+/* 粮兴坊风格设计系统 */
+/* ===== 主色：正红 / 暖橙 ===== */
+/* ===== 背景 ===== */
+/* ===== 文字 ===== */
+/* ===== 边框 / 分割 ===== */
+/* ===== 圆角 ===== */
+/* ===== 阴影 ===== */
+/* ===== 字号 ===== */
+/* ===== 间距 ===== */
+/* ===== 动画 ===== */
+/* 底部自定义 Tab 栏占位高度 */
+/* ===== 兼容旧变量 ===== */
+.coupon-wallet.data-v-0b2f6175 {
+  min-height: 100vh;
+  background: #FFFCF8;
+  display: flex;
+  flex-direction: column;
+}
+.coupon-wallet__tabs.data-v-0b2f6175 {
+  display: flex;
+  background: #fff;
+  border-bottom: 2rpx solid #E8DDD4;
+}
+.coupon-wallet__tab.data-v-0b2f6175 {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: #7F7368;
+  position: relative;
+}
+.coupon-wallet__tab--active.data-v-0b2f6175 {
+  color: #B10A0F;
+  font-weight: 700;
+}
+.coupon-wallet__tab--active.data-v-0b2f6175::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 4rpx;
+  background: #B10A0F;
+  border-radius: 2rpx;
+}
+.coupon-wallet__status.data-v-0b2f6175 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 32rpx;
+}
+.coupon-wallet__empty-icon.data-v-0b2f6175 {
+  font-size: 80rpx;
+}
+.coupon-wallet__empty-text.data-v-0b2f6175 {
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  color: #1A1410;
+  font-weight: 600;
+}
+.coupon-wallet__empty-sub.data-v-0b2f6175 {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #7F7368;
+}
+.coupon-wallet__list.data-v-0b2f6175 {
+  flex: 1;
+  padding: 24rpx;
+}
+.coupon-item.data-v-0b2f6175 {
+  background: #fff;
+  border-radius: 32rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
+}
+.coupon-item--used.data-v-0b2f6175 {
+  opacity: 0.6;
+}
+.coupon-item--expired.data-v-0b2f6175 {
+  opacity: 0.45;
+}
+.coupon-item__body.data-v-0b2f6175 {
+  display: flex;
+  padding: 28rpx 24rpx;
+}
+.coupon-item__left.data-v-0b2f6175 {
+  width: 170rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 2rpx dashed rgba(177, 10, 15, 0.2);
+  padding-right: 20rpx;
+}
+.coupon-item__amount.data-v-0b2f6175 {
+  font-size: 44rpx;
+  font-weight: 900;
+  color: #B10A0F;
+}
+.coupon-item__condition.data-v-0b2f6175 {
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  color: #7F7368;
+  text-align: center;
+}
+.coupon-item__info.data-v-0b2f6175 {
+  flex: 1;
+  padding-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  justify-content: center;
+}
+.coupon-item__name-row.data-v-0b2f6175 {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+.coupon-item__name.data-v-0b2f6175 {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1A1410;
+}
+.coupon-item__tag.data-v-0b2f6175 {
+  padding: 2rpx 12rpx;
+  border-radius: 999rpx;
+  background: rgba(177, 10, 15, 0.1);
+  font-size: 18rpx;
+  color: #B10A0F;
+}
+.coupon-item__period.data-v-0b2f6175 {
+  font-size: 22rpx;
+  color: #7F7368;
+}
+.coupon-item__night-tip.data-v-0b2f6175 {
+  font-size: 20rpx;
+  color: #FF8B1A;
+  font-weight: 600;
+}
+.coupon-item__used-time.data-v-0b2f6175 {
+  font-size: 20rpx;
+  color: #7F7368;
+}
+.coupon-item__verify.data-v-0b2f6175 {
+  border-top: 1rpx solid #E8DDD4;
+  padding: 16rpx 24rpx;
+  text-align: right;
+}
+.coupon-item__verify-btn.data-v-0b2f6175 {
+  font-size: 24rpx;
+  color: #B10A0F;
+  font-weight: 600;
+}
+.coupon-item__watermark.data-v-0b2f6175 {
+  position: absolute;
+  right: 16rpx;
+  bottom: 16rpx;
+  transform: rotate(-20deg);
+}
+.coupon-item__watermark text.data-v-0b2f6175 {
+  font-size: 48rpx;
+  font-weight: 900;
+  color: rgba(127, 115, 104, 0.3);
+}

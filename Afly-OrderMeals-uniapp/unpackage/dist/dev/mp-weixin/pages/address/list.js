@@ -52,7 +52,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     b: $data.list.length === 0
   }, $data.list.length === 0 ? {} : {}, {
-    c: common_vendor.o(($event) => $options.edit(), "70")
+    c: common_vendor.o(($event) => $options.edit())
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-90a3874e"]]);

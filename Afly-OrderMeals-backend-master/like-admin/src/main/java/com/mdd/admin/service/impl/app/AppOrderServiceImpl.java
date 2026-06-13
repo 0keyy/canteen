@@ -11,6 +11,7 @@ import com.mdd.common.entity.orders.OrdersDish;
 import com.mdd.common.entity.shop.ShopConfig;
 import com.mdd.common.entity.system.SystemAuthDept;
 import com.mdd.common.entity.user.User;
+import com.mdd.common.entity.coupon.UserCoupon;
 import com.mdd.common.entity.user.UserAddress;
 import com.mdd.common.enums.HttpEnum;
 import com.mdd.common.exception.BaseException;
@@ -22,10 +23,12 @@ import com.mdd.common.mapper.shop.ShopConfigMapper;
 import com.mdd.common.mapper.system.SystemAuthDeptMapper;
 import com.mdd.common.mapper.user.UserAddressMapper;
 import com.mdd.common.mapper.user.UserMapper;
+import com.mdd.common.mapper.coupon.UserCouponMapper;
 import com.mdd.common.util.TimeUtils;
 import com.mdd.common.util.UrlUtils;
 import com.mdd.admin.enums.app.DiningModeEnum;
 import com.mdd.admin.service.app.IAppOrderService;
+import com.mdd.admin.service.app.IAppCouponService;
 import com.mdd.admin.util.AdminNotifyUtils;
 import com.mdd.admin.validate.app.order.CartCreateValidate;
 import com.mdd.admin.validate.app.order.DishAddValidate;
@@ -58,6 +61,10 @@ public class AppOrderServiceImpl implements IAppOrderService {
     private UserAddressMapper userAddressMapper;
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private IAppCouponService appCouponService;
+    @Resource
+    private UserCouponMapper userCouponMapper;
 
     @Override
     public ShopVo shop(Integer aid) {
@@ -261,6 +268,42 @@ public class AppOrderServiceImpl implements IAppOrderService {
         }
 
         BigDecimal totalAmount = dishAmount.add(deliveryFee);
+
+        // 优惠券处理
+        BigDecimal couponDiscount = BigDecimal.ZERO;
+        if (validate.getCouponId() != null && validate.getCouponId() > 0) {
+            UserCoupon userCoupon = userCouponMapper.selectById(validate.getCouponId());
+            if (userCoupon == null || !userCoupon.getUserId().equals(userId)) {
+                throw new BaseException(500, "优惠券不存在");
+            }
+            if (userCoupon.getStatus() != 1) {
+                throw new BaseException(500, "优惠券不可用");
+            }
+            long nowCoupon = TimeUtils.timestamp();
+            if (userCoupon.getUseStartTime() > 0 && nowCoupon < userCoupon.getUseStartTime()) {
+                throw new BaseException(500, "优惠券尚未生效");
+            }
+            if (userCoupon.getUseEndTime() > 0 && nowCoupon > userCoupon.getUseEndTime()) {
+                throw new BaseException(500, "优惠券已过期");
+            }
+
+            // 计算优惠金额
+            couponDiscount = appCouponService.bestForOrder(validate.getOrderId(), userId).getDiscountAmount();
+            if (couponDiscount == null || couponDiscount.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new BaseException(500, "该优惠券不适用于当前订单");
+            }
+
+            // 标记券已使用
+            userCoupon.setStatus(2);
+            userCoupon.setUseTime(nowCoupon);
+            userCoupon.setOrderId(validate.getOrderId());
+            userCouponMapper.updateById(userCoupon);
+
+            orders.setCouponId(validate.getCouponId());
+            orders.setCouponDiscount(couponDiscount);
+            totalAmount = totalAmount.subtract(couponDiscount).max(BigDecimal.ZERO);
+        }
+
         long now = TimeUtils.timestamp();
         orders.setRemark(validate.getRemark());
         orders.setAmount(totalAmount.toPlainString());

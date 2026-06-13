@@ -13,12 +13,19 @@ const _sfc_main = {
       remark: "",
       loading: false,
       diningMode: 1,
-      payChannel: utils_pay_channels.DEFAULT_PAY_CHANNEL
+      payChannel: utils_pay_channels.DEFAULT_PAY_CHANNEL,
+      couponInfo: null,
+      selectedCouponId: 0,
+      couponDiscount: 0
     };
   },
   computed: {
     diningModeText() {
       return { 1: "堂食", 3: "外卖配送" }[this.diningMode] || "堂食";
+    },
+    finalAmount() {
+      const raw = Number(this.totalAmount);
+      return Math.max(0, raw - this.couponDiscount).toFixed(2);
     },
     totalAmount() {
       if (!this.order)
@@ -34,6 +41,7 @@ const _sfc_main = {
     this.orderId = Number(common_vendor.index.getStorageSync("orderId"));
     this.diningMode = Number(common_vendor.index.getStorageSync("diningMode") || 1);
     this.loadDetail();
+    this.loadBestCoupon();
   },
   methods: {
     calcDishesAmount(dishes) {
@@ -55,11 +63,28 @@ const _sfc_main = {
         return snapshot;
       }
     },
+    goCouponCenter() {
+      common_vendor.index.navigateTo({ url: "/pages/coupon/center" });
+    },
     async loadDetail() {
       try {
         this.order = await api_index.orderApi.detail(this.orderId);
       } catch (e) {
         this.order = { dishes: [], amount: "0.00" };
+      }
+    },
+    async loadBestCoupon() {
+      try {
+        const result = await api_index.couponApi.bestForOrder(this.orderId);
+        if (result && result.hasCoupon) {
+          this.couponInfo = result;
+          this.selectedCouponId = result.userCouponId;
+          this.couponDiscount = Number(result.discountAmount || 0);
+        }
+      } catch (e) {
+        this.couponInfo = null;
+        this.selectedCouponId = 0;
+        this.couponDiscount = 0;
       }
     },
     async handleSubmit() {
@@ -73,7 +98,8 @@ const _sfc_main = {
         await api_index.orderApi.submit({
           orderId: this.orderId,
           remark: this.remark,
-          addressId
+          addressId,
+          couponId: this.selectedCouponId || null
         });
         await utils_pay_index.payOrder(this.orderId, this.payChannel, "mp");
         common_vendor.index.showToast({ title: "支付成功", icon: "success" });
@@ -120,16 +146,26 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       };
     }),
     i: common_vendor.t($options.totalAmount),
-    j: common_vendor.o(($event) => $data.payChannel = $event, "5b"),
-    k: common_vendor.p({
+    j: common_vendor.o((...args) => $options.goCouponCenter && $options.goCouponCenter(...args)),
+    k: $data.couponInfo
+  }, $data.couponInfo ? {
+    l: common_vendor.t($data.couponInfo.templateName),
+    m: common_vendor.t($data.couponInfo.discountAmount)
+  } : {}, {
+    n: common_vendor.o(($event) => $data.payChannel = $event),
+    o: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    l: $data.remark,
-    m: common_vendor.o(($event) => $data.remark = $event.detail.value, "c1"),
-    n: common_vendor.t($options.totalAmount),
-    o: common_vendor.t($data.loading ? "提交中..." : "提交并支付"),
-    p: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "cb")
+    p: $data.remark,
+    q: common_vendor.o(($event) => $data.remark = $event.detail.value),
+    r: common_vendor.t($options.finalAmount),
+    s: $data.couponDiscount > 0
+  }, $data.couponDiscount > 0 ? {
+    t: common_vendor.t($data.couponDiscount.toFixed(2))
+  } : {}, {
+    v: common_vendor.t($data.loading ? "提交中..." : "提交并支付"),
+    w: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args))
   }) : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-aaa7ef6e"]]);

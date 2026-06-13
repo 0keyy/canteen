@@ -24,7 +24,7 @@
             <text class="profile-page__stat-label">余额</text>
           </view>
           <view class="profile-page__stat-item">
-            <text class="profile-page__stat-value">0</text>
+            <text class="profile-page__stat-value">{{ couponCount }}</text>
             <text class="profile-page__stat-label">优惠券</text>
           </view>
         </view>
@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import { authApi } from '../../api/index'
+import { authApi, couponApi } from '../../api/index'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getNavMetrics } from '../../utils/navbar'
 
@@ -143,6 +143,7 @@ export default {
       companyVerified: false,
       companyDeptName: '',
       balance: 0,
+      couponCount: 0,
       primaryActions: PRIMARY_ACTIONS,
       secondaryActions: SECONDARY_ACTIONS
     }
@@ -176,6 +177,14 @@ export default {
         this.companyVerified = !!uni.getStorageSync('companyVerified')
         this.companyDeptName = uni.getStorageSync('companyDeptName') || ''
       }
+
+      // 加载可用优惠券数量
+      try {
+        const myCoupons = await couponApi.myCoupons(1) || []
+        this.couponCount = myCoupons.length
+      } catch (e) {
+        this.couponCount = 0
+      }
     },
     onActionTap(item) {
       if (item.title === '我的订单') {
@@ -188,6 +197,10 @@ export default {
       }
       if (item.title === '公司认证') {
         uni.navigateTo({ url: '/pages/mine/company-auth' })
+        return
+      }
+      if (item.title === '优惠券包') {
+        uni.navigateTo({ url: '/pages/coupon/wallet' })
         return
       }
       if (item.title === '退出登录') {

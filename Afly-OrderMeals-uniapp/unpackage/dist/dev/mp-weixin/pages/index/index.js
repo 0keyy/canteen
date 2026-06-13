@@ -159,6 +159,10 @@ const _sfc_main = {
       common_vendor.index.showToast({ title: "搜索功能开发中", icon: "none" });
     },
     onShortcutTap(item) {
+      if ((item == null ? void 0 : item.name) === "优惠券包") {
+        common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
+        return;
+      }
       if ((item == null ? void 0 : item.name) === "储值优惠") {
         common_vendor.index.showToast({ title: "储值功能开发中", icon: "none" });
         return;
@@ -169,7 +173,7 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.o((...args) => $options.goSearch && $options.goSearch(...args), "d0"),
+    a: common_vendor.o((...args) => $options.goSearch && $options.goSearch(...args)),
     b: common_vendor.s($options.searchRowStyle),
     c: common_vendor.f($options.displayBanners, (item, index, i0) => {
       return common_vendor.e({
@@ -182,9 +186,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     d: $options.displayBanners.length > 1,
     e: $options.displayBanners.length > 0,
-    f: common_vendor.o(($event) => $options.selectMode(1), "0c"),
+    f: common_vendor.o(($event) => $options.selectMode(1)),
     g: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
-    h: common_vendor.o(($event) => $options.selectMode(3), "3e"),
+    h: common_vendor.o(($event) => $options.selectMode(3)),
     i: common_vendor.s($options.heroPaddingStyle),
     j: common_vendor.f($data.shortcuts, (item, k0, i0) => {
       return {
@@ -195,7 +199,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: common_vendor.o(($event) => $options.onShortcutTap(item), item.name)
       };
     }),
-    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "25"),
+    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args)),
     l: $options.homeRecommendDishes.length
   }, $options.homeRecommendDishes.length ? {
     m: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
@@ -216,7 +220,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   } : {}, {
     n: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
   }, !$data.recommendLoading && $options.homeRecommendDishes.length === 0 ? {} : {}, {
-    o: common_vendor.o(($event) => $options.onShortcutTap($data.shortcuts[1]), "3c"),
+    o: common_vendor.o(($event) => $options.onShortcutTap($data.shortcuts[1])),
     p: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,

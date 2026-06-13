@@ -9,7 +9,10 @@
     "pages/order/list",
     "pages/order/detail",
     "pages/mine/index",
-    "pages/mine/company-auth"
+    "pages/mine/company-auth",
+    "pages/coupon/center",
+    "pages/coupon/wallet",
+    "pages/coupon/verify-code"
   ],
   "window": {
     "navigationBarTextStyle": "black",

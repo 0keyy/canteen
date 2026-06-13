@@ -313,6 +313,10 @@ export default {
       uni.showToast({ title: '搜索功能开发中', icon: 'none' })
     },
     onShortcutTap(item) {
+      if (item?.name === '优惠券包') {
+        uni.navigateTo({ url: '/pages/coupon/wallet' })
+        return
+      }
       if (item?.name === '储值优惠') {
         uni.showToast({ title: '储值功能开发中', icon: 'none' })
         return

@@ -42,6 +42,20 @@
       </view>
 
       <view class="checkout__section">
+        <view class="checkout__section-title-row">
+          <text class="checkout__section-title">优惠券</text>
+          <text class="checkout__coupon-link" @tap="goCouponCenter">去领券</text>
+        </view>
+        <view v-if="couponInfo" class="checkout__coupon-applied">
+          <text class="checkout__coupon-name">✓ {{ couponInfo.templateName }}</text>
+          <text class="checkout__coupon-discount">-¥{{ couponInfo.discountAmount }}</text>
+        </view>
+        <view v-else class="checkout__coupon-empty">
+          <text class="checkout__coupon-empty-text">暂无可用优惠券</text>
+        </view>
+      </view>
+
+      <view class="checkout__section">
         <pay-method-picker :order-id="orderId" v-model="payChannel" />
       </view>
 
@@ -64,7 +78,12 @@
       <view class="checkout__submit-bar">
         <view class="checkout__submit-info">
           <text class="checkout__submit-label">合计</text>
-          <text class="checkout__submit-price">¥{{ totalAmount }}</text>
+          <text class="checkout__submit-price">
+            ¥{{ finalAmount }}
+          </text>
+          <text v-if="couponDiscount > 0" class="checkout__submit-saved">
+            已优惠¥{{ couponDiscount.toFixed(2) }}
+          </text>
         </view>
         <view class="checkout__submit-btn" @click="handleSubmit">
           <text class="checkout__submit-btn-text">{{ loading ? '提交中...' : '提交并支付' }}</text>
@@ -75,7 +94,7 @@
 </template>
 
 <script>
-import { orderApi } from '../../api/index'
+import { orderApi, couponApi } from '../../api/index'
 import { payOrder, DEFAULT_PAY_CHANNEL } from '../../utils/pay/index'
 import PayMethodPicker from '../../components/pay-method-picker/pay-method-picker.vue'
 
@@ -88,12 +107,19 @@ export default {
       remark: '',
       loading: false,
       diningMode: 1,
-      payChannel: DEFAULT_PAY_CHANNEL
+      payChannel: DEFAULT_PAY_CHANNEL,
+      couponInfo: null,
+      selectedCouponId: 0,
+      couponDiscount: 0
     }
   },
   computed: {
     diningModeText() {
       return { 1: '堂食', 3: '外卖配送' }[this.diningMode] || '堂食'
+    },
+    finalAmount() {
+      const raw = Number(this.totalAmount)
+      return Math.max(0, raw - this.couponDiscount).toFixed(2)
     },
     totalAmount() {
       if (!this.order) return '0.00'
@@ -108,6 +134,7 @@ export default {
     this.orderId = Number(uni.getStorageSync('orderId'))
     this.diningMode = Number(uni.getStorageSync('diningMode') || 1)
     this.loadDetail()
+    this.loadBestCoupon()
   },
   methods: {
     calcDishesAmount(dishes) {
@@ -128,11 +155,29 @@ export default {
         return snapshot
       }
     },
+    goCouponCenter() {
+      uni.navigateTo({ url: '/pages/coupon/center' })
+    },
     async loadDetail() {
       try {
         this.order = await orderApi.detail(this.orderId)
       } catch (e) {
         this.order = { dishes: [], amount: '0.00' }
+      }
+    },
+    async loadBestCoupon() {
+      try {
+        const result = await couponApi.bestForOrder(this.orderId)
+        if (result && result.hasCoupon) {
+          this.couponInfo = result
+          this.selectedCouponId = result.userCouponId
+          this.couponDiscount = Number(result.discountAmount || 0)
+        }
+      } catch (e) {
+        // 无可用的券，静默忽略
+        this.couponInfo = null
+        this.selectedCouponId = 0
+        this.couponDiscount = 0
       }
     },
     async handleSubmit() {
@@ -146,7 +191,8 @@ export default {
         await orderApi.submit({
           orderId: this.orderId,
           remark: this.remark,
-          addressId
+          addressId,
+          couponId: this.selectedCouponId || null
         })
         await payOrder(this.orderId, this.payChannel, 'mp')
         uni.showToast({ title: '支付成功', icon: 'success' })
@@ -340,6 +386,14 @@ export default {
     color: $text-price;
   }
 
+  &__submit-saved {
+    display: block;
+    font-size: 20rpx;
+    color: #34C759;
+    font-weight: 600;
+    margin-top: 2rpx;
+  }
+
   &__submit-btn {
     background: $brand-primary;
     padding: 24rpx 48rpx;
@@ -359,6 +413,45 @@ export default {
 
   &__bottom-space {
     height: 120rpx;
+  }
+
+  &__coupon-link {
+    font-size: 24rpx;
+    color: $brand-primary;
+    font-weight: 600;
+  }
+
+  &__coupon-applied {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16rpx 0;
+    margin-top: 8rpx;
+    background: rgba(52, 199, 89, 0.06);
+    border-radius: 12rpx;
+    padding: 16rpx 20rpx;
+  }
+
+  &__coupon-name {
+    font-size: 26rpx;
+    color: #34C759;
+    font-weight: 600;
+  }
+
+  &__coupon-discount {
+    font-size: 28rpx;
+    color: $text-price;
+    font-weight: 700;
+  }
+
+  &__coupon-empty {
+    padding: 16rpx 0;
+    margin-top: 8rpx;
+  }
+
+  &__coupon-empty-text {
+    font-size: 24rpx;
+    color: $text-secondary;
   }
 }
 </style>

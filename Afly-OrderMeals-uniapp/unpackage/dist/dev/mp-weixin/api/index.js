@@ -48,9 +48,17 @@ const payApi = {
   mockSuccess: (outTradeNo) => utils_request.post("/front/pay/mock/success", null, { outTradeNo }),
   status: (outTradeNo) => utils_request.get("/front/pay/status", { outTradeNo })
 };
+const couponApi = {
+  center: () => utils_request.get("/front/coupon/center"),
+  claim: (templateId) => utils_request.post("/front/coupon/claim", { templateId }),
+  myCoupons: (status) => utils_request.get("/front/coupon/my", { status }),
+  bestForOrder: (orderId) => utils_request.get("/front/coupon/bestForOrder", { orderId }),
+  verifyCode: (userCouponId) => utils_request.get("/front/coupon/verifyCode", { userCouponId })
+};
 exports.addressApi = addressApi;
 exports.authApi = authApi;
 exports.companyApi = companyApi;
+exports.couponApi = couponApi;
 exports.decorateApi = decorateApi;
 exports.orderApi = orderApi;
 exports.payApi = payApi;

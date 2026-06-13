@@ -26,6 +26,8 @@ public class Orders implements Serializable {
     private Integer payStatus;
     private String payType;
     private BigDecimal payAmount;
+    private Integer couponId;
+    private BigDecimal couponDiscount;
     private Long payTime;
     private BigDecimal deliveryFee;
     private String contactName;

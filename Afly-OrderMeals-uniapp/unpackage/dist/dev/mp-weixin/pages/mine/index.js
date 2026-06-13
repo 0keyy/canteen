@@ -28,6 +28,7 @@ const _sfc_main = {
       companyVerified: false,
       companyDeptName: "",
       balance: 0,
+      couponCount: 0,
       primaryActions: PRIMARY_ACTIONS,
       secondaryActions: SECONDARY_ACTIONS
     };
@@ -61,6 +62,12 @@ const _sfc_main = {
         this.companyVerified = !!common_vendor.index.getStorageSync("companyVerified");
         this.companyDeptName = common_vendor.index.getStorageSync("companyDeptName") || "";
       }
+      try {
+        const myCoupons = await api_index.couponApi.myCoupons(1) || [];
+        this.couponCount = myCoupons.length;
+      } catch (e) {
+        this.couponCount = 0;
+      }
     },
     onActionTap(item) {
       if (item.title === "我的订单") {
@@ -73,6 +80,10 @@ const _sfc_main = {
       }
       if (item.title === "公司认证") {
         common_vendor.index.navigateTo({ url: "/pages/mine/company-auth" });
+        return;
+      }
+      if (item.title === "优惠券包") {
+        common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
         return;
       }
       if (item.title === "退出登录") {
@@ -104,10 +115,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.companyVerified && $data.companyDeptName ? {
     e: common_vendor.t($data.companyDeptName)
   } : {}, {
-    f: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "61"),
+    f: common_vendor.o(($event) => $options.onFeatureTap("会员码")),
     g: common_vendor.t($data.balance),
-    h: common_vendor.s($options.heroPaddingStyle),
-    i: common_vendor.f($data.primaryActions, (item, k0, i0) => {
+    h: common_vendor.t($data.couponCount),
+    i: common_vendor.s($options.heroPaddingStyle),
+    j: common_vendor.f($data.primaryActions, (item, k0, i0) => {
       return {
         a: common_vendor.n(`profile-page__action-icon--${item.icon}`),
         b: common_vendor.t(item.title),
@@ -115,7 +127,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       };
     }),
-    j: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
+    k: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
       return {
         a: common_vendor.n(`profile-page__action-icon--${item.icon}`),
         b: common_vendor.t(item.title),
@@ -123,7 +135,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       };
     }),
-    k: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    l: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),
