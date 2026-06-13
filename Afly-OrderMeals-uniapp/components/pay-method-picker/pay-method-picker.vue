@@ -32,15 +32,16 @@ export default {
       type: Number,
       required: true
     },
-    value: {
+    modelValue: {
       type: String,
       default: DEFAULT_PAY_CHANNEL
     }
   },
+  emits: ['update:modelValue', 'change', 'loaded'],
   data() {
     return {
       methods: [],
-      selected: this.value || DEFAULT_PAY_CHANNEL
+      selected: this.modelValue || DEFAULT_PAY_CHANNEL
     }
   },
   watch: {
@@ -50,14 +51,20 @@ export default {
         if (val) this.loadMethods()
       }
     },
-    value(val) {
-      this.selected = val
+    modelValue(val) {
+      this.selected = val || DEFAULT_PAY_CHANNEL
     }
   },
   methods: {
     itemDesc(item) {
       if (item.channel === 'balance' && item.balance !== undefined) {
         return `可用余额 ${item.balance}，本次需 ${item.requiredBalance || 0}`
+      }
+      if (item.channel === 'credit') {
+        const limit = item.creditLimit ?? 0
+        const used = item.creditUsed ?? 0
+        const remain = item.creditRemain ?? 0
+        return `本月额度 ${limit}，已用 ${used}，剩余 ${remain}`
       }
       return item.desc || ''
     },
@@ -87,7 +94,7 @@ export default {
     },
     selectChannel(channel) {
       this.selected = channel
-      this.$emit('input', channel)
+      this.$emit('update:modelValue', channel)
       this.$emit('change', channel)
     }
   }

@@ -63,15 +63,17 @@ const _sfc_main = {
       }
     },
     async handleSubmit() {
+      if (!this.payChannel) {
+        common_vendor.index.showToast({ title: "请选择支付方式", icon: "none" });
+        return;
+      }
       this.loading = true;
       try {
         const addressId = common_vendor.index.getStorageSync("addressId") || null;
         await api_index.orderApi.submit({
           orderId: this.orderId,
           remark: this.remark,
-          addressId,
-          payChannel: this.payChannel,
-          payScene: "mp"
+          addressId
         });
         await utils_pay_index.payOrder(this.orderId, this.payChannel, "mp");
         common_vendor.index.showToast({ title: "支付成功", icon: "success" });

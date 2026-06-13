@@ -136,15 +136,17 @@ export default {
       }
     },
     async handleSubmit() {
+      if (!this.payChannel) {
+        uni.showToast({ title: '请选择支付方式', icon: 'none' })
+        return
+      }
       this.loading = true
       try {
         const addressId = uni.getStorageSync('addressId') || null
         await orderApi.submit({
           orderId: this.orderId,
           remark: this.remark,
-          addressId,
-          payChannel: this.payChannel,
-          payScene: 'mp'
+          addressId
         })
         await payOrder(this.orderId, this.payChannel, 'mp')
         uni.showToast({ title: '支付成功', icon: 'success' })

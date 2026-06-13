@@ -55,5 +55,9 @@ public class UserPointsLog implements Serializable {
     private String mobile;
 
     @TableField(exist = false)
-    private String nickname;
+    private String nickName;
+
+    /** 小程序用户昵称（la_user.nickname），与 nickName 不可同名避免 Lombok 冲突 */
+    @TableField(exist = false)
+    private String userNickname;
 }

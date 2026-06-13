@@ -15,7 +15,6 @@ public class UserCompanyListVo implements Serializable {
     private String nickname;
     private String deptName;
     private String userName;
-    private String nickName;
     private Integer balance;
     private String authTime;
 }

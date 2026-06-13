@@ -1,6 +1,7 @@
 "use strict";
 const PAY_CHANNEL = {
   BALANCE: "balance",
+  CREDIT: "credit",
   AGGREGATE: "aggregate",
   WXPAY: "wxpay",
   ALIPAY: "alipay"

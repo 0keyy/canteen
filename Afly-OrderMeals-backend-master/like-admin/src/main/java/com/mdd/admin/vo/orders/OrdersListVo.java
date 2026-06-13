@@ -20,6 +20,7 @@ public class OrdersListVo implements Serializable {
     private Integer status;
     private Integer payStatus;
     private String payType;
+    private String payTypeText;
     private String contactName;
     private String contactMobile;
     private String pickupCode;

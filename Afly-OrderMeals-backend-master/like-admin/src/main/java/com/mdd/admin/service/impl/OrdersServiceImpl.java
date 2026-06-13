@@ -14,12 +14,16 @@ import com.mdd.admin.vo.orders.OrdersCurrentVo;
 import com.mdd.admin.vo.orders.OrdersDishListVo;
 import com.mdd.admin.vo.orders.OrdersListVo;
 import com.mdd.common.config.GlobalConfig;
+import com.mdd.common.constant.PayChannelConstant;
 import com.mdd.common.core.PageResult;
+import com.mdd.common.entity.orders.OrderPay;
 import com.mdd.common.entity.orders.Orders;
 import com.mdd.common.entity.orders.OrdersDish;
 import com.mdd.common.exception.BaseException;
+import com.mdd.common.mapper.orders.OrderPayMapper;
 import com.mdd.common.mapper.orders.OrdersDishMapper;
 import com.mdd.common.mapper.orders.OrdersMapper;
+import com.mdd.common.util.StringUtils;
 import com.mdd.common.util.TimeUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -40,6 +44,8 @@ public class OrdersServiceImpl implements IOrdersServcice {
     OrdersMapper ordersMapper;
     @Resource
     OrdersDishMapper ordersDishMapper;
+    @Resource
+    OrderPayMapper orderPayMapper;
 
     @Override
     public PageResult<OrdersListVo> list(PageValidate pageValidate, OrdersSearchValidate searchValidate) {
@@ -78,6 +84,9 @@ public class OrdersServiceImpl implements IOrdersServcice {
             OrdersListVo vo = new OrdersListVo();
             BeanUtils.copyProperties(item, vo);
             vo.setDeskName(item.getDeskName());
+            String payType = resolvePayType(item);
+            vo.setPayType(payType);
+            vo.setPayTypeText(PayChannelConstant.displayName(payType));
             vo.setCreateTime(TimeUtils.timestampToDate(item.getCreateTime()));
             vo.setSubmitTime(formatTime(item.getSubmitTime()));
             vo.setPayTime(formatTime(item.getPayTime()));
@@ -197,5 +206,20 @@ public class OrdersServiceImpl implements IOrdersServcice {
 
     private String formatTime(Long timestamp) {
         return timestamp != null && timestamp > 0 ? TimeUtils.timestampToDate(timestamp) : "-";
+    }
+
+    private String resolvePayType(Orders orders) {
+        if (orders == null) {
+            return "";
+        }
+        if (StringUtils.isNotEmpty(orders.getPayType())) {
+            return orders.getPayType();
+        }
+        OrderPay orderPay = orderPayMapper.selectOne(new QueryWrapper<OrderPay>()
+                .eq("order_id", orders.getId())
+                .eq("pay_status", 1)
+                .orderByDesc("id")
+                .last("limit 1"));
+        return orderPay == null || orderPay.getPayChannel() == null ? "" : orderPay.getPayChannel();
     }
 }

@@ -394,10 +394,22 @@ public class AppOrderServiceImpl implements IAppOrderService {
     }
 
     public void markPaid(Orders orders) {
+        long now = TimeUtils.timestamp();
+        Orders update = new Orders();
+        update.setId(orders.getId());
+        update.setPayStatus(1);
+        update.setStatus(1);
+        update.setPayTime(now);
+        if (orders.getPayType() != null && !orders.getPayType().isEmpty()) {
+            update.setPayType(orders.getPayType());
+        }
+        if (orders.getPayAmount() != null) {
+            update.setPayAmount(orders.getPayAmount());
+        }
+        ordersMapper.updateById(update);
         orders.setPayStatus(1);
         orders.setStatus(1);
-        orders.setPayTime(TimeUtils.timestamp());
-        ordersMapper.updateById(orders);
+        orders.setPayTime(now);
         AdminNotifyUtils.notifySeller(orders.getAid().toString(), orders);
     }
 }

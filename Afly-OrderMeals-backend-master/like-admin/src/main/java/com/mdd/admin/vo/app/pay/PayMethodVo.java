@@ -28,4 +28,13 @@ public class PayMethodVo implements Serializable {
 
     /** 余额渠道：本次所需余额 */
     private Integer requiredBalance;
+
+    /** 挂账渠道：月挂账上限（元） */
+    private java.math.BigDecimal creditLimit;
+
+    /** 挂账渠道：本月已挂账（元） */
+    private java.math.BigDecimal creditUsed;
+
+    /** 挂账渠道：本月剩余额度（元） */
+    private java.math.BigDecimal creditRemain;
 }

@@ -116,6 +116,11 @@ public class LikeAdminInterceptor implements HandlerInterceptor {
             return HandlerInterceptor.super.preHandle(request, response, handler);
         }
 
+        // 认证与积分页面：拥有 company:manage 即可访问其下全部子接口
+        if (auths.startsWith("company:") && StpUtil.hasPermission("company:manage")) {
+            return HandlerInterceptor.super.preHandle(request, response, handler);
+        }
+
         // 校验用户的权限
         StpUtil.checkPermission(auths);
 

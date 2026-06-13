@@ -15,7 +15,9 @@ import com.mdd.common.util.PointsPayUtils;
 import com.mdd.common.util.TimeUtils;
 import com.mdd.admin.service.app.IAggregatePayService;
 import com.mdd.admin.service.app.IAppPayService;
+import com.mdd.admin.service.app.ICreditPayService;
 import com.mdd.admin.service.app.IUserPointsService;
+import com.mdd.admin.vo.app.pay.CreditPayInfoVo;
 import com.mdd.admin.validate.app.pay.PayCreateValidate;
 import com.mdd.admin.vo.app.pay.PayCreateVo;
 import com.mdd.admin.vo.app.pay.PayMethodVo;
@@ -44,7 +46,11 @@ public class AppPayServiceImpl implements IAppPayService {
     @Resource
     private IUserPointsService userPointsService;
     @Resource
+    private ICreditPayService creditPayService;
+    @Resource
     private IAggregatePayService aggregatePayService;
+    @Resource
+    private AppPayServiceImpl self;
 
     @Override
     public List<PayMethodVo> listMethods(Integer orderId, Integer userId) {
@@ -68,6 +74,22 @@ public class AppPayServiceImpl implements IAppPayService {
         }
         methods.add(balanceMethod);
 
+        CreditPayInfoVo creditInfo = creditPayService.getPayInfo(userId, payAmount);
+        PayMethodVo creditMethod = new PayMethodVo();
+        creditMethod.setChannel(PayChannelConstant.CREDIT);
+        creditMethod.setName("挂账支付");
+        creditMethod.setDesc("本月额度 " + formatAmount(creditInfo.getCreditLimit())
+                + "，已用 " + formatAmount(creditInfo.getCreditUsed())
+                + "，剩余 " + formatAmount(creditInfo.getCreditRemain()));
+        creditMethod.setCreditLimit(creditInfo.getCreditLimit());
+        creditMethod.setCreditUsed(creditInfo.getCreditUsed());
+        creditMethod.setCreditRemain(creditInfo.getCreditRemain());
+        creditMethod.setEnabled(Boolean.TRUE.equals(creditInfo.getEnabled()));
+        if (!Boolean.TRUE.equals(creditInfo.getEnabled())) {
+            creditMethod.setDisabledReason(creditInfo.getDisabledReason());
+        }
+        methods.add(creditMethod);
+
         PayMethodVo aggregateMethod = new PayMethodVo();
         aggregateMethod.setChannel(PayChannelConstant.AGGREGATE);
         aggregateMethod.setName("在线支付");
@@ -88,13 +110,29 @@ public class AppPayServiceImpl implements IAppPayService {
     }
 
     @Override
-    @Transactional
     public PayCreateVo create(PayCreateValidate validate, Integer userId) {
         Orders orders = getPayableOrder(validate.getOrderId(), userId);
         String payChannel = validate.getPayChannel() == null ? PayChannelConstant.BALANCE : validate.getPayChannel();
         String payScene = validate.getPayScene() == null ? "mp" : validate.getPayScene();
         BigDecimal payAmount = resolvePayAmount(orders);
 
+        // 挂账需先查 ruoyi 库角色（sys_user_role / sys_role），不可放在 @Transactional 内
+        CreditPayInfoVo creditPrepare = null;
+        if (PayChannelConstant.CREDIT.equals(payChannel)) {
+            creditPrepare = creditPayService.getPayInfo(userId, payAmount);
+            if (!Boolean.TRUE.equals(creditPrepare.getEnabled())) {
+                String reason = creditPrepare.getDisabledReason();
+                throw new BaseException(500, reason == null ? "挂账支付不可用" : reason);
+            }
+        }
+
+        return self.executeCreateInTransaction(orders, userId, payChannel, payScene, payAmount, creditPrepare);
+    }
+
+    @Transactional
+    public PayCreateVo executeCreateInTransaction(Orders orders, Integer userId, String payChannel,
+                                                String payScene, BigDecimal payAmount,
+                                                CreditPayInfoVo creditPrepare) {
         String outTradeNo = "PAY" + System.currentTimeMillis() + UUID.randomUUID().toString().substring(0, 6);
         OrderPay orderPay = buildOrderPay(orders, userId, payChannel, payScene, outTradeNo, payAmount);
         orderPayMapper.insert(orderPay);
@@ -106,6 +144,9 @@ public class AppPayServiceImpl implements IAppPayService {
 
         if (PayChannelConstant.BALANCE.equals(payChannel)) {
             return createBalancePay(orders, orderPay, userId);
+        }
+        if (PayChannelConstant.CREDIT.equals(payChannel)) {
+            return createCreditPay(orders, orderPay, userId, creditPrepare);
         }
         if (PayChannelConstant.AGGREGATE.equals(payChannel)) {
             return aggregatePayService.createPrepay(orders, orderPay);
@@ -140,6 +181,18 @@ public class AppPayServiceImpl implements IAppPayService {
                 .eq("out_trade_no", outTradeNo)
                 .eq("user_id", userId));
         return orderPay == null ? -1 : orderPay.getPayStatus();
+    }
+
+    private PayCreateVo createCreditPay(Orders orders, OrderPay orderPay, Integer userId,
+                                        CreditPayInfoVo creditPrepare) {
+        creditPayService.applyDeduction(userId, orders.getId(), orderPay.getOutTradeNo(),
+                orderPay.getPayAmount(), creditPrepare);
+        completePay(orderPay.getOutTradeNo(), "credit_" + orderPay.getOutTradeNo(), "credit");
+
+        PayCreateVo vo = buildBasePayVo(orders, orderPay);
+        vo.setCompleted(true);
+        vo.setMockPay(false);
+        return vo;
     }
 
     private PayCreateVo createBalancePay(Orders orders, OrderPay orderPay, Integer userId) {
@@ -242,6 +295,13 @@ public class AppPayServiceImpl implements IAppPayService {
         orders.setPayType(orderPay.getPayChannel());
         orders.setPayAmount(orderPay.getPayAmount());
         orderService.markPaid(orders);
+    }
+
+    private String formatAmount(BigDecimal amount) {
+        if (amount == null) {
+            return "0";
+        }
+        return amount.stripTrailingZeros().toPlainString();
     }
 
     private String extractOutTradeNo(String body) {

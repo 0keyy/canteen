@@ -20,10 +20,14 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
 public class AppCompanyAuthServiceImpl implements IAppCompanyAuthService {
+
+    private static final int MIN_EMPLOYMENT_DAYS = 30;
 
     @Resource
     private RuoyiSysService ruoyiSysService;
@@ -72,6 +76,8 @@ public class AppCompanyAuthServiceImpl implements IAppCompanyAuthService {
             throw new OperateException("密码错误");
         }
 
+        validateEmploymentDays(sysUser);
+
         UserCompany ruoyiBound = userCompanyMapper.selectOne(new QueryWrapper<UserCompany>()
                 .eq("ruoyi_user_id", sysUser.getUserId())
                 .last("limit 1"));
@@ -108,6 +114,18 @@ public class AppCompanyAuthServiceImpl implements IAppCompanyAuthService {
             return vo;
         } catch (DuplicateKeyException e) {
             throw new OperateException(resolveDuplicateMessage(e));
+        }
+    }
+
+    private void validateEmploymentDays(RuoyiSysUser sysUser) {
+        if (sysUser.getCreateTime() == null) {
+            throw new OperateException("入职时间未满30天");
+        }
+        LocalDate createDate = sysUser.getCreateTime().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+        if (createDate.plusDays(MIN_EMPLOYMENT_DAYS).isAfter(LocalDate.now())) {
+            throw new OperateException("入职时间未满30天");
         }
     }
 

@@ -37,7 +37,11 @@
                 <el-table-column label="就餐方式" width="100" :formatter="(row) => diningModeText(row.diningMode)" />
                 <el-table-column label="联系人" width="100" prop="contactName" />
                 <el-table-column label="手机号" width="120" prop="contactMobile" />
-                <el-table-column label="支付方式" width="90" :formatter="(row) => payTypeText(row.payType)" />
+                <el-table-column label="支付方式" width="90">
+                    <template #default="{ row }">
+                        {{ row.payTypeText || payTypeText(row.payType) }}
+                    </template>
+                </el-table-column>
                 <el-table-column label="状态" width="100">
                     <template #default="{ row }">
                         <el-tag :type="statusTagType(row)" size="small">{{ statusText(row) }}</el-tag>
@@ -111,6 +115,7 @@ const diningModeText = (mode?: number) => {
 
 const payTypeText = (payType?: string) => {
     if (payType === 'balance') return '余额'
+    if (payType === 'credit') return '挂账'
     if (payType === 'wxpay') return '微信'
     if (payType === 'alipay') return '支付宝'
     if (payType === 'aggregate') return '在线支付'

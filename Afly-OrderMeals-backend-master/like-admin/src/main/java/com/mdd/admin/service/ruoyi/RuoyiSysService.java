@@ -64,6 +64,13 @@ public class RuoyiSysService {
                 .last("limit 1"));
     }
 
+    public List<RuoyiSysRole> selectAllRoles() {
+        return ruoyiSysRoleMapper.selectList(new QueryWrapper<RuoyiSysRole>()
+                .eq("status", "0")
+                .eq("del_flag", "0")
+                .orderByAsc("role_id"));
+    }
+
     public List<RuoyiSysRole> selectRolesByUserId(Long userId) {
         if (userId == null || userId <= 0) {
             return Collections.emptyList();

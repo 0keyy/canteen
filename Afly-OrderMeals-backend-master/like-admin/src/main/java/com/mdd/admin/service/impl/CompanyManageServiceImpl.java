@@ -43,7 +43,7 @@ public class CompanyManageServiceImpl implements ICompanyManageService {
     public PageResult<UserCompanyListVo> authList(PageValidate pageValidate, UserCompanySearchValidate searchValidate) {
         MPJQueryWrapper<UserCompany> wrapper = new MPJQueryWrapper<UserCompany>()
                 .selectAll(UserCompany.class)
-                .select("u.mobile as mobile", "u.nickname as nickname", "IFNULL(up.points, 0) as balance")
+                .select("u.mobile as mobile", "u.nickname as userNickname", "IFNULL(up.points, 0) as balance")
                 .leftJoin("?_user u ON u.id=t.user_id AND u.is_delete=0".replace("?_", GlobalConfig.tablePrefix))
                 .leftJoin("?_user_points up ON up.user_id=t.user_id".replace("?_", GlobalConfig.tablePrefix))
                 .orderByDesc("t.auth_time");
@@ -59,6 +59,7 @@ public class CompanyManageServiceImpl implements ICompanyManageService {
         for (UserCompany item : iPage.getRecords()) {
             UserCompanyListVo vo = new UserCompanyListVo();
             BeanUtils.copyProperties(item, vo);
+            vo.setNickname(resolveDisplayName(item.getNickName(), item.getUserNickname()));
             vo.setBalance(item.getBalance() == null ? 0 : item.getBalance());
             vo.setAuthTime(item.getAuthTime() != null && item.getAuthTime() > 0
                     ? TimeUtils.timestampToDate(item.getAuthTime()) : "-");
@@ -71,8 +72,9 @@ public class CompanyManageServiceImpl implements ICompanyManageService {
     public PageResult<UserPointsLogListVo> pointsLogList(PageValidate pageValidate, UserPointsLogSearchValidate searchValidate) {
         MPJQueryWrapper<UserPointsLog> wrapper = new MPJQueryWrapper<UserPointsLog>()
                 .selectAll(UserPointsLog.class)
-                .select("u.mobile as mobile", "u.nickname as nickname")
+                .select("u.mobile as mobile", "uc.nick_name as nickName", "u.nickname as userNickname")
                 .leftJoin("?_user u ON u.id=t.user_id AND u.is_delete=0".replace("?_", GlobalConfig.tablePrefix))
+                .leftJoin("?_user_company uc ON uc.user_id=t.user_id".replace("?_", GlobalConfig.tablePrefix))
                 .orderByDesc("t.id");
 
         applyPointsLogSearch(wrapper, searchValidate);
@@ -86,6 +88,7 @@ public class CompanyManageServiceImpl implements ICompanyManageService {
         for (UserPointsLog item : iPage.getRecords()) {
             UserPointsLogListVo vo = new UserPointsLogListVo();
             BeanUtils.copyProperties(item, vo);
+            vo.setNickname(resolveDisplayName(item.getNickName(), item.getUserNickname()));
             vo.setSourceText(resolveSourceText(item.getSource()));
             vo.setCreateTime(item.getCreateTime() != null && item.getCreateTime() > 0
                     ? TimeUtils.timestampToDate(item.getCreateTime()) : "-");
@@ -193,5 +196,12 @@ public class CompanyManageServiceImpl implements ICompanyManageService {
             return "手工发放";
         }
         return "未知";
+    }
+
+    private String resolveDisplayName(String nickName, String nickname) {
+        if (StringUtils.isNotEmpty(nickName)) {
+            return nickName;
+        }
+        return nickname == null ? "" : nickname;
     }
 }
