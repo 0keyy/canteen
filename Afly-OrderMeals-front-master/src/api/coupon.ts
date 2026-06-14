@@ -34,3 +34,8 @@ export function couponTemplateStatus(params: any) {
 export function couponVerify(params: any) {
     return request.post({ url: '/coupon/verify', params })
 }
+
+// 用户核销领取记录列表
+export function couponRecordList(params?: any) {
+    return request.get({ url: '/coupon/record/list', params })
+}
