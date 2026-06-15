@@ -167,7 +167,8 @@ public class UserPointsServiceImpl implements IUserPointsService {
         }
         int required = PointsPayUtils.toPoints(payAmount);
         if (required <= 0) {
-            throw new BaseException(500, "支付金额无效");
+            // 金额为0（如优惠券全额抵扣），无需扣款
+            return;
         }
 
         UserPoints account = userPointsMapper.selectOne(new QueryWrapper<UserPoints>()

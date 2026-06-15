@@ -309,8 +309,21 @@ public class AppOrderServiceImpl implements IAppOrderService {
         orders.setAmount(totalAmount.toPlainString());
         orders.setDeliveryFee(deliveryFee);
         orders.setPayAmount(totalAmount);
-        orders.setPayStatus(0);
         orders.setSubmitTime(now);
+
+        // 优惠券全额抵扣时无需支付，直接标记已支付
+        if (totalAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            orders.setPayStatus(1);
+            orders.setStatus(1);
+            orders.setPayTime(now);
+            orders.setPayType("coupon");
+            ordersMapper.updateById(orders);
+            OrderDetailVo vo = buildDetailVo(orders);
+            vo.setNeedPay(false);
+            return vo;
+        }
+
+        orders.setPayStatus(0);
         orders.setStatus(4);
         ordersMapper.updateById(orders);
 

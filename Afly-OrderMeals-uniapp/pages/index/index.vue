@@ -176,8 +176,8 @@ export default {
       recommendLoading: false,
       shortcuts: [
         { name: '积分商城', desc: '神秘好物等你来', iconClass: 'home__icon--points' },
-        { name: '储值优惠', desc: '查看&绑定', iconClass: 'home__icon--wallet' },
-        { name: '优惠券包', desc: '享多重优惠', iconClass: 'home__icon--coupon' }
+        { name: '领券中心', desc: '限时领取优惠', iconClass: 'home__icon--coupon' },
+        { name: '优惠券包', desc: '享多重优惠', iconClass: 'home__icon--wallet' }
       ]
     }
   },
@@ -317,8 +317,8 @@ export default {
         uni.navigateTo({ url: '/pages/coupon/wallet' })
         return
       }
-      if (item?.name === '储值优惠') {
-        uni.showToast({ title: '储值功能开发中', icon: 'none' })
+      if (item?.name === '领券中心') {
+        uni.navigateTo({ url: '/pages/coupon/center' })
         return
       }
       uni.showToast({ title: '功能开发中', icon: 'none' })

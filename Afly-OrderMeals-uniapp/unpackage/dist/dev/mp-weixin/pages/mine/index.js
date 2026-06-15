@@ -115,7 +115,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.companyVerified && $data.companyDeptName ? {
     e: common_vendor.t($data.companyDeptName)
   } : {}, {
-    f: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "e1"),
+    f: common_vendor.o(($event) => $options.onFeatureTap("会员码")),
     g: common_vendor.t($data.balance),
     h: common_vendor.t($data.couponCount),
     i: common_vendor.s($options.heroPaddingStyle),

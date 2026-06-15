@@ -185,8 +185,10 @@ public class AppPayServiceImpl implements IAppPayService {
 
     private PayCreateVo createCreditPay(Orders orders, OrderPay orderPay, Integer userId,
                                         CreditPayInfoVo creditPrepare) {
-        creditPayService.applyDeduction(userId, orders.getId(), orderPay.getOutTradeNo(),
-                orderPay.getPayAmount(), creditPrepare);
+        if (orderPay.getPayAmount() != null && orderPay.getPayAmount().compareTo(BigDecimal.ZERO) > 0) {
+            creditPayService.applyDeduction(userId, orders.getId(), orderPay.getOutTradeNo(),
+                    orderPay.getPayAmount(), creditPrepare);
+        }
         completePay(orderPay.getOutTradeNo(), "credit_" + orderPay.getOutTradeNo(), "credit");
 
         PayCreateVo vo = buildBasePayVo(orders, orderPay);
@@ -196,7 +198,9 @@ public class AppPayServiceImpl implements IAppPayService {
     }
 
     private PayCreateVo createBalancePay(Orders orders, OrderPay orderPay, Integer userId) {
-        userPointsService.deductForOrder(userId, orders.getId(), orderPay.getOutTradeNo(), orderPay.getPayAmount());
+        if (orderPay.getPayAmount() != null && orderPay.getPayAmount().compareTo(BigDecimal.ZERO) > 0) {
+            userPointsService.deductForOrder(userId, orders.getId(), orderPay.getOutTradeNo(), orderPay.getPayAmount());
+        }
         completePay(orderPay.getOutTradeNo(), "balance_" + orderPay.getOutTradeNo(), "balance");
 
         PayCreateVo vo = buildBasePayVo(orders, orderPay);

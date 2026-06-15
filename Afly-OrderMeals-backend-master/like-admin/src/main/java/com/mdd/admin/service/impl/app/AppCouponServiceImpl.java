@@ -86,12 +86,13 @@ public class AppCouponServiceImpl implements IAppCouponService {
     public Map<String, Object> claim(Integer templateId, Integer userId) {
         long now = TimeUtils.timestamp();
 
-        // 验证模板存在
+        // 使用 FOR UPDATE 悲观锁查询模板，防止并发超发
         CouponTemplate template = couponTemplateMapper.selectOne(
                 new QueryWrapper<CouponTemplate>()
                         .eq("id", templateId)
                         .eq("is_delete", 0)
-                        .eq("is_show", 1));
+                        .eq("is_show", 1)
+                        .last("FOR UPDATE"));
 
         if (template == null) {
             throw new BaseException(500, "券不存在或已下架");
@@ -105,16 +106,18 @@ public class AppCouponServiceImpl implements IAppCouponService {
             throw new BaseException(500, "领取时间已过");
         }
 
-        // 验证库存
-        if (template.getTotalStock() > 0 && template.getClaimedCount() >= template.getTotalStock()) {
+        // 验证库存（FOR UPDATE 保证并发安全）
+        int claimedCount = template.getClaimedCount() != null ? template.getClaimedCount() : 0;
+        if (template.getTotalStock() > 0 && claimedCount >= template.getTotalStock()) {
             throw new BaseException(500, "该券已被领完");
         }
 
-        // 验证用户是否已领取
+        // 验证用户是否已领取（过滤软删除记录）
         Long alreadyClaimed = userCouponMapper.selectCount(
                 new QueryWrapper<UserCoupon>()
                         .eq("template_id", templateId)
-                        .eq("user_id", userId));
+                        .eq("user_id", userId)
+                        .eq("is_delete", 0));
         if (alreadyClaimed > 0) {
             throw new BaseException(500, "您已领取过该券");
         }
@@ -130,8 +133,8 @@ public class AppCouponServiceImpl implements IAppCouponService {
             useEndTime = template.getUseEndTime() != null ? template.getUseEndTime() : 0;
         }
 
-        // 生成核销码（仅兑换券和套餐券）
-        String verifyCode = "";
+        // 生成核销码（仅兑换券和套餐券，其余类型为 NULL 避免唯一键冲突）
+        String verifyCode = null;
         if (template.getType() == 3 || template.getType() == 4) {
             verifyCode = UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
         }
@@ -149,7 +152,7 @@ public class AppCouponServiceImpl implements IAppCouponService {
         userCouponMapper.insert(userCoupon);
 
         // 增加已领取计数
-        template.setClaimedCount((template.getClaimedCount() != null ? template.getClaimedCount() : 0) + 1);
+        template.setClaimedCount(claimedCount + 1);
         couponTemplateMapper.updateById(template);
 
         Map<String, Object> result = new HashMap<>();
@@ -157,7 +160,7 @@ public class AppCouponServiceImpl implements IAppCouponService {
         result.put("templateId", templateId);
         result.put("templateName", template.getName());
         result.put("discountAmount", template.getDiscountAmount());
-        result.put("verifyCode", verifyCode);
+        result.put("verifyCode", verifyCode != null ? verifyCode : "");
         return result;
     }
 

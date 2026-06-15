@@ -146,26 +146,26 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       };
     }),
     i: common_vendor.t($options.totalAmount),
-    j: common_vendor.o((...args) => $options.goCouponCenter && $options.goCouponCenter(...args), "4d"),
+    j: common_vendor.o((...args) => $options.goCouponCenter && $options.goCouponCenter(...args)),
     k: $data.couponInfo
   }, $data.couponInfo ? {
     l: common_vendor.t($data.couponInfo.templateName),
     m: common_vendor.t($data.couponInfo.discountAmount)
   } : {}, {
-    n: common_vendor.o(($event) => $data.payChannel = $event, "4f"),
+    n: common_vendor.o(($event) => $data.payChannel = $event),
     o: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
     p: $data.remark,
-    q: common_vendor.o(($event) => $data.remark = $event.detail.value, "5b"),
+    q: common_vendor.o(($event) => $data.remark = $event.detail.value),
     r: common_vendor.t($options.finalAmount),
     s: $data.couponDiscount > 0
   }, $data.couponDiscount > 0 ? {
     t: common_vendor.t($data.couponDiscount.toFixed(2))
   } : {}, {
     v: common_vendor.t($data.loading ? "提交中..." : "提交并支付"),
-    w: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "9d")
+    w: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args))
   }) : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-aaa7ef6e"]]);

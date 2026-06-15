@@ -64,6 +64,9 @@ public class GlobalException {
         if (raw.contains("uk_user_id")) {
             return AjaxResult.failed(HttpEnum.FAILED.getCode(), "您已完成公司认证，无需重复认证");
         }
+        if (raw.contains("uk_user_template")) {
+            return AjaxResult.failed(HttpEnum.FAILED.getCode(), "您已领取过该券");
+        }
         return AjaxResult.failed(HttpEnum.FAILED.getCode(), "数据已存在，请勿重复操作");
     }
 
