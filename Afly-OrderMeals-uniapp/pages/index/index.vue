@@ -116,11 +116,11 @@
             </view>
           </view>
 
-          <view class="home__promo" @tap="onShortcutTap(shortcuts[1])">
-            <view class="home__promo-icon home__icon home__icon--wallet"></view>
+          <view class="home__promo" @tap="goCouponCenter">
+            <view class="home__promo-icon home__icon home__icon--coupon"></view>
             <view class="home__promo-content">
-              <text class="home__promo-sub">下单至储值活动</text>
-              <text class="home__promo-title">储100元送5元优惠券×2</text>
+              <text class="home__promo-sub">限时优惠</text>
+              <text class="home__promo-title">领取优惠券，下单更优惠</text>
             </view>
             <text class="home__promo-arrow">›</text>
           </view>
@@ -322,6 +322,9 @@ export default {
         return
       }
       uni.showToast({ title: '功能开发中', icon: 'none' })
+    },
+    goCouponCenter() {
+      uni.navigateTo({ url: '/pages/coupon/center' })
     }
   }
 }

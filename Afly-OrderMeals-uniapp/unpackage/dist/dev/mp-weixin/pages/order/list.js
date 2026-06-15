@@ -86,7 +86,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: $data.pendingTotal > 0
   }, $data.pendingTotal > 0 ? {
     c: common_vendor.t($data.pendingTotal.toFixed(2)),
-    d: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args))
+    d: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "3a")
   } : {}, {
     e: $data.list.length > 0
   }, $data.list.length > 0 ? {
