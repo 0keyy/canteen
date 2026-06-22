@@ -4,5 +4,5 @@
 
 export const WX_APP_NAME = '点餐小程序'
 
-export const DEV_API_BASE_URL = 'http://localhost:8082/api'
+export const DEV_API_BASE_URL = 'http://47.97.4.12:8082/api'
 export const PROD_API_BASE_URL = 'https://your-domain.com/api'
