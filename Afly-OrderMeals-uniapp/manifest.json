@@ -1,37 +1,37 @@
 {
-  "name": "点餐小程序",
-  "appid": "__UNI__ORDERMEALS",
-  "description": "线上点餐",
-  "versionName": "1.0.0",
-  "versionCode": "100",
-  "transformPx": false,
-  "mp-weixin": {
-    "appid": "wx05421f029390b075",
-    "setting": {
-      "urlCheck": true,
-      "es6": true,
-      "minified": true,
-      "ignoreDevUnusedFiles": false,
-      "ignoreUploadUnusedFiles": false,
-      "compileHotReLoad": false
+    "name" : "点餐小程序",
+    "appid" : "__UNI__ORDERMEALS",
+    "description" : "线上点餐",
+    "versionName" : "1.0.0",
+    "versionCode" : "100",
+    "transformPx" : false,
+    "mp-weixin" : {
+        "appid" : "wxe17e32d6876402e4",
+        "setting" : {
+            "urlCheck" : true,
+            "es6" : true,
+            "minified" : true,
+            "ignoreDevUnusedFiles" : false,
+            "ignoreUploadUnusedFiles" : false,
+            "compileHotReLoad" : false
+        },
+        "usingComponents" : true,
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "用于外卖配送定位"
+            }
+        }
     },
-    "usingComponents": true,
-    "permission": {
-      "scope.userLocation": {
-        "desc": "用于外卖配送定位"
-      }
-    }
-  },
-  "mp-alipay": {
-    "usingComponents": true
-  },
-  "app-plus": {
-    "distribute": {
-      "android": {
-        "permissions": []
-      },
-      "ios": {}
-    }
-  },
-  "vueVersion": "3"
+    "mp-alipay" : {
+        "usingComponents" : true
+    },
+    "app-plus" : {
+        "distribute" : {
+            "android" : {
+                "permissions" : []
+            },
+            "ios" : {}
+        }
+    },
+    "vueVersion" : "3"
 }

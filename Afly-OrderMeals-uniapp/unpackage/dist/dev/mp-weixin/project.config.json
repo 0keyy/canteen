@@ -18,6 +18,7 @@
       "disablePlugins": [],
       "outputPath": ""
     },
+    "urlCheck": true,
     "ignoreUploadUnusedFiles": false
   },
   "condition": {},
@@ -25,5 +26,5 @@
     "tabIndent": "auto",
     "tabSize": 2
   },
-  "appid": "wx05421f029390b075"
+  "appid": "wxe17e32d6876402e4"
 }
