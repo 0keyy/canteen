@@ -1,5 +1,5 @@
-/* 粮兴坊风格设计系统 v2 */
-/* ===== 主色：正红 / 暖橙 ===== */
+/* 粮兴坊 UI 图风格设计系统 */
+/* ===== 主色：招牌红 / 粉红渐变 ===== */
 /* ===== 背景 ===== */
 /* ===== 我的页渐变背景 ===== */
 /* ===== 用户信息栏背景 ===== */
@@ -22,16 +22,16 @@
   min-height: 88rpx;
   padding: 0 24rpx;
   border-radius: 24rpx;
-  background: #F5F0EA;
+  background: #F5F5F5;
   font-size: 28rpx;
-  color: #1A1410;
+  color: #111111;
 }
 .dept-picker__placeholder.data-v-a752faee {
-  color: #7F7368;
+  color: #666666;
 }
 .dept-picker__arrow.data-v-a752faee {
   font-size: 36rpx;
-  color: #7F7368;
+  color: #666666;
   line-height: 1;
 }
 .dept-picker__popup.data-v-a752faee {
@@ -71,12 +71,12 @@
 .dept-picker__title.data-v-a752faee {
   font-size: 32rpx;
   font-weight: bold;
-  color: #1A1410;
+  color: #111111;
 }
 .dept-picker__close.data-v-a752faee {
   font-size: 44rpx;
   line-height: 1;
-  color: #7F7368;
+  color: #666666;
   padding: 0 8rpx;
 }
 .dept-picker__scroll.data-v-a752faee {
@@ -94,7 +94,7 @@
   background: rgba(177, 10, 15, 0.06);
 }
 .dept-picker__row--active .dept-picker__name.data-v-a752faee {
-  color: #C41E3A;
+  color: #D00000;
   font-weight: 600;
 }
 .dept-picker__expand.data-v-a752faee {
@@ -110,7 +110,7 @@
 }
 .dept-picker__expand-icon.data-v-a752faee {
   font-size: 32rpx;
-  color: #7F7368;
+  color: #666666;
   transform: rotate(0deg);
   transition: transform 0.2s;
 }
@@ -120,12 +120,12 @@
 .dept-picker__name.data-v-a752faee {
   flex: 1;
   font-size: 28rpx;
-  color: #1A1410;
+  color: #111111;
   line-height: 1.4;
 }
 .dept-picker__check.data-v-a752faee {
   font-size: 28rpx;
-  color: #C41E3A;
+  color: #D00000;
   font-weight: bold;
   margin-left: 12rpx;
 }
@@ -133,5 +133,5 @@
   padding: 80rpx 0;
   text-align: center;
   font-size: 26rpx;
-  color: #7F7368;
+  color: #666666;
 }

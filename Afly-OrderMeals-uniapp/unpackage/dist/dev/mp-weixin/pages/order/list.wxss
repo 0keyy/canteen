@@ -1,5 +1,5 @@
-/* 粮兴坊风格设计系统 v2 */
-/* ===== 主色：正红 / 暖橙 ===== */
+/* 粮兴坊 UI 图风格设计系统 */
+/* ===== 主色：招牌红 / 粉红渐变 ===== */
 /* ===== 背景 ===== */
 /* ===== 我的页渐变背景 ===== */
 /* ===== 用户信息栏背景 ===== */
@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #F5F0EA;
+  background: #F5F5F5;
 }
 .orders-page__content.data-v-456ecf67 {
   flex: 1;
@@ -28,25 +28,25 @@
   background: #FFFFFF;
   border-radius: 24rpx;
   padding: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 .orders-page__store.data-v-456ecf67 {
   display: block;
   font-size: 22rpx;
-  color: #7F7368;
+  color: #666666;
 }
 .orders-page__title.data-v-456ecf67 {
   display: block;
   margin-top: 4rpx;
   font-size: 40rpx;
   font-weight: 900;
-  color: #1A1410;
+  color: #111111;
 }
 .orders-page__pending.data-v-456ecf67 {
   margin-top: 24rpx;
   padding: 24rpx;
   border-radius: 24rpx;
-  background: linear-gradient(135deg, #C41E3A 0%, #FF8B1A 100%);
+  background: linear-gradient(135deg, #D00000 0%, #FF7B7B 100%);
 }
 .orders-page__pending-title.data-v-456ecf67 {
   display: block;
@@ -74,11 +74,11 @@
 .orders-page__pending-btn-text.data-v-456ecf67 {
   font-size: 24rpx;
   font-weight: 600;
-  color: #1A1410;
+  color: #111111;
 }
 .orders-page__pending-arrow.data-v-456ecf67 {
   font-size: 28rpx;
-  color: #1A1410;
+  color: #111111;
   line-height: 1;
 }
 .orders-page__list.data-v-456ecf67 {
@@ -102,12 +102,12 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 32rpx;
-  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 .orders-page__empty-icon-inner.data-v-456ecf67 {
   width: 48rpx;
   height: 56rpx;
-  border: 4rpx solid #A89B90;
+  border: 4rpx solid #999999;
   border-radius: 6rpx;
 }
 .orders-page__empty-icon-inner.data-v-456ecf67::before {
@@ -116,17 +116,17 @@
   margin: 12rpx auto 0;
   width: 28rpx;
   height: 4rpx;
-  background: #A89B90;
-  box-shadow: 0 10rpx 0 #A89B90, 0 20rpx 0 #A89B90;
+  background: #999999;
+  box-shadow: 0 10rpx 0 #999999, 0 20rpx 0 #999999;
 }
 .orders-page__empty-title.data-v-456ecf67 {
   font-size: 30rpx;
-  color: #7F7368;
+  color: #666666;
   margin-bottom: 12rpx;
 }
 .orders-page__empty-desc.data-v-456ecf67 {
   font-size: 24rpx;
-  color: #A89B90;
+  color: #999999;
 }
 .orders-page__bottom-space.data-v-456ecf67 {
   height: calc(108rpx + env(safe-area-inset-bottom));
@@ -137,7 +137,7 @@
   background: #FFFFFF;
   border-radius: 24rpx;
   padding: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 .order-card.data-v-456ecf67:active {
   opacity: 0.92;
@@ -155,7 +155,7 @@
 .order-card__icon.data-v-456ecf67 {
   width: 36rpx;
   height: 44rpx;
-  border: 3rpx solid #C41E3A;
+  border: 3rpx solid #D00000;
   border-radius: 4rpx;
 }
 .order-card__icon.data-v-456ecf67::before {
@@ -164,8 +164,8 @@
   margin: 8rpx auto 0;
   width: 22rpx;
   height: 3rpx;
-  background: #C41E3A;
-  box-shadow: 0 8rpx 0 #C41E3A, 0 16rpx 0 #C41E3A;
+  background: #D00000;
+  box-shadow: 0 8rpx 0 #D00000, 0 16rpx 0 #D00000;
 }
 .order-card__body.data-v-456ecf67 {
   flex: 1;
@@ -181,7 +181,7 @@
   flex: 1;
   font-size: 30rpx;
   font-weight: 900;
-  color: #1A1410;
+  color: #111111;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -189,20 +189,20 @@
 .order-card__status.data-v-456ecf67 {
   font-size: 22rpx;
   font-weight: 600;
-  color: #C41E3A;
+  color: #D00000;
   flex-shrink: 0;
 }
 .order-card__status--paid.data-v-456ecf67 {
   color: #4CAF50;
 }
 .order-card__status--cancelled.data-v-456ecf67 {
-  color: #A89B90;
+  color: #999999;
 }
 .order-card__meta.data-v-456ecf67 {
   display: block;
   margin-top: 8rpx;
   font-size: 22rpx;
-  color: #7F7368;
+  color: #666666;
 }
 .order-card__bottom.data-v-456ecf67 {
   display: flex;
@@ -213,22 +213,22 @@
 .order-card__amount.data-v-456ecf67 {
   font-size: 32rpx;
   font-weight: 900;
-  color: #1A1410;
+  color: #111111;
 }
 .order-card__reorder.data-v-456ecf67 {
   display: flex;
   align-items: center;
   gap: 6rpx;
   padding: 8rpx 24rpx;
-  border: 1rpx solid #E8DDD4;
+  border: 1rpx solid #EEEEEE;
   border-radius: 999rpx;
 }
 .order-card__reorder-icon.data-v-456ecf67 {
   font-size: 22rpx;
-  color: #7F7368;
+  color: #666666;
 }
 .order-card__reorder-text.data-v-456ecf67 {
   font-size: 22rpx;
   font-weight: 600;
-  color: #7F7368;
+  color: #666666;
 }

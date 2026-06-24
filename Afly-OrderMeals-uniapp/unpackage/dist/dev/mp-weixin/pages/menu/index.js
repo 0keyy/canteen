@@ -343,14 +343,14 @@ if (!Math) {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: common_vendor.n($data.diningMode === 1 ? "order-page__mode-tab--active" : ""),
-    b: common_vendor.o(($event) => $options.switchMode(1), "cc"),
+    b: common_vendor.o(($event) => $options.switchMode(1), "52"),
     c: common_vendor.n($data.diningMode === 3 ? "order-page__mode-tab--active" : ""),
     d: common_vendor.n($data.shop && $data.shop.deliveryEnable !== 1 ? "order-page__mode-tab--disabled" : ""),
-    e: common_vendor.o(($event) => $options.switchMode(3), "53"),
+    e: common_vendor.o(($event) => $options.switchMode(3), "4d"),
     f: common_vendor.s($options.headerPaddingStyle),
     g: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    i: common_vendor.o($options.selectCategory, "f7"),
+    i: common_vendor.o($options.selectCategory, "ca"),
     j: common_vendor.p({
       menu: $data.menu,
       ["active-index"]: $data.activeIndex,
@@ -387,7 +387,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     q: common_vendor.t($options.cartSummary),
     r: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
     s: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    t: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "c0"),
+    t: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "f1"),
     v: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected !== index ? 1 : "",

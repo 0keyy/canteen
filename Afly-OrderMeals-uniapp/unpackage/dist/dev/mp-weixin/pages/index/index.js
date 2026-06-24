@@ -154,8 +154,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: common_vendor.t($options.nickname || "用户"),
     b: common_vendor.s($options.heroPaddingStyle),
-    c: common_vendor.o(($event) => $options.selectMode(1), "da"),
-    d: common_vendor.o(($event) => $options.selectMode(3), "19"),
+    c: common_vendor.o(($event) => $options.selectMode(1), "36"),
+    d: common_vendor.o(($event) => $options.selectMode(3), "46"),
     e: common_vendor.f($data.shortcuts, (item, k0, i0) => {
       return {
         a: item.icon,

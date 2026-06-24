@@ -1,5 +1,5 @@
-/* 粮兴坊风格设计系统 v2 */
-/* ===== 主色：正红 / 暖橙 ===== */
+/* 粮兴坊 UI 图风格设计系统 */
+/* ===== 主色：招牌红 / 粉红渐变 ===== */
 /* ===== 背景 ===== */
 /* ===== 我的页渐变背景 ===== */
 /* ===== 用户信息栏背景 ===== */
@@ -15,7 +15,7 @@
 .login-page.data-v-d08ef7d4 {
   min-height: 100vh;
   padding: 0 48rpx 120rpx;
-  background: #FFFCF8;
+  background: #FFFFFF;
 }
 .login-page__status-bar.data-v-d08ef7d4 {
   height: env(safe-area-inset-top, 44px);
@@ -57,20 +57,20 @@
   width: 220rpx;
   font-size: 24rpx;
   background: #FFFFFF;
-  color: #C41E3A;
+  color: #D00000;
   border-radius: 16rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 .login-page__btn.data-v-d08ef7d4 {
   margin-top: 24rpx;
-  background: #C41E3A;
+  background: #D00000;
   color: #FFFFFF;
   border-radius: 999rpx;
   font-size: 32rpx;
   font-weight: bold;
 }
 .login-page__btn.data-v-d08ef7d4:active {
-  background: #8E1526;
+  background: #A60000;
 }
 .login-page__tip.data-v-d08ef7d4 {
   display: block;

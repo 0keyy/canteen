@@ -1,5 +1,5 @@
-/* 粮兴坊风格设计系统 v2 */
-/* ===== 主色：正红 / 暖橙 ===== */
+/* 粮兴坊 UI 图风格设计系统 */
+/* ===== 主色：招牌红 / 粉红渐变 ===== */
 /* ===== 背景 ===== */
 /* ===== 我的页渐变背景 ===== */
 /* ===== 用户信息栏背景 ===== */
@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #F5F0EA;
+  background: #F5F5F5;
   /* Header */
   /* Stats Card */
   /* Card */
@@ -30,7 +30,7 @@
 .mine-page__header.data-v-569e925a {
   position: relative;
   padding: 0 32rpx 48rpx;
-  background: linear-gradient(180deg, #FFE4EC 0%, #FFFFFF 100%);
+  background: linear-gradient(180deg, #FFA3A9 0%, #FFFFFF 100%);
   overflow: hidden;
 }
 .mine-page__watermark.data-v-569e925a {
@@ -71,7 +71,7 @@
 .mine-page__nickname.data-v-569e925a {
   font-size: 34rpx;
   font-weight: 900;
-  color: #1A1410;
+  color: #111111;
 }
 .mine-page__level-tag.data-v-569e925a {
   padding: 4rpx 18rpx;
@@ -93,7 +93,7 @@
   padding: 28rpx 0;
   background: #FFFFFF;
   border-radius: 24rpx;
-  box-shadow: 0 4rpx 16rpx rgba(196, 30, 58, 0.08);
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.06);
   position: relative;
   z-index: 2;
 }
@@ -108,24 +108,24 @@
 .mine-page__stat-value.data-v-569e925a {
   font-size: 36rpx;
   font-weight: 900;
-  color: #1A1410;
+  color: #111111;
 }
 .mine-page__stat-label.data-v-569e925a {
   font-size: 22rpx;
   font-weight: 600;
-  color: #7F7368;
+  color: #666666;
 }
 .mine-page__stat-divider.data-v-569e925a {
   width: 1rpx;
   height: 48rpx;
-  background: #E8DDD4;
+  background: #EEEEEE;
 }
 .mine-page__card.data-v-569e925a {
   margin: 20rpx 24rpx 0;
   padding: 24rpx;
   background: #FFFFFF;
   border-radius: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 .mine-page__card--grid.data-v-569e925a {
   display: grid;
@@ -141,7 +141,7 @@
 .mine-page__card-title.data-v-569e925a {
   font-size: 32rpx;
   font-weight: 900;
-  color: #1A1410;
+  color: #111111;
 }
 .mine-page__card-more.data-v-569e925a {
   display: flex;
@@ -150,11 +150,11 @@
 }
 .mine-page__card-more-text.data-v-569e925a {
   font-size: 24rpx;
-  color: #A89B90;
+  color: #999999;
 }
 .mine-page__card-more-arrow.data-v-569e925a {
   font-size: 24rpx;
-  color: #A89B90;
+  color: #999999;
 }
 .mine-page__order-row.data-v-569e925a {
   display: flex;
@@ -174,7 +174,7 @@
 .mine-page__order-label.data-v-569e925a {
   font-size: 22rpx;
   font-weight: 600;
-  color: #1A1410;
+  color: #111111;
 }
 .mine-page__grid-item.data-v-569e925a {
   display: flex;
@@ -189,7 +189,7 @@
 .mine-page__grid-label.data-v-569e925a {
   font-size: 22rpx;
   font-weight: 600;
-  color: #1A1410;
+  color: #111111;
   text-align: center;
 }
 .mine-page__bottom-space.data-v-569e925a {
