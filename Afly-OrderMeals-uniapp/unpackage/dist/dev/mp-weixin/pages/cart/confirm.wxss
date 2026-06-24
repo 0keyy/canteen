@@ -1,6 +1,8 @@
-/* 粮兴坊风格设计系统 */
+/* 粮兴坊风格设计系统 v2 */
 /* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
+/* ===== 我的页渐变背景 ===== */
+/* ===== 用户信息栏背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
 /* ===== 圆角 ===== */
@@ -22,9 +24,9 @@
 .checkout__section.data-v-aaa7ef6e {
   background: #FFFFFF;
   margin: 16rpx 24rpx;
-  border-radius: 32rpx;
+  border-radius: 24rpx;
   padding: 28rpx;
-  box-shadow: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
+  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
 }
 .checkout__section-title-row.data-v-aaa7ef6e {
   display: flex;
@@ -166,12 +168,12 @@
   margin-top: 2rpx;
 }
 .checkout__submit-btn.data-v-aaa7ef6e {
-  background: #B10A0F;
+  background: #C41E3A;
   padding: 24rpx 48rpx;
   border-radius: 999rpx;
 }
 .checkout__submit-btn.data-v-aaa7ef6e:active {
-  background: #7A070A;
+  background: #8E1526;
 }
 .checkout__submit-btn-text.data-v-aaa7ef6e {
   color: #FFFFFF;
@@ -184,7 +186,7 @@
 }
 .checkout__coupon-link.data-v-aaa7ef6e {
   font-size: 24rpx;
-  color: #B10A0F;
+  color: #C41E3A;
   font-weight: 600;
 }
 .checkout__coupon-applied.data-v-aaa7ef6e {

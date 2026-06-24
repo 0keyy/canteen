@@ -9,6 +9,7 @@ const authApi = {
   smsLogin: (mobile, code) => utils_request.post("/front/auth/app/sms/login", { mobile, code }),
   mockPhoneLogin: (mobile) => utils_request.post("/front/auth/mock/phone", { mobile }),
   profile: () => utils_request.get("/front/auth/profile"),
+  updateProfile: (data) => utils_request.post("/front/auth/profile/update", data),
   logout: () => utils_request.post("/front/auth/logout")
 };
 const companyApi = {

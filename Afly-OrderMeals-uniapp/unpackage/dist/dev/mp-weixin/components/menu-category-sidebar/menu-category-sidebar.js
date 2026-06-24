@@ -33,15 +33,17 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       return common_vendor.e({
         a: $props.activeIndex === index
       }, $props.activeIndex === index ? {} : {}, {
-        b: common_vendor.t(cate.name),
-        c: common_vendor.n($props.activeIndex === index ? "sidebar__name--active" : ""),
-        d: $options.badgeCount(index) > 0
+        b: index === 0
+      }, index === 0 ? {} : {}, {
+        c: common_vendor.t(index === 0 ? "猜你喜欢" : cate.name),
+        d: common_vendor.n($props.activeIndex === index ? "sidebar__name--active" : ""),
+        e: $options.badgeCount(index) > 0
       }, $options.badgeCount(index) > 0 ? {
-        e: common_vendor.t($options.badgeCount(index))
+        f: common_vendor.t($options.badgeCount(index))
       } : {}, {
-        f: cate.id || cate.name || index,
-        g: common_vendor.n($props.activeIndex === index ? "sidebar__item--active" : ""),
-        h: common_vendor.o(($event) => _ctx.$emit("select", index), cate.id || cate.name || index)
+        g: cate.id || cate.name || index,
+        h: common_vendor.n($props.activeIndex === index ? "sidebar__item--active" : ""),
+        i: common_vendor.o(($event) => _ctx.$emit("select", index), cate.id || cate.name || index)
       });
     })
   };

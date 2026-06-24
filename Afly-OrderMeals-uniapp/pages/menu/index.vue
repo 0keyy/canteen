@@ -1,56 +1,45 @@
 <template>
   <view class="order-page">
+    <!-- ===== Header: red gradient ===== -->
     <view class="order-page__header" :style="headerPaddingStyle">
-      <view class="order-page__search-row" :style="searchRowStyle">
-        <view class="order-page__search" @tap.stop="goSearch">
-          <view class="order-page__search-icon"></view>
-          <text class="order-page__search-text">点击搜索</text>
-        </view>
+      <view class="order-page__brand-row">
+        <image class="order-page__logo" src="/static/白logo.png" mode="aspectFit" />
+        <image class="order-page__mascot" src="/static/点赞.png" mode="aspectFit" />
       </view>
-
-      <view class="order-page__store-row">
-        <view class="order-page__store-info">
-          <view class="order-page__store-name-row">
-            <view class="order-page__store-star"></view>
-            <text class="order-page__store-name">{{ shopName }}</text>
-            <text class="order-page__store-arrow">›</text>
-          </view>
-          <view class="order-page__store-distance">
-            <view class="order-page__pin-icon"></view>
-            <text class="order-page__distance-text">{{ distanceText }}</text>
-          </view>
-        </view>
-        <view class="order-page__mode-switch">
+      <text class="order-page__slogan">良心好食材</text>
+      <view class="order-page__store-status">
+        <text class="order-page__store-status-text">粮兴坊正在营业中</text>
+        <text class="order-page__store-hours">营业时间: 6:00-22:00</text>
+      </view>
+      <!-- Hanging sign dining mode toggle -->
+      <view class="order-page__mode-sign">
+        <view class="order-page__mode-sign-rope"></view>
+        <view class="order-page__mode-sign-board">
           <view
-            :class="['order-page__mode-btn', diningMode === 1 ? 'order-page__mode-btn--active' : '']"
+            :class="['order-page__mode-tab', diningMode === 1 ? 'order-page__mode-tab--active' : '']"
             @tap="switchMode(1)"
           >
-            <text class="order-page__mode-btn-text">自取</text>
+            <text class="order-page__mode-tab-text">堂食</text>
           </view>
           <view
             :class="[
-              'order-page__mode-btn',
-              diningMode === 3 ? 'order-page__mode-btn--active' : '',
-              shop && shop.deliveryEnable !== 1 ? 'order-page__mode-btn--disabled' : ''
+              'order-page__mode-tab',
+              diningMode === 3 ? 'order-page__mode-tab--active' : '',
+              shop && shop.deliveryEnable !== 1 ? 'order-page__mode-tab--disabled' : ''
             ]"
             @tap="switchMode(3)"
           >
-            <text class="order-page__mode-btn-text">外卖</text>
+            <text class="order-page__mode-tab-text">外卖</text>
           </view>
         </view>
       </view>
-
-      <view class="order-page__notice">
-        <view class="order-page__notice-left">
-          <view class="order-page__bell-icon"></view>
-          <text class="order-page__notice-text">欢迎光临，很高兴为您服务</text>
-        </view>
-        <text class="order-page__notice-more">门店信息⌄</text>
-      </view>
     </view>
 
+    <!-- ===== Loading / Empty ===== -->
     <view v-if="loading" class="order-page__loading">加载中...</view>
     <view v-else-if="menu.length === 0" class="order-page__empty">暂无菜品，请先在后台添加菜品分类和菜品</view>
+
+    <!-- ===== Main: sidebar + dishes ===== -->
     <view v-else class="order-page__main">
       <menu-category-sidebar
         :menu="menu"
@@ -63,32 +52,28 @@
         <text class="order-page__section-title">{{ currentCategoryName }}</text>
         <view class="order-page__dish-list">
           <view v-for="(food, idx) in currentFoods" :key="food.id" class="menu-card">
-            <view class="menu-card__image-wrap">
-              <image :src="food.image" class="menu-card__image" mode="aspectFill" />
-              <view class="menu-card__tag" v-if="foodTag(idx)">
-                <text class="menu-card__tag-text">{{ foodTag(idx) }}</text>
-              </view>
-            </view>
+            <image :src="food.image" class="menu-card__image" mode="aspectFill" />
             <view class="menu-card__info">
               <text class="menu-card__name">{{ food.title }}</text>
-              <text class="menu-card__desc" v-if="food.intro">{{ food.intro }}</text>
+              <view class="menu-card__tags" v-if="foodTag(idx)">
+                <text class="menu-card__tag">{{ foodTag(idx) }}</text>
+              </view>
+              <text class="menu-card__sales">月销{{ food.sales || 13 }}</text>
               <view class="menu-card__bottom">
                 <text class="menu-card__price">¥{{ food.price }}</text>
                 <view class="menu-card__actions">
+                  <template v-if="getCount(food.id) > 0">
+                    <view class="menu-card__btn menu-card__btn--minus" @tap.stop="decFood(food)">
+                      <text class="menu-card__btn-icon">−</text>
+                    </view>
+                    <text class="menu-card__count">{{ getCount(food.id) }}</text>
+                  </template>
                   <view
-                    class="menu-card__btn menu-card__btn--minus"
-                    v-if="getCount(food.id) > 0"
-                    @tap.stop="decFood(food)"
-                  >
-                    <text class="menu-card__btn-icon">−</text>
-                  </view>
-                  <text class="menu-card__count" v-if="getCount(food.id) > 0">{{ getCount(food.id) }}</text>
-                  <view
-                    class="menu-card__btn menu-card__btn--plus"
-                    :class="{ 'menu-card__btn--disabled': cartBusy }"
+                    class="menu-card__spec-btn"
+                    :class="{ 'menu-card__spec-btn--disabled': cartBusy }"
                     @tap.stop="addFood(food)"
                   >
-                    <text class="menu-card__btn-icon menu-card__btn-icon--plus">+</text>
+                    <text class="menu-card__spec-btn-text">选规格</text>
                   </view>
                 </view>
               </view>
@@ -100,13 +85,14 @@
       </scroll-view>
     </view>
 
+    <!-- ===== Bottom Cart Bar ===== -->
     <view
       class="cart-bar"
       :class="{ 'cart-bar--disabled': !cartReady || cartItemCount === 0 }"
       @tap="goConfirm"
     >
-      <view class="cart-bar__bag">
-        <view class="cart-bar__bag-icon"></view>
+      <view class="cart-bar__avatar-wrap">
+        <image class="cart-bar__avatar" src="/static/新版小唐.png" mode="aspectFit" />
         <view class="cart-bar__badge" v-if="cartItemCount > 0">
           <text class="cart-bar__badge-text">{{ cartItemCount }}</text>
         </view>
@@ -120,6 +106,7 @@
       </view>
     </view>
 
+    <!-- ===== Bottom TabBar ===== -->
     <view class="app-tab-bar">
       <view
         v-for="(item, index) in tabbarList"
@@ -131,6 +118,7 @@
         <view class="app-tab-icon-wrap">
           <image
             class="app-tab-icon"
+            :class="{ 'app-tab-icon--inactive': tabbarSelected !== index }"
             :src="tabbarSelected === index ? item.selected : item.unselected"
             mode="aspectFit"
           />
@@ -176,9 +164,6 @@ export default {
     headerPaddingStyle() {
       return { paddingTop: `${this.navMetrics.statusBarHeight + 8}px` }
     },
-    searchRowStyle() {
-      return { paddingRight: `${this.menuButtonRight}px` }
-    },
     shopName() {
       return this.shop?.name || '粮兴坊'
     },
@@ -205,7 +190,7 @@ export default {
     cartSummary() {
       if (!this.cartReady) return '¥0.00'
       if (this.cartItemCount === 0) return '¥0.00'
-      return `¥ ${this.totalPrice}`
+      return `¥${this.totalPrice}`
     }
   },
   onLoad() {
@@ -234,9 +219,6 @@ export default {
     },
     selectCategory(index) {
       this.activeIndex = index
-    },
-    goSearch() {
-      uni.showToast({ title: '搜索功能开发中', icon: 'none' })
     },
     async switchMode(mode) {
       if (mode === this.diningMode) return
@@ -482,139 +464,109 @@ export default {
   height: 100vh;
   background: $bg-page;
 
+  /* ===== Header ===== */
   &__header {
     flex-shrink: 0;
-    padding: 0 24rpx 24rpx;
-    background: $bg-surface;
-    border-bottom: 1rpx solid $divider-color;
+    padding: 0 32rpx 28rpx;
+    background: linear-gradient(135deg, #C41E3A 0%, #E8364E 60%, #F05A6E 100%);
+    position: relative;
+    overflow: visible;
   }
 
-  &__search-row {
-    margin-bottom: 24rpx;
-  }
-
-  &__search {
+  &__brand-row {
     display: flex;
     align-items: center;
-    height: 64rpx;
-    padding: 0 24rpx;
-    border: 1rpx solid $border-light;
-    border-radius: 999rpx;
-    background: $bg-surface;
+    justify-content: space-between;
   }
 
-  &__search-icon {
-    width: 28rpx;
-    height: 28rpx;
-    border: 3rpx solid $text-tertiary;
-    border-radius: 50%;
-    position: relative;
-    flex-shrink: 0;
-    margin-right: 12rpx;
+  &__logo {
+    width: 160rpx;
+    height: 64rpx;
+  }
 
+  &__mascot {
+    width: 72rpx;
+    height: 72rpx;
+  }
+
+  &__slogan {
+    display: block;
+    margin-top: 8rpx;
+    font-size: 24rpx;
+    font-weight: 600;
+    color: $text-white;
+    opacity: 0.9;
+    letter-spacing: 4rpx;
+  }
+
+  &__store-status {
+    display: flex;
+    align-items: center;
+    gap: 16rpx;
+    margin-top: 16rpx;
+  }
+
+  &__store-status-text {
+    font-size: 22rpx;
+    color: $text-white;
+    opacity: 0.85;
+  }
+
+  &__store-hours {
+    font-size: 22rpx;
+    color: $text-white;
+    opacity: 0.7;
+  }
+
+  /* Hanging sign toggle */
+  &__mode-sign {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20rpx;
+  }
+
+  &__mode-sign-rope {
+    width: 4rpx;
+    height: 24rpx;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  &__mode-sign-board {
+    display: flex;
+    align-items: center;
+    background: $brand-yellow;
+    border-radius: 12rpx;
+    padding: 4rpx;
+    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+    position: relative;
+
+    &::before,
     &::after {
       content: '';
       position: absolute;
-      width: 10rpx;
-      height: 3rpx;
-      background: $text-tertiary;
-      border-radius: 2rpx;
-      bottom: -2rpx;
-      right: -6rpx;
-      transform: rotate(45deg);
+      top: -12rpx;
+      width: 4rpx;
+      height: 14rpx;
+      background: rgba(255, 255, 255, 0.5);
     }
-  }
-
-  &__search-text {
-    font-size: 24rpx;
-    font-weight: 600;
-    color: $text-secondary;
-  }
-
-  &__store-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16rpx;
-  }
-
-  &__store-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  &__store-name-row {
-    display: flex;
-    align-items: center;
-    gap: 8rpx;
-  }
-
-  &__store-star {
-    width: 28rpx;
-    height: 28rpx;
-    position: relative;
-    flex-shrink: 0;
 
     &::before {
-      content: '★';
-      color: $brand-primary;
-      font-size: 28rpx;
-      line-height: 1;
+      left: 40rpx;
+    }
+
+    &::after {
+      right: 40rpx;
     }
   }
 
-  &__store-name {
-    font-size: 36rpx;
-    font-weight: 900;
-    color: $text-primary;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__store-arrow {
-    font-size: 28rpx;
-    color: $text-tertiary;
-    flex-shrink: 0;
-  }
-
-  &__store-distance {
-    display: flex;
-    align-items: center;
-    gap: 6rpx;
-    margin-top: 8rpx;
-  }
-
-  &__pin-icon {
-    width: 20rpx;
-    height: 20rpx;
-    border: 3rpx solid $text-tertiary;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    flex-shrink: 0;
-  }
-
-  &__distance-text {
-    font-size: 22rpx;
-    color: $text-secondary;
-  }
-
-  &__mode-switch {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 256rpx;
-    flex-shrink: 0;
-    padding: 4rpx;
-    background: $bg-gray;
-    border-radius: $radius-card;
-  }
-
-  &__mode-btn {
+  &__mode-tab {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 64rpx;
-    border-radius: 24rpx;
+    width: 112rpx;
+    height: 56rpx;
+    border-radius: 8rpx;
     transition: background $transition-fast;
 
     &--active {
@@ -627,70 +579,17 @@ export default {
     }
   }
 
-  &__mode-btn-text {
+  &__mode-tab-text {
     font-size: 26rpx;
-    font-weight: 600;
-    color: $text-secondary;
+    font-weight: 700;
+    color: $text-primary;
   }
 
-  &__mode-btn--active &__mode-btn-text {
+  &__mode-tab--active &__mode-tab-text {
     color: $text-white;
   }
 
-  &__notice {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 24rpx;
-    padding: 16rpx 24rpx;
-    background: $bg-gray;
-    border-radius: $radius-card;
-  }
-
-  &__notice-left {
-    display: flex;
-    align-items: center;
-    gap: 8rpx;
-    flex: 1;
-    min-width: 0;
-  }
-
-  &__bell-icon {
-    width: 24rpx;
-    height: 24rpx;
-    border: 3rpx solid $brand-primary;
-    border-radius: 4rpx 4rpx 2rpx 2rpx;
-    position: relative;
-    flex-shrink: 0;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: -8rpx;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 8rpx;
-      height: 8rpx;
-      border: 3rpx solid $brand-primary;
-      border-radius: 50%;
-    }
-  }
-
-  &__notice-text {
-    font-size: 22rpx;
-    color: $text-secondary;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__notice-more {
-    font-size: 22rpx;
-    color: $text-secondary;
-    flex-shrink: 0;
-    margin-left: 12rpx;
-  }
-
+  /* ===== Loading / Empty ===== */
   &__loading,
   &__empty {
     flex: 1;
@@ -704,6 +603,7 @@ export default {
     font-size: 26rpx;
   }
 
+  /* ===== Main content ===== */
   &__main {
     flex: 1;
     display: flex;
@@ -745,48 +645,28 @@ export default {
   }
 }
 
+/* ===== Menu Card ===== */
 .menu-card {
   display: flex;
   padding: 16rpx;
   background: $bg-surface;
   border-radius: $radius-card;
-
-  &__image-wrap {
-    position: relative;
-    width: 176rpx;
-    height: 132rpx;
-    flex-shrink: 0;
-    border-radius: $radius-sm;
-    overflow: hidden;
-  }
+  border: 1rpx solid $border-light;
 
   &__image {
-    width: 100%;
-    height: 100%;
-  }
-
-  &__tag {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 4rpx 12rpx;
-    background: $brand-red;
-    border-radius: 0 0 $radius-sm 0;
-  }
-
-  &__tag-text {
-    font-size: 18rpx;
-    color: $text-white;
-    font-weight: bold;
+    width: 176rpx;
+    height: 176rpx;
+    flex-shrink: 0;
+    border-radius: $radius-sm;
   }
 
   &__info {
     flex: 1;
-    margin-left: 16rpx;
+    margin-left: 20rpx;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 132rpx;
+    min-height: 176rpx;
     overflow: hidden;
   }
 
@@ -799,27 +679,36 @@ export default {
     white-space: nowrap;
   }
 
-  &__desc {
-    font-size: $font-size-desc;
-    color: $text-desc;
+  &__tags {
     margin-top: 8rpx;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    line-height: 1.4;
+  }
+
+  &__tag {
+    display: inline-block;
+    padding: 2rpx 12rpx;
+    font-size: 18rpx;
+    font-weight: 600;
+    color: $brand-primary;
+    border: 1rpx solid $brand-primary;
+    border-radius: $radius-tag;
+    background: rgba($brand-primary, 0.06);
+  }
+
+  &__sales {
+    font-size: $font-size-desc;
+    color: $text-tertiary;
+    margin-top: 6rpx;
   }
 
   &__bottom {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 12rpx;
+    margin-top: 8rpx;
   }
 
   &__price {
-    color: $text-price;
+    color: $brand-primary;
     font-size: $font-size-price;
     font-weight: 900;
   }
@@ -827,11 +716,12 @@ export default {
   &__actions {
     display: flex;
     align-items: center;
+    gap: 8rpx;
   }
 
   &__btn {
-    width: 52rpx;
-    height: 52rpx;
+    width: 44rpx;
+    height: 44rpx;
     border-radius: 50%;
     border: 1rpx solid $border-light;
     background: $bg-surface;
@@ -839,31 +729,49 @@ export default {
     align-items: center;
     justify-content: center;
 
-    &--disabled {
-      opacity: 0.5;
+    &--minus {
+      border-color: $text-tertiary;
     }
   }
 
   &__btn-icon {
     color: $text-secondary;
-    font-size: 32rpx;
+    font-size: 28rpx;
     font-weight: bold;
     line-height: 1;
-
-    &--plus {
-      color: $brand-primary;
-    }
   }
 
   &__count {
-    min-width: 48rpx;
+    min-width: 36rpx;
     text-align: center;
-    font-size: 28rpx;
+    font-size: 26rpx;
     font-weight: bold;
     color: $text-primary;
   }
+
+  &__spec-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48rpx;
+    padding: 0 20rpx;
+    border: 2rpx solid $brand-primary;
+    border-radius: $radius-btn;
+    background: rgba($brand-primary, 0.04);
+
+    &--disabled {
+      opacity: 0.5;
+    }
+  }
+
+  &__spec-btn-text {
+    font-size: 22rpx;
+    font-weight: 700;
+    color: $brand-primary;
+  }
 }
 
+/* ===== Cart Bar ===== */
 .cart-bar {
   position: fixed;
   left: 32rpx;
@@ -872,8 +780,8 @@ export default {
   z-index: 99;
   display: flex;
   align-items: center;
-  gap: 24rpx;
-  padding: 16rpx 16rpx 16rpx 24rpx;
+  gap: 16rpx;
+  padding: 12rpx 16rpx 12rpx 12rpx;
   background: $text-primary;
   border-radius: 999rpx;
   box-shadow: $shadow-hero;
@@ -882,43 +790,23 @@ export default {
     opacity: 0.75;
   }
 
-  &__bag {
+  &__avatar-wrap {
     position: relative;
-    width: 96rpx;
-    height: 96rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgba(255, 252, 248, 0.1);
+    width: 88rpx;
+    height: 88rpx;
     flex-shrink: 0;
   }
 
-  &__bag-icon {
-    width: 40rpx;
-    height: 36rpx;
-    border: 3rpx solid $text-white;
-    border-radius: 8rpx 8rpx 12rpx 12rpx;
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: -10rpx;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 20rpx;
-      height: 10rpx;
-      border: 3rpx solid $text-white;
-      border-bottom: none;
-      border-radius: 10rpx 10rpx 0 0;
-    }
+  &__avatar {
+    width: 88rpx;
+    height: 88rpx;
+    border-radius: 50%;
   }
 
   &__badge {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: -6rpx;
+    right: -6rpx;
     min-width: 36rpx;
     height: 36rpx;
     background: $brand-primary;
@@ -927,6 +815,7 @@ export default {
     align-items: center;
     justify-content: center;
     padding: 0 8rpx;
+    border: 3rpx solid $text-primary;
   }
 
   &__badge-text {
@@ -944,8 +833,8 @@ export default {
 
   &__btn {
     flex-shrink: 0;
-    height: 96rpx;
-    padding: 0 56rpx;
+    height: 80rpx;
+    padding: 0 48rpx;
     background: $brand-primary;
     border-radius: 999rpx;
     display: flex;
@@ -959,8 +848,61 @@ export default {
 
   &__btn-text {
     color: $text-white;
-    font-size: 32rpx;
+    font-size: 30rpx;
     font-weight: 900;
   }
+}
+
+/* ===== Bottom TabBar ===== */
+.app-tab-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: $tabbar-height;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: $bg-surface;
+  border-top: 1rpx solid $divider-color;
+}
+
+.app-tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 4rpx;
+
+  &--active {
+    .app-tab-text {
+      font-weight: 700;
+    }
+  }
+}
+
+.app-tab-icon-wrap {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-tab-icon {
+  width: 44rpx;
+  height: 44rpx;
+
+  &--inactive {
+    filter: grayscale(1) opacity(0.45);
+  }
+}
+
+.app-tab-text {
+  font-size: 20rpx;
+  line-height: 1.2;
 }
 </style>

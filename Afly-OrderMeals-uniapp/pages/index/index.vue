@@ -2,127 +2,70 @@
   <view class="home">
     <scroll-view class="home__content" scroll-y :show-scrollbar="false">
       <view class="home__scroll-inner">
-        <!-- 渐变顶栏：搜索 → 轮播 → 自提/外卖 -->
+        <!-- Hero 广告区 -->
         <view class="home__hero">
-          <view class="home__hero-inner" :style="heroPaddingStyle">
-            <view class="home__nav-row" :style="searchRowStyle">
-              <view class="home__search" @tap.stop="goSearch">
-                <view class="home__search-icon"></view>
-                <text class="home__search-text">点击搜索</text>
-              </view>
-            </view>
-            <text class="home__slogan">食材当日现备 · 好滋味有温度 · 新鲜现做</text>
-
-            <view class="home__banner-section">
-              <view class="home__banner-wrap">
-                <swiper
-                  class="home__swiper"
-                  :circular="displayBanners.length > 1"
-                  :autoplay="displayBanners.length > 0"
-                  :interval="4000"
-                  :duration="600"
-                  indicator-dots
-                  indicator-color="rgba(255,255,255,0.45)"
-                  indicator-active-color="#FFFFFF"
-                >
-                  <swiper-item
-                    v-for="(item, index) in displayBanners"
-                    :key="index"
-                    class="home__swiper-item"
-                  >
-                    <image
-                      v-if="item.image"
-                      :src="item.image"
-                      class="home__banner-image"
-                      mode="aspectFill"
-                    />
-                    <view v-else class="home__banner-placeholder"></view>
-                  </swiper-item>
-                </swiper>
-              </view>
-            </view>
-
-            <view class="home__primary-card">
-              <view class="home__primary-item" @click="selectMode(1)">
-                <view class="home__icon home__icon--store"></view>
-                <text class="home__primary-name">自提</text>
-                <text class="home__primary-desc">下单免排队</text>
-              </view>
-              <view class="home__primary-divider"></view>
-              <view
-                class="home__primary-item"
-                :class="{ 'home__primary-item--disabled': shop && shop.deliveryEnable !== 1 }"
-                @click="selectMode(3)"
-              >
-                <view class="home__icon home__icon--delivery"></view>
-                <text class="home__primary-name">外卖</text>
-                <text class="home__primary-desc">美味配送到家</text>
+          <image class="home__hero-bg" src="/static/首页广告.png" mode="aspectFill" />
+          <view class="home__hero-overlay" :style="heroPaddingStyle">
+            <!-- 用户信息栏 -->
+            <view class="home__user-bar">
+              <text class="home__user-name">{{ nickname || '用户' }}</text>
+              <view class="home__user-stats">
+                <text class="home__user-stat">0 积分</text>
+                <text class="home__user-stat">0 优惠券</text>
               </view>
             </view>
           </view>
         </view>
 
-        <view class="home__sections">
-          <view class="home__shortcut-row">
-            <view
-              class="home__shortcut-item"
-              v-for="item in shortcuts"
-              :key="item.name"
-              @tap="onShortcutTap(item)"
-            >
-              <view class="home__icon" :class="item.iconClass"></view>
-              <text class="home__shortcut-name">{{ item.name }}</text>
-              <text class="home__shortcut-desc">{{ item.desc }}</text>
+        <!-- 就餐方式卡片 -->
+        <view class="home__dining-section">
+          <view class="home__dining-card" @tap="selectMode(1)">
+            <text class="home__dining-name">到店堂食</text>
+            <image class="home__dining-img" src="/static/图层 2.png" mode="aspectFit" />
+          </view>
+          <view class="home__dining-card" @tap="selectMode(3)">
+            <text class="home__dining-name">外卖配送</text>
+            <image class="home__dining-img" src="/static/小唐骑车.png" mode="aspectFit" />
+          </view>
+        </view>
+
+        <!-- 快捷入口 -->
+        <view class="home__shortcuts">
+          <view class="home__shortcut-item" v-for="item in shortcuts" :key="item.name" @tap="onShortcutTap(item)">
+            <view class="home__shortcut-icon-wrap">
+              <image class="home__shortcut-icon" :src="item.icon" mode="aspectFit" />
+            </view>
+            <text class="home__shortcut-name">{{ item.name }}</text>
+          </view>
+        </view>
+
+        <!-- 粮兴推荐 -->
+        <view class="home__recommend">
+          <view class="home__recommend-header">
+            <view class="home__recommend-title-row">
+              <text class="home__recommend-title">粮兴推荐</text>
+              <text class="home__recommend-tag">限时优惠</text>
             </view>
           </view>
 
-          <view class="home__recommend">
-            <view class="home__recommend-header">
-              <text class="home__recommend-title">招牌推荐</text>
-              <view class="home__recommend-link" @tap="goMenu">
-                <text class="home__recommend-link-text">去点单</text>
-                <text class="home__recommend-link-arrow">›</text>
-              </view>
-            </view>
-
-            <view class="home__dish-list" v-if="homeRecommendDishes.length">
-              <view
-                class="home__dish-item"
-                v-for="dish in homeRecommendDishes"
-                :key="dish.id"
-                @tap="selectSpec(dish)"
-              >
-                <view class="home__dish-image-wrap">
-                  <image class="home__dish-image" :src="dish.image" mode="aspectFill" />
-                  <view class="home__dish-badge" v-if="dish.badge">
-                    <text class="home__dish-badge-text">{{ dish.badge }}</text>
-                  </view>
-                </view>
-                <view class="home__dish-info">
-                  <text class="home__dish-name">{{ dish.title }}</text>
-                  <text class="home__dish-desc">{{ dish.intro || '匠心制作，每日新鲜' }}</text>
-                  <view class="home__dish-bottom">
-                    <text class="home__dish-price">¥{{ dish.price }}</text>
-                    <view class="home__dish-btn" @tap.stop="selectSpec(dish)">
-                      <text class="home__dish-btn-text">选规格</text>
-                    </view>
+          <view class="home__dish-list" v-if="homeRecommendDishes.length">
+            <view class="home__dish-item" v-for="dish in homeRecommendDishes" :key="dish.id" @tap="goMenu">
+              <image class="home__dish-image" :src="dish.image" mode="aspectFill" />
+              <view class="home__dish-info">
+                <text class="home__dish-name">{{ dish.title }}</text>
+                <text class="home__dish-desc">{{ dish.intro || '匠心制作，每日新鲜' }}</text>
+                <view class="home__dish-bottom">
+                  <text class="home__dish-price">¥{{ dish.price }}</text>
+                  <view class="home__dish-btn" @tap.stop="goMenu">
+                    <text class="home__dish-btn-text">立即下单</text>
                   </view>
                 </view>
               </view>
             </view>
-
-            <view class="home__recommend-empty" v-if="!recommendLoading && homeRecommendDishes.length === 0">
-              <text class="home__recommend-empty-text">暂无推荐菜品</text>
-            </view>
           </view>
 
-          <view class="home__promo" @tap="goCouponCenter">
-            <view class="home__promo-icon home__icon home__icon--coupon"></view>
-            <view class="home__promo-content">
-              <text class="home__promo-sub">限时优惠</text>
-              <text class="home__promo-title">领取优惠券，下单更优惠</text>
-            </view>
-            <text class="home__promo-arrow">›</text>
+          <view class="home__recommend-empty" v-if="!recommendLoading && homeRecommendDishes.length === 0">
+            <text class="home__recommend-empty-text">暂无推荐菜品</text>
           </view>
         </view>
 
@@ -141,6 +84,7 @@
         <view class="app-tab-icon-wrap">
           <image
             class="app-tab-icon"
+            :class="{ 'app-tab-icon--inactive': tabbarSelected !== index }"
             :src="tabbarSelected === index ? item.selected : item.unselected"
             mode="aspectFit"
           />
@@ -175,36 +119,27 @@ export default {
       recommendDishes: [],
       recommendLoading: false,
       shortcuts: [
-        { name: '积分商城', desc: '神秘好物等你来', iconClass: 'home__icon--points' },
-        { name: '领券中心', desc: '限时领取优惠', iconClass: 'home__icon--coupon' },
-        { name: '优惠券包', desc: '享多重优惠', iconClass: 'home__icon--wallet' }
+        { name: '充值中心', icon: '/static/tabbar/充值 1.png' },
+        { name: '红包卡券', icon: '/static/tabbar/卡券 1.png' },
+        { name: '订单详情', icon: '/static/tabbar/全部订单 1.png' },
+        { name: '客服中心', icon: '/static/tabbar/客服 1.png' }
       ]
     }
   },
   computed: {
+    nickname() {
+      return uni.getStorageSync('nickname') || ''
+    },
     heroPaddingStyle() {
       const { statusBarHeight } = this.navMetrics
-      return {
-        paddingTop: `${statusBarHeight + 10}px`
-      }
-    },
-    searchRowStyle() {
-      return { paddingRight: `${this.menuButtonRight}px` }
-    },
-    displayBanners() {
-      if (this.banners.length) return this.banners
-      return [{ image: '' }]
+      return { paddingTop: `${statusBarHeight + 8}px` }
     },
     homeRecommendDishes() {
       return this.recommendDishes.slice(0, 2)
     }
   },
-  onLoad() {
-    this.updateNavPadding()
-  },
-  onReady() {
-    this.updateNavPadding()
-  },
+  onLoad() { this.updateNavPadding() },
+  onReady() { this.updateNavPadding() },
   onShow() {
     this.updateNavPadding()
     this.setupTabbar(0)
@@ -220,31 +155,10 @@ export default {
       await this.loadDecoration()
       this.loadRecommend()
     },
-    parsePageWidgets(pageData) {
-      if (!pageData) return []
-      if (Array.isArray(pageData)) return pageData
-      try {
-        const parsed = JSON.parse(pageData)
-        return Array.isArray(parsed) ? parsed : []
-      } catch (e) {
-        return []
-      }
-    },
-    isWidgetEnabled(enabled) {
-      if (enabled === undefined || enabled === null) return true
-      return enabled !== 0 && enabled !== false && enabled !== '0'
-    },
-    normalizeBannerItem(item) {
-      const rawImage = item?.image || item?.img || item?.url || ''
-      const image = resolveImageUrl(rawImage)
-      return image ? { ...item, image } : null
-    },
     async loadShop() {
       try {
         const shop = await orderApi.shop(this.aid)
-        if (shop?.image) {
-          shop.image = resolveImageUrl(shop.image)
-        }
+        if (shop?.image) shop.image = resolveImageUrl(shop.image)
         this.shop = shop
       } catch (e) {
         uni.showToast({ title: e.message || e, icon: 'none' })
@@ -257,15 +171,23 @@ export default {
         const bannerWidget = widgets.find((item) => item.name === 'banner')
         const data = bannerWidget?.content?.data
         if (bannerWidget && this.isWidgetEnabled(bannerWidget.content?.enabled) && Array.isArray(data)) {
-          this.banners = data
-            .map((item) => this.normalizeBannerItem(item))
-            .filter(Boolean)
-        } else {
-          this.banners = []
+          this.banners = data.map((item) => this.normalizeBannerItem(item)).filter(Boolean)
         }
-      } catch (e) {
-        this.banners = []
-      }
+      } catch (e) { this.banners = [] }
+    },
+    parsePageWidgets(pageData) {
+      if (!pageData) return []
+      if (Array.isArray(pageData)) return pageData
+      try { const p = JSON.parse(pageData); return Array.isArray(p) ? p : [] } catch (e) { return [] }
+    },
+    isWidgetEnabled(enabled) {
+      if (enabled === undefined || enabled === null) return true
+      return enabled !== 0 && enabled !== false && enabled !== '0'
+    },
+    normalizeBannerItem(item) {
+      const rawImage = item?.image || item?.img || item?.url || ''
+      const image = resolveImageUrl(rawImage)
+      return image ? { ...item, image } : null
     },
     async loadRecommend() {
       this.recommendLoading = true
@@ -274,21 +196,12 @@ export default {
         const foods = []
         ;(Array.isArray(list) ? list : []).forEach((cate) => {
           ;(cate.foods || []).forEach((food) => {
-            foods.push({
-              ...food,
-              image: resolveImageUrl(food.image)
-            })
+            foods.push({ ...food, image: resolveImageUrl(food.image) })
           })
         })
-        this.recommendDishes = foods.slice(0, 5).map((food, index) => ({
-          ...food,
-          badge: index === 0 ? '招牌' : index === 1 ? '热卖' : ''
-        }))
-      } catch (e) {
-        this.recommendDishes = []
-      } finally {
-        this.recommendLoading = false
-      }
+        this.recommendDishes = foods.slice(0, 5)
+      } catch (e) { this.recommendDishes = [] }
+      finally { this.recommendLoading = false }
     },
     selectMode(mode) {
       if (mode === 3 && this.shop && this.shop.deliveryEnable !== 1) {
@@ -306,33 +219,23 @@ export default {
       uni.setStorageSync('diningMode', 1)
       uni.switchTab({ url: '/pages/menu/index' })
     },
-    selectSpec() {
-      this.goMenu()
-    },
-    goSearch() {
-      uni.showToast({ title: '搜索功能开发中', icon: 'none' })
-    },
     onShortcutTap(item) {
-      if (item?.name === '优惠券包') {
+      if (item?.name === '红包卡券') {
         uni.navigateTo({ url: '/pages/coupon/wallet' })
         return
       }
-      if (item?.name === '领券中心') {
-        uni.navigateTo({ url: '/pages/coupon/center' })
+      if (item?.name === '订单详情') {
+        uni.switchTab({ url: '/pages/order/list' })
         return
       }
       uni.showToast({ title: '功能开发中', icon: 'none' })
-    },
-    goCouponCenter() {
-      uni.navigateTo({ url: '/pages/coupon/center' })
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-$page-pad: $spacing-page;
-$section-gap: 20rpx;
+$page-pad: 24rpx;
 
 .home {
   display: flex;
@@ -340,361 +243,166 @@ $section-gap: 20rpx;
   height: 100vh;
   background: $bg-page;
 
-  &__scroll-inner {
-    box-sizing: border-box;
-  }
-
   &__content {
     flex: 1;
     background: $bg-page;
     overflow: hidden;
   }
 
-  /* ===== 顶部渐变区（对齐 HomeView 结构） ===== */
+  &__scroll-inner {
+    box-sizing: border-box;
+  }
+
+  /* ===== Hero 广告区 ===== */
   &__hero {
-    background: linear-gradient(180deg, $brand-primary 0%, $brand-orange-light 100%);
-    color: $text-white;
-  }
-
-  &__hero-inner {
-    padding: 0 $page-pad 24rpx;
-    box-sizing: border-box;
-  }
-
-  &__nav-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12rpx;
-  }
-
-  &__search {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    height: 56rpx;
-    padding: 0 24rpx;
-    background: rgba(255, 252, 248, 0.9);
-    border-radius: 999rpx;
-    box-sizing: border-box;
-  }
-
-  &__search-icon {
-    width: 28rpx;
-    height: 28rpx;
-    border: 3rpx solid $text-tertiary;
-    border-radius: 50%;
     position: relative;
-    flex-shrink: 0;
-    margin-right: 12rpx;
-
-    &::after {
-      content: '';
-      position: absolute;
-      width: 10rpx;
-      height: 3rpx;
-      background: $text-tertiary;
-      border-radius: 2rpx;
-      bottom: -2rpx;
-      right: -6rpx;
-      transform: rotate(45deg);
-    }
-  }
-
-  &__search-text {
-    font-size: 24rpx;
-    font-weight: 600;
-    color: $text-primary;
-  }
-
-  &__slogan {
-    display: block;
-    margin-bottom: 12rpx;
-    font-size: 20rpx;
-    color: rgba(255, 252, 248, 0.9);
-    line-height: 1.4;
-  }
-
-  &__banner-section {
-    margin-top: 12rpx;
-  }
-
-  &__banner-wrap {
-    padding: 4rpx;
-    border-radius: $radius-card;
-    background: rgba(255, 252, 248, 0.15);
-  }
-
-  &__swiper {
-    width: 100%;
-    height: 280rpx;
-    border-radius: 28rpx;
-    overflow: hidden;
-    background: linear-gradient(135deg, $brand-primary-dark 0%, $brand-primary 50%, $brand-orange-light 100%);
-  }
-
-  &__swiper-item {
-    width: 100%;
-    height: 280rpx;
-  }
-
-  &__banner-image {
-    display: block;
-    width: 100%;
-    height: 280rpx;
-  }
-
-  &__banner-placeholder {
-    width: 100%;
-    height: 280rpx;
-    background: linear-gradient(135deg, $brand-primary-dark 0%, $brand-primary 50%, $brand-orange-light 100%);
-  }
-
-  &__primary-card {
-    display: flex;
-    align-items: stretch;
-    margin-top: 20rpx;
-    background: $bg-surface;
-    border: 4rpx solid rgba(255, 252, 248, 0.85);
-    border-radius: $radius-card;
+    color: $text-white;
     overflow: hidden;
   }
 
-  &__primary-item {
-    flex: 1;
+  &__hero-bg {
+    width: 100%;
+    height: 520rpx;
+    display: block;
+  }
+
+  &__hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  /* ===== 用户信息栏 ===== */
+  &__user-bar {
+	  margin-left: 40rpx;
+    display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 4rpx;
-    padding: 20rpx 16rpx;
+    justify-content: space-between;
+   background: linear-gradient(to right, #8b4a45, #3c120e);
+   border-radius: 15rpx 15rpx 0 0;
+    padding: 14rpx $page-pad;
+	width: 90%;
+  }
+
+  &__user-name {
+    font-size: 24rpx;
+    font-weight: 500;
+    color: #ffd48b;
+  }
+
+  &__user-stats {
+    display: flex;
+    align-items: center;
+    gap: 48rpx;
+	
+  }
+
+  &__user-stat {
+    font-size: 20rpx;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* ===== 就餐方式卡片 ===== */
+  &__dining-section {
+    display: flex;
+    gap: 20rpx;
+    padding: 24rpx $page-pad 0;
+    margin-top: -4rpx;
+  }
+
+  &__dining-card {
+    flex: 1;
+	height: 220rpx;
+    background: linear-gradient(to bottom, #f7afaa, #ffffff);
+    border-radius: $radius-card;
+    padding: 24rpx 16rpx 20rpx 24rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    box-shadow: 0 4rpx 20rpx rgba(196, 30, 58, 0.08);
+    overflow: hidden;
 
     &:active {
-      background: $bg-gray;
-    }
-
-    &--disabled {
-      opacity: 0.45;
+      opacity: 0.92;
+      transform: scale(0.98);
     }
   }
 
-  &__primary-divider {
-    width: 1rpx;
-    align-self: stretch;
-    background: $divider-color;
-    margin: 24rpx 0;
+  &__dining-img {
+    width: 200rpx;
+    height: 150rpx;
+    flex-shrink: 0;
   }
 
-  &__primary-name {
-    font-size: 32rpx;
+  &__dining-name {
+    font-size: 34rpx;
     font-weight: 900;
-    color: $text-primary;
+    color: #000;
+    letter-spacing: 2rpx;
+    padding-top: 8rpx;
+    white-space: nowrap;
   }
 
-  &__primary-desc {
-    font-size: 20rpx;
-    color: $text-secondary;
-  }
-
-  /* ===== 内容区 ===== */
-  &__sections {
-    margin-top: -8rpx;
-    padding: 0 $page-pad 16rpx;
+  /* ===== 快捷入口 ===== */
+  &__shortcuts {
     display: flex;
-    flex-direction: column;
-    gap: 24rpx;
-  }
-
-  &__shortcut-row {
-    display: flex;
-    gap: 16rpx;
+    justify-content: space-around;
+    padding: 36rpx 16rpx 0;
   }
 
   &__shortcut-item {
-    flex: 1;
-    background: $bg-surface;
-    border-radius: $radius-card;
-    padding: 20rpx 12rpx 16rpx;
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: $shadow-sm;
-    box-sizing: border-box;
+    gap: 10rpx;
 
     &:active {
       opacity: 0.88;
     }
   }
 
+  &__shortcut-icon-wrap {
+    width: 100rpx;
+    height: 100rpx;
+    background: rgba($brand-primary, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__shortcut-icon {
+    width: 60rpx;
+    height: 60rpx;
+  }
+
   &__shortcut-name {
-    margin-top: 8rpx;
-    font-size: 26rpx;
-    font-weight: 900;
-    color: $text-primary;
-  }
-
-  &__shortcut-desc {
-    margin-top: 4rpx;
-    font-size: 20rpx;
+    font-size: 22rpx;
     color: $text-secondary;
-    text-align: center;
-    line-height: 1.35;
+    font-weight: 500;
   }
 
-  /* ===== 红色线描图标 ===== */
-  &__icon {
-    width: 48rpx;
-    height: 48rpx;
-    position: relative;
-    box-sizing: border-box;
-
-    &--store {
-      border: 3rpx solid $brand-primary;
-      border-radius: 8rpx;
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: -14rpx;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 16rpx solid transparent;
-        border-right: 16rpx solid transparent;
-        border-bottom: 14rpx solid $brand-primary;
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 10rpx;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 20rpx;
-        height: 20rpx;
-        border: 3rpx solid $brand-primary;
-        border-radius: 2rpx;
-      }
-    }
-
-    &--delivery {
-      border: 3rpx solid $brand-primary;
-      border-radius: 8rpx 8rpx 4rpx 4rpx;
-      margin-top: 4rpx;
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: 14rpx;
-        left: -10rpx;
-        width: 14rpx;
-        height: 14rpx;
-        border: 3rpx solid $brand-primary;
-        border-radius: 50%;
-        background: transparent;
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        top: 14rpx;
-        right: -10rpx;
-        width: 14rpx;
-        height: 14rpx;
-        border: 3rpx solid $brand-primary;
-        border-radius: 50%;
-        background: transparent;
-      }
-    }
-
-    &--points {
-      border: 3rpx solid $brand-primary;
-      border-radius: 50%;
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -60%);
-        width: 6rpx;
-        height: 6rpx;
-        background: $brand-primary;
-        border-radius: 50%;
-        box-shadow:
-          -10rpx 6rpx 0 $brand-primary,
-          10rpx 6rpx 0 $brand-primary,
-          0 14rpx 0 $brand-primary;
-      }
-    }
-
-    &--wallet {
-      border: 3rpx solid $brand-primary;
-      border-radius: 8rpx;
-
-      &::before {
-        content: '';
-        position: absolute;
-        top: -8rpx;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 20rpx;
-        height: 12rpx;
-        border: 3rpx solid $brand-primary;
-        border-bottom: none;
-        border-radius: 8rpx 8rpx 0 0;
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 12rpx;
-        height: 12rpx;
-        border: 3rpx solid $brand-primary;
-        border-radius: 50%;
-      }
-    }
-
-    &--coupon {
-      border: 3rpx dashed $brand-primary;
-      border-radius: 6rpx;
-
-      &::before,
-      &::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 10rpx;
-        height: 10rpx;
-        background: $bg-surface;
-        border: 3rpx solid $brand-primary;
-        border-radius: 50%;
-      }
-
-      &::before {
-        left: -8rpx;
-      }
-
-      &::after {
-        right: -8rpx;
-      }
-    }
-  }
-
-  /* ===== 招牌推荐 ===== */
+  /* ===== 粮兴推荐 ===== */
   &__recommend {
-    padding-top: 0;
+    padding: 36rpx $page-pad 0;
   }
 
   &__recommend-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16rpx;
+    margin-bottom: 20rpx;
+  }
+
+  &__recommend-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
   }
 
   &__recommend-title {
@@ -703,13 +411,19 @@ $section-gap: 20rpx;
     color: $text-primary;
   }
 
+  &__recommend-tag {
+    font-size: 20rpx;
+    font-weight: 600;
+    color: #FFFFFF;
+    background: #ffd880;
+    border-radius: 0 99rpx 0 99rpx;
+    padding: 4rpx 16rpx;
+  }
+
   &__recommend-link {
     display: flex;
     align-items: center;
     gap: 4rpx;
-    height: 56rpx;
-    padding: 0 12rpx;
-    border-radius: 999rpx;
   }
 
   &__recommend-link-text {
@@ -722,7 +436,6 @@ $section-gap: 20rpx;
     font-size: 32rpx;
     color: $brand-primary;
     line-height: 1;
-    margin-top: -2rpx;
   }
 
   &__dish-list {
@@ -732,22 +445,15 @@ $section-gap: 20rpx;
   }
 
   &__dish-item {
+	margin: 0px 8px;
     display: flex;
-    align-items: stretch;
     gap: 24rpx;
     padding: 24rpx;
-    background: $bg-surface;
+    background:#ffe8cd;
     border-radius: $radius-lg;
     box-shadow: $shadow-sm;
 
-    &:active {
-      opacity: 0.92;
-    }
-  }
-
-  &__dish-image-wrap {
-    position: relative;
-    flex-shrink: 0;
+    &:active { opacity: 0.92; }
   }
 
   &__dish-image {
@@ -755,21 +461,7 @@ $section-gap: 20rpx;
     height: 192rpx;
     border-radius: $radius-card;
     background: $bg-gray;
-  }
-
-  &__dish-badge {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: $brand-primary;
-    border-radius: $radius-card 0 12rpx 0;
-    padding: 4rpx 14rpx;
-  }
-
-  &__dish-badge-text {
-    font-size: 20rpx;
-    color: $text-white;
-    font-weight: 600;
+    flex-shrink: 0;
   }
 
   &__dish-info {
@@ -777,12 +469,12 @@ $section-gap: 20rpx;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     padding: 4rpx 0;
   }
 
   &__dish-name {
-    font-size: 32rpx;
+    font-size: 30rpx;
     font-weight: 900;
     color: $text-primary;
     overflow: hidden;
@@ -813,12 +505,11 @@ $section-gap: 20rpx;
   &__dish-price {
     font-size: 36rpx;
     font-weight: 900;
-    color: $text-price;
+    color: #000;
   }
 
   &__dish-btn {
-    flex-shrink: 0;
-    background: $brand-primary;
+    background: #be0000;
     border-radius: 999rpx;
     padding: 12rpx 32rpx;
   }
@@ -835,65 +526,11 @@ $section-gap: 20rpx;
     text-align: center;
     background: $bg-surface;
     border-radius: $radius-card;
-    box-shadow: $shadow-card;
   }
 
   &__recommend-empty-text {
     font-size: 26rpx;
     color: $text-secondary;
-  }
-
-  /* ===== 储值营销条 ===== */
-  &__promo {
-    display: flex;
-    align-items: center;
-    gap: 24rpx;
-    padding: 24rpx;
-    border-radius: $radius-card;
-    background: linear-gradient(135deg, $text-primary 0%, $brand-primary 100%);
-    box-shadow: $shadow-card;
-
-    &:active {
-      opacity: 0.92;
-    }
-  }
-
-  &__promo-icon {
-    flex-shrink: 0;
-    border-color: rgba(255, 252, 248, 0.85) !important;
-
-    &::before,
-    &::after {
-      border-color: rgba(255, 252, 248, 0.85) !important;
-    }
-  }
-
-  &__promo-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  &__promo-sub {
-    display: block;
-    font-size: 24rpx;
-    color: rgba(255, 252, 248, 0.8);
-    line-height: 1.4;
-  }
-
-  &__promo-title {
-    display: block;
-    margin-top: 4rpx;
-    font-size: 28rpx;
-    font-weight: 900;
-    color: $text-white;
-    line-height: 1.35;
-  }
-
-  &__promo-arrow {
-    flex-shrink: 0;
-    font-size: 40rpx;
-    color: $text-white;
-    line-height: 1;
   }
 
   &__bottom-space {

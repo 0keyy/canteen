@@ -35,20 +35,20 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: $data.form.contactName,
-    b: common_vendor.o(($event) => $data.form.contactName = $event.detail.value),
+    b: common_vendor.o(($event) => $data.form.contactName = $event.detail.value, "6b"),
     c: $data.form.contactMobile,
-    d: common_vendor.o(($event) => $data.form.contactMobile = $event.detail.value),
+    d: common_vendor.o(($event) => $data.form.contactMobile = $event.detail.value, "75"),
     e: $data.form.province,
-    f: common_vendor.o(($event) => $data.form.province = $event.detail.value),
+    f: common_vendor.o(($event) => $data.form.province = $event.detail.value, "2a"),
     g: $data.form.city,
-    h: common_vendor.o(($event) => $data.form.city = $event.detail.value),
+    h: common_vendor.o(($event) => $data.form.city = $event.detail.value, "5b"),
     i: $data.form.district,
-    j: common_vendor.o(($event) => $data.form.district = $event.detail.value),
+    j: common_vendor.o(($event) => $data.form.district = $event.detail.value, "29"),
     k: $data.form.detail,
-    l: common_vendor.o(($event) => $data.form.detail = $event.detail.value),
+    l: common_vendor.o(($event) => $data.form.detail = $event.detail.value, "ea"),
     m: $data.form.isDefault === 1,
-    n: common_vendor.o((...args) => $options.onDefaultChange && $options.onDefaultChange(...args)),
-    o: common_vendor.o((...args) => $options.save && $options.save(...args))
+    n: common_vendor.o((...args) => $options.onDefaultChange && $options.onDefaultChange(...args), "de"),
+    o: common_vendor.o((...args) => $options.save && $options.save(...args), "7f")
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-dcb1f0d8"]]);

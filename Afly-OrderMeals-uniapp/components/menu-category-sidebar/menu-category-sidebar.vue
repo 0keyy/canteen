@@ -7,9 +7,17 @@
       @tap="$emit('select', index)"
     >
       <view v-if="activeIndex === index" class="sidebar__indicator"></view>
-      <text :class="['sidebar__name', activeIndex === index ? 'sidebar__name--active' : '']">
-        {{ cate.name }}
-      </text>
+      <view class="sidebar__name-wrap">
+        <image
+          v-if="index === 0"
+          class="sidebar__heart-icon"
+          src="/static/tabbar/爱心 _实心 1.png"
+          mode="aspectFit"
+        />
+        <text :class="['sidebar__name', activeIndex === index ? 'sidebar__name--active' : '']">
+          {{ index === 0 ? '猜你喜欢' : cate.name }}
+        </text>
+      </view>
       <text v-if="badgeCount(index) > 0" class="sidebar__badge">{{ badgeCount(index) }}</text>
     </view>
   </scroll-view>
@@ -70,6 +78,18 @@ export default {
     height: 48rpx;
     background: $brand-primary;
     border-radius: 0 8rpx 8rpx 0;
+  }
+
+  &__name-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rpx;
+  }
+
+  &__heart-icon {
+    width: 32rpx;
+    height: 32rpx;
   }
 
   &__name {

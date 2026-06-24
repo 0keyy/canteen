@@ -1,6 +1,8 @@
-/* 粮兴坊风格设计系统 */
+/* 粮兴坊风格设计系统 v2 */
 /* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
+/* ===== 我的页渐变背景 ===== */
+/* ===== 用户信息栏背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
 /* ===== 圆角 ===== */
@@ -40,24 +42,24 @@
   border-top: 1rpx solid #E8DDD4;
 }
 .address-page__add-btn.data-v-90a3874e {
-  background: #B10A0F;
+  background: #C41E3A;
   color: #FFFFFF;
   border-radius: 999rpx;
   font-size: 30rpx;
   font-weight: bold;
 }
 .address-page__add-btn.data-v-90a3874e:active {
-  background: #7A070A;
+  background: #8E1526;
 }
 .address-page__bottom-space.data-v-90a3874e {
   height: 120rpx;
 }
 .address-card.data-v-90a3874e {
   background: #FFFFFF;
-  border-radius: 32rpx;
+  border-radius: 24rpx;
   padding: 28rpx;
   margin: 16rpx 24rpx;
-  box-shadow: 0 4rpx 12rpx rgba(112, 21, 16, 0.06);
+  box-shadow: 0 4rpx 16rpx rgba(196, 30, 58, 0.08);
 }
 .address-card.data-v-90a3874e:active {
   opacity: 0.9;
@@ -78,7 +80,7 @@
 }
 .address-card__tag.data-v-90a3874e {
   background: #FFFFFF;
-  color: #B10A0F;
+  color: #C41E3A;
   font-size: 20rpx;
   padding: 4rpx 12rpx;
   border-radius: 8rpx;

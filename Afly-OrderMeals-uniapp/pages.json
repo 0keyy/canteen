@@ -72,6 +72,12 @@
       }
     },
     {
+      "path": "pages/mine/profile",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/coupon/center",
       "style": {
         "navigationBarTitleText": "领券中心",
@@ -94,6 +100,12 @@
         "navigationBarBackgroundColor": "#FFFCF8",
         "navigationBarTextStyle": "black"
       }
+    },
+    {
+      "path": "pages/points/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
     }
   ],
   "globalStyle": {
@@ -105,7 +117,7 @@
   },
   "tabBar": {
     "color": "#999999",
-    "selectedColor": "#B10A0F",
+    "selectedColor": "#C41E3A",
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
@@ -117,13 +129,13 @@
       },
       {
         "pagePath": "pages/menu/index",
-        "text": "点单",
+        "text": "点餐",
         "iconPath": "static/tabbar/icon.png",
         "selectedIconPath": "static/tabbar/icon-active.png"
       },
       {
-        "pagePath": "pages/order/list",
-        "text": "订单",
+        "pagePath": "pages/points/index",
+        "text": "积分商城",
         "iconPath": "static/tabbar/icon.png",
         "selectedIconPath": "static/tabbar/icon-active.png"
       },

@@ -28,9 +28,6 @@ const _sfc_main = {
     headerPaddingStyle() {
       return { paddingTop: `${this.navMetrics.statusBarHeight + 8}px` };
     },
-    searchRowStyle() {
-      return { paddingRight: `${this.menuButtonRight}px` };
-    },
     shopName() {
       var _a;
       return ((_a = this.shop) == null ? void 0 : _a.name) || "粮兴坊";
@@ -64,7 +61,7 @@ const _sfc_main = {
         return "¥0.00";
       if (this.cartItemCount === 0)
         return "¥0.00";
-      return `¥ ${this.totalPrice}`;
+      return `¥${this.totalPrice}`;
     }
   },
   onLoad() {
@@ -93,9 +90,6 @@ const _sfc_main = {
     },
     selectCategory(index) {
       this.activeIndex = index;
-    },
-    goSearch() {
-      common_vendor.index.showToast({ title: "搜索功能开发中", icon: "none" });
     },
     async switchMode(mode) {
       if (mode === this.diningMode)
@@ -348,70 +342,61 @@ if (!Math) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.o((...args) => $options.goSearch && $options.goSearch(...args)),
-    b: common_vendor.s($options.searchRowStyle),
-    c: common_vendor.t($options.shopName),
-    d: common_vendor.t($options.distanceText),
-    e: common_vendor.n($data.diningMode === 1 ? "order-page__mode-btn--active" : ""),
-    f: common_vendor.o(($event) => $options.switchMode(1)),
-    g: common_vendor.n($data.diningMode === 3 ? "order-page__mode-btn--active" : ""),
-    h: common_vendor.n($data.shop && $data.shop.deliveryEnable !== 1 ? "order-page__mode-btn--disabled" : ""),
-    i: common_vendor.o(($event) => $options.switchMode(3)),
-    j: common_vendor.s($options.headerPaddingStyle),
-    k: $data.loading
+    a: common_vendor.n($data.diningMode === 1 ? "order-page__mode-tab--active" : ""),
+    b: common_vendor.o(($event) => $options.switchMode(1), "cc"),
+    c: common_vendor.n($data.diningMode === 3 ? "order-page__mode-tab--active" : ""),
+    d: common_vendor.n($data.shop && $data.shop.deliveryEnable !== 1 ? "order-page__mode-tab--disabled" : ""),
+    e: common_vendor.o(($event) => $options.switchMode(3), "53"),
+    f: common_vendor.s($options.headerPaddingStyle),
+    g: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    m: common_vendor.o($options.selectCategory),
-    n: common_vendor.p({
+    i: common_vendor.o($options.selectCategory, "f7"),
+    j: common_vendor.p({
       menu: $data.menu,
       ["active-index"]: $data.activeIndex,
       ["cart-map"]: $data.cartMap
     }),
-    o: common_vendor.t($options.currentCategoryName),
-    p: common_vendor.f($options.currentFoods, (food, idx, i0) => {
+    k: common_vendor.t($options.currentCategoryName),
+    l: common_vendor.f($options.currentFoods, (food, idx, i0) => {
       return common_vendor.e({
         a: food.image,
-        b: $options.foodTag(idx)
+        b: common_vendor.t(food.title),
+        c: $options.foodTag(idx)
       }, $options.foodTag(idx) ? {
-        c: common_vendor.t($options.foodTag(idx))
+        d: common_vendor.t($options.foodTag(idx))
       } : {}, {
-        d: common_vendor.t(food.title),
-        e: food.intro
-      }, food.intro ? {
-        f: common_vendor.t(food.intro)
-      } : {}, {
-        g: common_vendor.t(food.price),
-        h: $options.getCount(food.id) > 0
+        e: common_vendor.t(food.sales || 13),
+        f: common_vendor.t(food.price),
+        g: $options.getCount(food.id) > 0
       }, $options.getCount(food.id) > 0 ? {
-        i: common_vendor.o(($event) => $options.decFood(food), food.id)
+        h: common_vendor.o(($event) => $options.decFood(food), food.id),
+        i: common_vendor.t($options.getCount(food.id))
       } : {}, {
-        j: $options.getCount(food.id) > 0
-      }, $options.getCount(food.id) > 0 ? {
-        k: common_vendor.t($options.getCount(food.id))
-      } : {}, {
-        l: common_vendor.o(($event) => $options.addFood(food), food.id),
-        m: food.id
+        j: common_vendor.o(($event) => $options.addFood(food), food.id),
+        k: food.id
       });
     }),
-    q: $data.cartBusy ? 1 : "",
-    r: $options.currentFoods.length === 0
+    m: $data.cartBusy ? 1 : "",
+    n: $options.currentFoods.length === 0
   }, $options.currentFoods.length === 0 ? {} : {}), {
-    l: $data.menu.length === 0,
-    s: $options.cartItemCount > 0
+    h: $data.menu.length === 0,
+    o: $options.cartItemCount > 0
   }, $options.cartItemCount > 0 ? {
-    t: common_vendor.t($options.cartItemCount)
+    p: common_vendor.t($options.cartItemCount)
   } : {}, {
-    v: common_vendor.t($options.cartSummary),
-    w: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    x: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    y: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args)),
-    z: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    q: common_vendor.t($options.cartSummary),
+    r: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
+    s: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
+    t: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "c0"),
+    v: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
-        a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
-        b: common_vendor.t(item.name),
-        c: _ctx.tabbarSelected === index ? _ctx.tabbarSelectedColor : _ctx.tabbarDefaultColor,
-        d: index,
-        e: _ctx.tabbarSelected === index ? 1 : "",
-        f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
+        a: _ctx.tabbarSelected !== index ? 1 : "",
+        b: _ctx.tabbarSelected === index ? item.selected : item.unselected,
+        c: common_vendor.t(item.name),
+        d: _ctx.tabbarSelected === index ? _ctx.tabbarSelectedColor : _ctx.tabbarDefaultColor,
+        e: index,
+        f: _ctx.tabbarSelected === index ? 1 : "",
+        g: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
       };
     })
   });

@@ -95,7 +95,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   } : {}, {
     j: $data.order.payStatus === 0 || $data.order.status === 4
   }, $data.order.payStatus === 0 || $data.order.status === 4 ? {
-    k: common_vendor.o(($event) => $data.payChannel = $event),
+    k: common_vendor.o(($event) => $data.payChannel = $event, "59"),
     l: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
@@ -112,11 +112,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     n: common_vendor.t($data.order.amount),
     o: $data.order.payStatus === 0 || $data.order.status === 4
   }, $data.order.payStatus === 0 || $data.order.status === 4 ? {
-    p: common_vendor.o((...args) => $options.payNow && $options.payNow(...args))
+    p: common_vendor.o((...args) => $options.payNow && $options.payNow(...args), "9e")
   } : {}, {
     q: $data.order.status === 1
   }, $data.order.status === 1 ? {
-    r: common_vendor.o((...args) => $options.cancelOrder && $options.cancelOrder(...args))
+    r: common_vendor.o((...args) => $options.cancelOrder && $options.cancelOrder(...args), "fc")
   } : {}) : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-6b23c96c"]]);

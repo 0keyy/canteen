@@ -1,6 +1,8 @@
-/* 粮兴坊风格设计系统 */
+/* 粮兴坊风格设计系统 v2 */
 /* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
+/* ===== 我的页渐变背景 ===== */
+/* ===== 用户信息栏背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
 /* ===== 圆角 ===== */
@@ -20,9 +22,9 @@
 }
 .company-auth-page__card.data-v-431fd8fd {
   background: #FFFFFF;
-  border-radius: 32rpx;
+  border-radius: 24rpx;
   padding: 32rpx 28rpx;
-  box-shadow: 0 4rpx 12rpx rgba(112, 21, 16, 0.06);
+  box-shadow: 0 4rpx 16rpx rgba(196, 30, 58, 0.08);
 }
 .company-auth-page__card--success.data-v-431fd8fd {
   text-align: center;
@@ -56,7 +58,7 @@
   align-items: center;
   min-height: 88rpx;
   padding: 0 24rpx;
-  border-radius: 32rpx;
+  border-radius: 24rpx;
   background: #F5F0EA;
   font-size: 28rpx;
   color: #1A1410;
@@ -72,7 +74,7 @@
   margin: 0 auto 24rpx;
   border-radius: 50%;
   background: rgba(177, 10, 15, 0.1);
-  color: #B10A0F;
+  color: #C41E3A;
   font-size: 48rpx;
   font-weight: 900;
   line-height: 96rpx;
@@ -112,7 +114,7 @@
   border-top: 1rpx solid #E8DDD4;
 }
 .company-auth-page__submit-btn.data-v-431fd8fd {
-  background: #B10A0F;
+  background: #C41E3A;
   color: #FFFFFF;
   border-radius: 999rpx;
   font-size: 30rpx;

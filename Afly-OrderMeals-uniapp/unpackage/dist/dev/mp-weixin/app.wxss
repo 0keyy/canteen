@@ -1,6 +1,8 @@
-/* 粮兴坊风格设计系统 */
+/* 粮兴坊风格设计系统 v2 */
 /* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
+/* ===== 我的页渐变背景 ===== */
+/* ===== 用户信息栏背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
 /* ===== 圆角 ===== */
@@ -32,7 +34,7 @@ view, text, image, scroll-view, swiper {
 
 /* 主按钮 */
 .btn-primary {
-  background: #B10A0F;
+  background: #C41E3A;
   color: #FFFFFF;
   border-radius: 999rpx;
   font-weight: 600;
@@ -40,7 +42,7 @@ view, text, image, scroll-view, swiper {
   transition: background 0.15s ease;
 }
 .btn-primary:active {
-  background: #7A070A;
+  background: #8E1526;
 }
 .btn-primary--disabled {
   background: #CCCCCC !important;

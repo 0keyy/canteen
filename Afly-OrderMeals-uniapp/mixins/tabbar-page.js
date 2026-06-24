@@ -15,7 +15,7 @@ export default {
     return {
       tabbarSelected: 0,
       tabbarDefaultColor: '#999999',
-      tabbarSelectedColor: '#B10A0F',
+      tabbarSelectedColor: '#C41E3A',
       tabbarList: getDefaultTabbar().list
     }
   },
@@ -53,14 +53,15 @@ export default {
     applyTabbarConfig(config) {
       const style = config?.style || {}
       this.tabbarDefaultColor = style.defaultColor || '#999999'
-      this.tabbarSelectedColor = style.selectedColor || '#B10A0F'
+      this.tabbarSelectedColor = style.selectedColor || '#C41E3A'
       const list = config.list || getDefaultTabbar().list
       this.tabbarList = list.map((item) => {
         const normalized = normalizeTabbarItem(item)
+        const isLocal = (p) => !p || p.startsWith('/static') || p.startsWith('static')
         return {
           ...normalized,
-          selected: resolveImageUrl(normalized.selected),
-          unselected: resolveImageUrl(normalized.unselected)
+          selected: isLocal(normalized.selected) ? normalized.selected : resolveImageUrl(normalized.selected),
+          unselected: isLocal(normalized.unselected) ? normalized.unselected : resolveImageUrl(normalized.unselected)
         }
       })
     },

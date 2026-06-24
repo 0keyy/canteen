@@ -8,7 +8,7 @@ const tabbarPageMixin = {
     return {
       tabbarSelected: 0,
       tabbarDefaultColor: "#999999",
-      tabbarSelectedColor: "#B10A0F",
+      tabbarSelectedColor: "#C41E3A",
       tabbarList: utils_tabbar.getDefaultTabbar().list
     };
   },
@@ -48,14 +48,15 @@ const tabbarPageMixin = {
     applyTabbarConfig(config) {
       const style = (config == null ? void 0 : config.style) || {};
       this.tabbarDefaultColor = style.defaultColor || "#999999";
-      this.tabbarSelectedColor = style.selectedColor || "#B10A0F";
+      this.tabbarSelectedColor = style.selectedColor || "#C41E3A";
       const list = config.list || utils_tabbar.getDefaultTabbar().list;
       this.tabbarList = list.map((item) => {
         const normalized = utils_tabbar.normalizeTabbarItem(item);
+        const isLocal = (p) => !p || p.startsWith("/static") || p.startsWith("static");
         return {
           ...normalized,
-          selected: utils_image.resolveImageUrl(normalized.selected),
-          unselected: utils_image.resolveImageUrl(normalized.unselected)
+          selected: isLocal(normalized.selected) ? normalized.selected : utils_image.resolveImageUrl(normalized.selected),
+          unselected: isLocal(normalized.unselected) ? normalized.unselected : utils_image.resolveImageUrl(normalized.unselected)
         };
       });
     },

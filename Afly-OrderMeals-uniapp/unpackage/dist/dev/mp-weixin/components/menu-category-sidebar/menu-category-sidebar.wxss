@@ -1,6 +1,8 @@
-/* 粮兴坊风格设计系统 */
+/* 粮兴坊风格设计系统 v2 */
 /* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
+/* ===== 我的页渐变背景 ===== */
+/* ===== 用户信息栏背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
 /* ===== 圆角 ===== */
@@ -34,8 +36,18 @@
   transform: translateY(-50%);
   width: 8rpx;
   height: 48rpx;
-  background: #B10A0F;
+  background: #C41E3A;
   border-radius: 0 8rpx 8rpx 0;
+}
+.sidebar__name-wrap.data-v-75257acb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+}
+.sidebar__heart-icon.data-v-75257acb {
+  width: 32rpx;
+  height: 32rpx;
 }
 .sidebar__name.data-v-75257acb {
   font-size: 28rpx;
@@ -45,7 +57,7 @@
   line-height: 1.4;
 }
 .sidebar__name--active.data-v-75257acb {
-  color: #B10A0F;
+  color: #C41E3A;
 }
 .sidebar__badge.data-v-75257acb {
   position: absolute;
@@ -56,7 +68,7 @@
   line-height: 28rpx;
   padding: 0 6rpx;
   border-radius: 14rpx;
-  background: #B10A0F;
+  background: #C41E3A;
   color: #FFFFFF;
   font-size: 18rpx;
   text-align: center;

@@ -3,21 +3,6 @@ const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
 const utils_navbar = require("../../utils/navbar.js");
-const PRIMARY_ACTIONS = [
-  { title: "我的订单", icon: "orders" },
-  { title: "地址管理", icon: "address" },
-  { title: "联系客服", icon: "service" },
-  { title: "会员码", icon: "code" }
-];
-const SECONDARY_ACTIONS = [
-  { title: "公司认证", icon: "check" },
-  { title: "充值中心", icon: "wallet" },
-  { title: "积分商城", icon: "coins" },
-  { title: "集点有礼", icon: "star" },
-  { title: "优惠券包", icon: "ticket" },
-  { title: "会员日", icon: "crown" },
-  { title: "退出登录", icon: "logout" }
-];
 const _sfc_main = {
   mixins: [mixins_tabbarPage.tabbarPageMixin],
   data() {
@@ -26,15 +11,12 @@ const _sfc_main = {
       nickname: "",
       mobile: "",
       companyVerified: false,
-      companyDeptName: "",
       balance: 0,
-      couponCount: 0,
-      primaryActions: PRIMARY_ACTIONS,
-      secondaryActions: SECONDARY_ACTIONS
+      couponCount: 0
     };
   },
   computed: {
-    heroPaddingStyle() {
+    headerPaddingStyle() {
       return { paddingTop: `${this.navMetrics.statusBarHeight + 8}px` };
     }
   },
@@ -46,6 +28,9 @@ const _sfc_main = {
     this.loadProfile();
   },
   methods: {
+    goProfile() {
+      common_vendor.index.navigateTo({ url: "/pages/mine/profile" });
+    },
     async loadProfile() {
       try {
         const profile = await api_index.authApi.profile();
@@ -53,14 +38,11 @@ const _sfc_main = {
           this.nickname = profile.nickname || this.nickname;
           this.mobile = profile.mobile || this.mobile;
           this.companyVerified = !!profile.companyVerified;
-          this.companyDeptName = profile.companyDeptName || "";
           this.balance = profile.balance != null ? profile.balance : 0;
           common_vendor.index.setStorageSync("companyVerified", this.companyVerified);
-          common_vendor.index.setStorageSync("companyDeptName", this.companyDeptName);
         }
       } catch (e) {
         this.companyVerified = !!common_vendor.index.getStorageSync("companyVerified");
-        this.companyDeptName = common_vendor.index.getStorageSync("companyDeptName") || "";
       }
       try {
         const myCoupons = await api_index.couponApi.myCoupons(1) || [];
@@ -69,31 +51,35 @@ const _sfc_main = {
         this.couponCount = 0;
       }
     },
-    onActionTap(item) {
-      if (item.title === "我的订单") {
+    onViewAllOrders() {
+      common_vendor.index.switchTab({ url: "/pages/order/list" });
+    },
+    onOrderTap(status) {
+      common_vendor.index.switchTab({ url: "/pages/order/list" });
+    },
+    onStatTap(type) {
+      if (type === "coupon") {
+        common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
+      }
+    },
+    onFeatureItemTap(name) {
+      if (name === "我的订单") {
         common_vendor.index.switchTab({ url: "/pages/order/list" });
         return;
       }
-      if (item.title === "地址管理") {
+      if (name === "地址管理") {
         common_vendor.index.navigateTo({ url: "/pages/address/list" });
         return;
       }
-      if (item.title === "公司认证") {
-        common_vendor.index.navigateTo({ url: "/pages/mine/company-auth" });
-        return;
-      }
-      if (item.title === "优惠券包") {
+      if (name === "红包卡券") {
         common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
         return;
       }
-      if (item.title === "退出登录") {
+      if (name === "安全退出") {
         this.logout();
         return;
       }
-      this.onFeatureTap(item.title);
-    },
-    onFeatureTap(title) {
-      common_vendor.index.showToast({ title: `${title}功能开发中`, icon: "none" });
+      common_vendor.index.showToast({ title: "功能开发中", icon: "none" });
     },
     async logout() {
       try {
@@ -106,46 +92,40 @@ const _sfc_main = {
   }
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return common_vendor.e({
+  return {
     a: common_vendor.t($data.nickname || "未登录用户"),
-    b: $data.companyVerified
-  }, $data.companyVerified ? {} : {}, {
-    c: common_vendor.t($data.mobile || "请登录后查看"),
-    d: $data.companyVerified && $data.companyDeptName
-  }, $data.companyVerified && $data.companyDeptName ? {
-    e: common_vendor.t($data.companyDeptName)
-  } : {}, {
-    f: common_vendor.o(($event) => $options.onFeatureTap("会员码")),
-    g: common_vendor.t($data.balance),
-    h: common_vendor.t($data.couponCount),
-    i: common_vendor.s($options.heroPaddingStyle),
-    j: common_vendor.f($data.primaryActions, (item, k0, i0) => {
+    b: common_vendor.o((...args) => $options.goProfile && $options.goProfile(...args), "42"),
+    c: common_vendor.s($options.headerPaddingStyle),
+    d: common_vendor.t($data.balance),
+    e: common_vendor.o(($event) => $options.onStatTap("balance"), "9a"),
+    f: common_vendor.o(($event) => $options.onStatTap("points"), "ea"),
+    g: common_vendor.t($data.couponCount),
+    h: common_vendor.o(($event) => $options.onStatTap("coupon"), "3b"),
+    i: common_vendor.o((...args) => $options.onViewAllOrders && $options.onViewAllOrders(...args), "d1"),
+    j: common_vendor.o(($event) => $options.onOrderTap("待支付"), "e7"),
+    k: common_vendor.o(($event) => $options.onOrderTap("待发货"), "b3"),
+    l: common_vendor.o(($event) => $options.onOrderTap("待收货"), "e4"),
+    m: common_vendor.o(($event) => $options.onOrderTap("退款售后"), "3a"),
+    n: common_vendor.o(($event) => $options.onFeatureItemTap("我的订单"), "e1"),
+    o: common_vendor.o(($event) => $options.onFeatureItemTap("地址管理"), "61"),
+    p: common_vendor.o(($event) => $options.onFeatureItemTap("客服中心"), "75"),
+    q: common_vendor.o(($event) => $options.onFeatureItemTap("充值中心"), "3a"),
+    r: common_vendor.o(($event) => $options.onFeatureItemTap("红包卡券"), "48"),
+    s: common_vendor.o(($event) => $options.onFeatureItemTap("签到中心"), "79"),
+    t: common_vendor.o(($event) => $options.onFeatureItemTap("积分抽奖"), "19"),
+    v: common_vendor.o(($event) => $options.onFeatureItemTap("安全退出"), "02"),
+    w: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
-        a: common_vendor.n(`profile-page__action-icon--${item.icon}`),
-        b: common_vendor.t(item.title),
-        c: item.title,
-        d: common_vendor.o(($event) => $options.onActionTap(item), item.title)
-      };
-    }),
-    k: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
-      return {
-        a: common_vendor.n(`profile-page__action-icon--${item.icon}`),
-        b: common_vendor.t(item.title),
-        c: item.title,
-        d: common_vendor.o(($event) => $options.onActionTap(item), item.title)
-      };
-    }),
-    l: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
-      return {
-        a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
-        b: common_vendor.t(item.name),
-        c: _ctx.tabbarSelected === index ? _ctx.tabbarSelectedColor : _ctx.tabbarDefaultColor,
-        d: index,
-        e: _ctx.tabbarSelected === index ? 1 : "",
-        f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
+        a: _ctx.tabbarSelected !== index ? 1 : "",
+        b: _ctx.tabbarSelected === index ? item.selected : item.unselected,
+        c: common_vendor.t(item.name),
+        d: _ctx.tabbarSelected === index ? _ctx.tabbarSelectedColor : _ctx.tabbarDefaultColor,
+        e: index,
+        f: _ctx.tabbarSelected === index ? 1 : "",
+        g: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
       };
     })
-  });
+  };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-569e925a"]]);
 wx.createPage(MiniProgramPage);
