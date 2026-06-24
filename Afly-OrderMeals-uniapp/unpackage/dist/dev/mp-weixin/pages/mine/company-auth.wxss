@@ -1,5 +1,5 @@
-/* 粮兴坊 UI 图风格设计系统 */
-/* ===== 主色：招牌红 / 粉红渐变 ===== */
+/* 粮兴坊风格设计系统 v2 */
+/* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
 /* ===== 我的页渐变背景 ===== */
 /* ===== 用户信息栏背景 ===== */
@@ -14,7 +14,7 @@
 /* ===== 兼容旧变量 ===== */
 .company-auth-page.data-v-431fd8fd {
   min-height: 100vh;
-  background: #FFFFFF;
+  background: #FFFCF8;
   padding: 24rpx 24rpx 140rpx;
 }
 .company-auth-page--verified.data-v-431fd8fd {
@@ -24,7 +24,7 @@
   background: #FFFFFF;
   border-radius: 24rpx;
   padding: 32rpx 28rpx;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4rpx 16rpx rgba(196, 30, 58, 0.08);
 }
 .company-auth-page__card--success.data-v-431fd8fd {
   text-align: center;
@@ -34,14 +34,14 @@
   display: block;
   font-size: 36rpx;
   font-weight: 900;
-  color: #111111;
+  color: #1A1410;
 }
 .company-auth-page__desc.data-v-431fd8fd {
   display: block;
   margin-top: 8rpx;
   margin-bottom: 32rpx;
   font-size: 24rpx;
-  color: #666666;
+  color: #7F7368;
 }
 .company-auth-page__field.data-v-431fd8fd {
   margin-bottom: 24rpx;
@@ -51,7 +51,7 @@
   margin-bottom: 12rpx;
   font-size: 26rpx;
   font-weight: 600;
-  color: #111111;
+  color: #1A1410;
 }
 .company-auth-page__input.data-v-431fd8fd {
   display: flex;
@@ -59,14 +59,14 @@
   min-height: 88rpx;
   padding: 0 24rpx;
   border-radius: 24rpx;
-  background: #F5F5F5;
+  background: #F5F0EA;
   font-size: 28rpx;
-  color: #111111;
+  color: #1A1410;
   width: 100%;
   box-sizing: border-box;
 }
 .company-auth-page__placeholder.data-v-431fd8fd {
-  color: #666666;
+  color: #7F7368;
 }
 .company-auth-page__success-icon.data-v-431fd8fd {
   width: 96rpx;
@@ -74,7 +74,7 @@
   margin: 0 auto 24rpx;
   border-radius: 50%;
   background: rgba(177, 10, 15, 0.1);
-  color: #D00000;
+  color: #C41E3A;
   font-size: 48rpx;
   font-weight: 900;
   line-height: 96rpx;
@@ -85,7 +85,7 @@
   margin-bottom: 32rpx;
   font-size: 34rpx;
   font-weight: 900;
-  color: #111111;
+  color: #1A1410;
 }
 .company-auth-page__info-row.data-v-431fd8fd {
   display: flex;
@@ -97,12 +97,12 @@
 }
 .company-auth-page__label.data-v-431fd8fd {
   font-size: 26rpx;
-  color: #666666;
+  color: #7F7368;
 }
 .company-auth-page__value.data-v-431fd8fd {
   font-size: 28rpx;
   font-weight: 600;
-  color: #111111;
+  color: #1A1410;
 }
 .company-auth-page__footer.data-v-431fd8fd {
   position: fixed;
@@ -111,10 +111,10 @@
   bottom: 0;
   background: #FFFFFF;
   padding: 16rpx 24rpx;
-  border-top: 1rpx solid #EEEEEE;
+  border-top: 1rpx solid #E8DDD4;
 }
 .company-auth-page__submit-btn.data-v-431fd8fd {
-  background: #D00000;
+  background: #C41E3A;
   color: #FFFFFF;
   border-radius: 999rpx;
   font-size: 30rpx;

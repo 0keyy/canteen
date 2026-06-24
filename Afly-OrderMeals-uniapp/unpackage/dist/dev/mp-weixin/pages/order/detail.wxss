@@ -1,5 +1,5 @@
-/* 粮兴坊 UI 图风格设计系统 */
-/* ===== 主色：招牌红 / 粉红渐变 ===== */
+/* 粮兴坊风格设计系统 v2 */
+/* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
 /* ===== 我的页渐变背景 ===== */
 /* ===== 用户信息栏背景 ===== */
@@ -14,7 +14,7 @@
 /* ===== 兼容旧变量 ===== */
 .detail-page.data-v-6b23c96c {
   min-height: 100vh;
-  background: #FFFFFF;
+  background: #FFFCF8;
   display: flex;
   flex-direction: column;
 }
@@ -22,7 +22,7 @@
   flex: 1;
 }
 .detail-page__status-card.data-v-6b23c96c {
-  background: #D00000;
+  background: #C41E3A;
   margin: 16rpx 24rpx;
   border-radius: 24rpx;
   padding: 40rpx 32rpx;
@@ -55,7 +55,7 @@
   border-radius: 24rpx;
   padding: 28rpx;
   margin: 16rpx 24rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
 }
 .detail-page__card-title.data-v-6b23c96c {
   font-size: 28rpx;
@@ -115,12 +115,12 @@
 .detail-page__total-price.data-v-6b23c96c {
   font-size: 38rpx;
   font-weight: bold;
-  color: #111111;
+  color: #1A1410;
 }
 .detail-page__footer.data-v-6b23c96c {
   background: #FFFFFF;
   padding: 16rpx 24rpx;
-  border-top: 1rpx solid #EEEEEE;
+  border-top: 1rpx solid #E8DDD4;
   display: flex;
   gap: 16rpx;
 }
@@ -131,16 +131,16 @@
   font-weight: bold;
 }
 .detail-page__btn--primary.data-v-6b23c96c {
-  background: #D00000;
+  background: #C41E3A;
   color: #FFFFFF;
 }
 .detail-page__btn--primary.data-v-6b23c96c:active {
-  background: #A60000;
+  background: #8E1526;
 }
 .detail-page__btn--secondary.data-v-6b23c96c {
   background: #FFFFFF;
-  color: #666666;
-  border: 1rpx solid #EEEEEE;
+  color: #7F7368;
+  border: 1rpx solid #E8DDD4;
 }
 .detail-page__bottom-space.data-v-6b23c96c {
   height: 120rpx;

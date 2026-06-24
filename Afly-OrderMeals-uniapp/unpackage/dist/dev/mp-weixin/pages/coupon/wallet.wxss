@@ -1,5 +1,5 @@
-/* 粮兴坊 UI 图风格设计系统 */
-/* ===== 主色：招牌红 / 粉红渐变 ===== */
+/* 粮兴坊风格设计系统 v2 */
+/* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
 /* ===== 我的页渐变背景 ===== */
 /* ===== 用户信息栏背景 ===== */
@@ -14,25 +14,25 @@
 /* ===== 兼容旧变量 ===== */
 .coupon-wallet.data-v-0b2f6175 {
   min-height: 100vh;
-  background: #FFFFFF;
+  background: #FFFCF8;
   display: flex;
   flex-direction: column;
 }
 .coupon-wallet__tabs.data-v-0b2f6175 {
   display: flex;
   background: #fff;
-  border-bottom: 2rpx solid #EEEEEE;
+  border-bottom: 2rpx solid #E8DDD4;
 }
 .coupon-wallet__tab.data-v-0b2f6175 {
   flex: 1;
   text-align: center;
   padding: 24rpx 0;
   font-size: 28rpx;
-  color: #666666;
+  color: #7F7368;
   position: relative;
 }
 .coupon-wallet__tab--active.data-v-0b2f6175 {
-  color: #D00000;
+  color: #C41E3A;
   font-weight: 700;
 }
 .coupon-wallet__tab--active.data-v-0b2f6175::after {
@@ -43,7 +43,7 @@
   transform: translateX(-50%);
   width: 48rpx;
   height: 4rpx;
-  background: #D00000;
+  background: #C41E3A;
   border-radius: 2rpx;
 }
 .coupon-wallet__status.data-v-0b2f6175 {
@@ -60,13 +60,13 @@
 .coupon-wallet__empty-text.data-v-0b2f6175 {
   margin-top: 24rpx;
   font-size: 28rpx;
-  color: #111111;
+  color: #1A1410;
   font-weight: 600;
 }
 .coupon-wallet__empty-sub.data-v-0b2f6175 {
   margin-top: 8rpx;
   font-size: 24rpx;
-  color: #666666;
+  color: #7F7368;
 }
 .coupon-wallet__list.data-v-0b2f6175 {
   flex: 1;
@@ -78,7 +78,7 @@
   margin-bottom: 20rpx;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
 }
 .coupon-item--used.data-v-0b2f6175 {
   opacity: 0.6;
@@ -96,18 +96,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-right: 2rpx dashed rgba(208, 0, 0, 0.2);
+  border-right: 2rpx dashed rgba(196, 30, 58, 0.2);
   padding-right: 20rpx;
 }
 .coupon-item__amount.data-v-0b2f6175 {
   font-size: 44rpx;
   font-weight: 900;
-  color: #D00000;
+  color: #C41E3A;
 }
 .coupon-item__condition.data-v-0b2f6175 {
   margin-top: 6rpx;
   font-size: 20rpx;
-  color: #666666;
+  color: #7F7368;
   text-align: center;
 }
 .coupon-item__info.data-v-0b2f6175 {
@@ -126,36 +126,36 @@
 .coupon-item__name.data-v-0b2f6175 {
   font-size: 30rpx;
   font-weight: 700;
-  color: #111111;
+  color: #1A1410;
 }
 .coupon-item__tag.data-v-0b2f6175 {
   padding: 2rpx 12rpx;
   border-radius: 999rpx;
-  background: rgba(208, 0, 0, 0.1);
+  background: rgba(196, 30, 58, 0.1);
   font-size: 18rpx;
-  color: #D00000;
+  color: #C41E3A;
 }
 .coupon-item__period.data-v-0b2f6175 {
   font-size: 22rpx;
-  color: #666666;
+  color: #7F7368;
 }
 .coupon-item__night-tip.data-v-0b2f6175 {
   font-size: 20rpx;
-  color: #FF7B7B;
+  color: #FF8B1A;
   font-weight: 600;
 }
 .coupon-item__used-time.data-v-0b2f6175 {
   font-size: 20rpx;
-  color: #666666;
+  color: #7F7368;
 }
 .coupon-item__verify.data-v-0b2f6175 {
-  border-top: 1rpx solid #EEEEEE;
+  border-top: 1rpx solid #E8DDD4;
   padding: 16rpx 24rpx;
   text-align: right;
 }
 .coupon-item__verify-btn.data-v-0b2f6175 {
   font-size: 24rpx;
-  color: #D00000;
+  color: #C41E3A;
   font-weight: 600;
 }
 .coupon-item__watermark.data-v-0b2f6175 {
@@ -167,5 +167,5 @@
 .coupon-item__watermark text.data-v-0b2f6175 {
   font-size: 48rpx;
   font-weight: 900;
-  color: rgba(102, 102, 102, 0.3);
+  color: rgba(127, 115, 104, 0.3);
 }

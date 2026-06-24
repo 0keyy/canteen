@@ -1,5 +1,5 @@
-/* 粮兴坊 UI 图风格设计系统 */
-/* ===== 主色：招牌红 / 粉红渐变 ===== */
+/* 粮兴坊风格设计系统 v2 */
+/* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
 /* ===== 我的页渐变背景 ===== */
 /* ===== 用户信息栏背景 ===== */
@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #FFFFFF;
+  background: #FFFCF8;
   /* ===== Header ===== */
   /* Hanging sign toggle */
   /* ===== Loading / Empty ===== */
@@ -81,7 +81,7 @@
 .order-page__mode-sign-board.data-v-1f245baa {
   display: flex;
   align-items: center;
-  background: #FFD978;
+  background: #FFC107;
   border-radius: 12rpx;
   padding: 4rpx;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
@@ -111,8 +111,8 @@
   transition: background 0.15s ease;
 }
 .order-page__mode-tab--active.data-v-1f245baa {
-  background: #D00000;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  background: #C41E3A;
+  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
 }
 .order-page__mode-tab--disabled.data-v-1f245baa {
   opacity: 0.45;
@@ -120,7 +120,7 @@
 .order-page__mode-tab-text.data-v-1f245baa {
   font-size: 26rpx;
   font-weight: 700;
-  color: #111111;
+  color: #1A1410;
 }
 .order-page__mode-tab--active .order-page__mode-tab-text.data-v-1f245baa {
   color: #FFFFFF;
@@ -130,7 +130,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #999999;
+  color: #A89B90;
   padding: 0 48rpx;
   text-align: center;
   line-height: 1.6;
@@ -153,7 +153,7 @@
   display: block;
   font-size: 36rpx;
   font-weight: 900;
-  color: #111111;
+  color: #1A1410;
   margin-bottom: 24rpx;
 }
 .order-page__dish-list.data-v-1f245baa {
@@ -164,7 +164,7 @@
 .order-page__dish-empty.data-v-1f245baa {
   padding: 80rpx 24rpx;
   text-align: center;
-  color: #999999;
+  color: #A89B90;
   font-size: 26rpx;
 }
 .order-page__dish-bottom-space.data-v-1f245baa {
@@ -177,7 +177,7 @@
   padding: 16rpx;
   background: #FFFFFF;
   border-radius: 24rpx;
-  border: 1rpx solid #EEEEEE;
+  border: 1rpx solid #E8DDD4;
 }
 .menu-card__image.data-v-1f245baa {
   width: 176rpx;
@@ -197,7 +197,7 @@
 .menu-card__name.data-v-1f245baa {
   font-size: 26rpx;
   font-weight: 900;
-  color: #111111;
+  color: #1A1410;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -210,14 +210,14 @@
   padding: 2rpx 12rpx;
   font-size: 18rpx;
   font-weight: 600;
-  color: #D00000;
-  border: 1rpx solid #D00000;
+  color: #C41E3A;
+  border: 1rpx solid #C41E3A;
   border-radius: 999rpx;
-  background: rgba(208, 0, 0, 0.06);
+  background: rgba(196, 30, 58, 0.06);
 }
 .menu-card__sales.data-v-1f245baa {
   font-size: 22rpx;
-  color: #999999;
+  color: #A89B90;
   margin-top: 6rpx;
 }
 .menu-card__bottom.data-v-1f245baa {
@@ -227,7 +227,7 @@
   margin-top: 8rpx;
 }
 .menu-card__price.data-v-1f245baa {
-  color: #D00000;
+  color: #C41E3A;
   font-size: 34rpx;
   font-weight: 900;
 }
@@ -240,17 +240,17 @@
   width: 44rpx;
   height: 44rpx;
   border-radius: 50%;
-  border: 1rpx solid #EEEEEE;
+  border: 1rpx solid #E8DDD4;
   background: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .menu-card__btn--minus.data-v-1f245baa {
-  border-color: #999999;
+  border-color: #A89B90;
 }
 .menu-card__btn-icon.data-v-1f245baa {
-  color: #666666;
+  color: #7F7368;
   font-size: 28rpx;
   font-weight: bold;
   line-height: 1;
@@ -260,7 +260,7 @@
   text-align: center;
   font-size: 26rpx;
   font-weight: bold;
-  color: #111111;
+  color: #1A1410;
 }
 .menu-card__spec-btn.data-v-1f245baa {
   display: flex;
@@ -268,9 +268,9 @@
   justify-content: center;
   height: 48rpx;
   padding: 0 20rpx;
-  border: 2rpx solid #D00000;
+  border: 2rpx solid #C41E3A;
   border-radius: 999rpx;
-  background: rgba(208, 0, 0, 0.04);
+  background: rgba(196, 30, 58, 0.04);
 }
 .menu-card__spec-btn--disabled.data-v-1f245baa {
   opacity: 0.5;
@@ -278,7 +278,7 @@
 .menu-card__spec-btn-text.data-v-1f245baa {
   font-size: 22rpx;
   font-weight: 700;
-  color: #D00000;
+  color: #C41E3A;
 }
 
 /* ===== Cart Bar ===== */
@@ -292,9 +292,9 @@
   align-items: center;
   gap: 16rpx;
   padding: 12rpx 16rpx 12rpx 12rpx;
-  background: #111111;
+  background: #1A1410;
   border-radius: 999rpx;
-  box-shadow: 0 48rpx 120rpx -60rpx rgba(208, 0, 0, 0.32);
+  box-shadow: 0 48rpx 160rpx -60rpx rgba(196, 30, 58, 0.22);
 }
 .cart-bar--disabled.data-v-1f245baa {
   opacity: 0.75;
@@ -316,13 +316,13 @@
   right: -6rpx;
   min-width: 36rpx;
   height: 36rpx;
-  background: #D00000;
+  background: #C41E3A;
   border-radius: 18rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 8rpx;
-  border: 3rpx solid #111111;
+  border: 3rpx solid #1A1410;
 }
 .cart-bar__badge-text.data-v-1f245baa {
   color: #FFFFFF;
@@ -339,7 +339,7 @@
   flex-shrink: 0;
   height: 80rpx;
   padding: 0 48rpx;
-  background: #D00000;
+  background: #C41E3A;
   border-radius: 999rpx;
   display: flex;
   align-items: center;
@@ -367,7 +367,7 @@
   height: calc(108rpx + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   background: #FFFFFF;
-  border-top: 1rpx solid #EEEEEE;
+  border-top: 1rpx solid #E8DDD4;
 }
 .app-tab-item.data-v-1f245baa {
   display: flex;

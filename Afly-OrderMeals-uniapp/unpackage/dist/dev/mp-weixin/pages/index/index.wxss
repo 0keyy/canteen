@@ -1,5 +1,5 @@
-/* 粮兴坊 UI 图风格设计系统 */
-/* ===== 主色：招牌红 / 粉红渐变 ===== */
+/* 粮兴坊风格设计系统 v2 */
+/* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
 /* ===== 我的页渐变背景 ===== */
 /* ===== 用户信息栏背景 ===== */
@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #FFFFFF;
+  background: #FFFCF8;
   /* ===== Hero 广告区 ===== */
   /* ===== 用户信息栏 ===== */
   /* ===== 就餐方式卡片 ===== */
@@ -25,7 +25,7 @@
 }
 .home__content.data-v-1cf27b2a {
   flex: 1;
-  background: #FFFFFF;
+  background: #FFFCF8;
   overflow: hidden;
 }
 .home__scroll-inner.data-v-1cf27b2a {
@@ -130,7 +130,7 @@
 .home__shortcut-icon-wrap.data-v-1cf27b2a {
   width: 100rpx;
   height: 100rpx;
-  background: rgba(208, 0, 0, 0.04);
+  background: rgba(196, 30, 58, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,7 +141,7 @@
 }
 .home__shortcut-name.data-v-1cf27b2a {
   font-size: 22rpx;
-  color: #666666;
+  color: #7F7368;
   font-weight: 500;
 }
 .home__recommend.data-v-1cf27b2a {
@@ -161,7 +161,7 @@
 .home__recommend-title.data-v-1cf27b2a {
   font-size: 36rpx;
   font-weight: 900;
-  color: #111111;
+  color: #1A1410;
 }
 .home__recommend-tag.data-v-1cf27b2a {
   font-size: 20rpx;
@@ -178,12 +178,12 @@
 }
 .home__recommend-link-text.data-v-1cf27b2a {
   font-size: 24rpx;
-  color: #D00000;
+  color: #C41E3A;
   font-weight: 600;
 }
 .home__recommend-link-arrow.data-v-1cf27b2a {
   font-size: 32rpx;
-  color: #D00000;
+  color: #C41E3A;
   line-height: 1;
 }
 .home__dish-list.data-v-1cf27b2a {
@@ -199,7 +199,7 @@
   padding: 24rpx;
   background: #ffe8cd;
   border-radius: 32rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
 }
 .home__dish-item.data-v-1cf27b2a:active {
   opacity: 0.92;
@@ -208,7 +208,7 @@
   width: 192rpx;
   height: 192rpx;
   border-radius: 24rpx;
-  background: #F5F5F5;
+  background: #F5F0EA;
   flex-shrink: 0;
 }
 .home__dish-info.data-v-1cf27b2a {
@@ -222,7 +222,7 @@
 .home__dish-name.data-v-1cf27b2a {
   font-size: 30rpx;
   font-weight: 900;
-  color: #111111;
+  color: #1A1410;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -230,7 +230,7 @@
 .home__dish-desc.data-v-1cf27b2a {
   margin-top: 8rpx;
   font-size: 22rpx;
-  color: #666666;
+  color: #7F7368;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -268,7 +268,7 @@
 }
 .home__recommend-empty-text.data-v-1cf27b2a {
   font-size: 26rpx;
-  color: #666666;
+  color: #7F7368;
 }
 .home__bottom-space.data-v-1cf27b2a {
   height: calc(108rpx + env(safe-area-inset-bottom));

@@ -3,13 +3,13 @@ const common_vendor = require("../common/vendor.js");
 const TAB_PAGES = [
   "pages/index/index",
   "pages/menu/index",
-  "pages/points/index",
+  "pages/order/list",
   "pages/mine/index"
 ];
 const TAB_NAME_PATH_MAP = {
   "首页": "pages/index/index",
   "点餐": "pages/menu/index",
-  "积分商城": "pages/points/index",
+  "订单": "pages/order/list",
   "我的": "pages/mine/index"
 };
 const DEFAULT_TABBAR = {
@@ -20,7 +20,7 @@ const DEFAULT_TABBAR = {
   list: [
     { name: "首页", selected: "/static/tabbar/首页 1.png", unselected: "/static/tabbar/首页 1.png", link: { path: "/pages/index/index" } },
     { name: "点餐", selected: "/static/tabbar/面条 1.png", unselected: "/static/tabbar/面条 1.png", link: { path: "/pages/menu/index" } },
-    { name: "积分商城", selected: "/static/tabbar/商城-幸福餐桌 1.png", unselected: "/static/tabbar/商城-幸福餐桌 1.png", link: { path: "/pages/points/index" } },
+    { name: "订单", selected: "/static/tabbar/全部订单 1.png", unselected: "/static/tabbar/全部订单 1.png", link: { path: "/pages/order/list" } },
     { name: "我的", selected: "/static/tabbar/头像 1.png", unselected: "/static/tabbar/头像 1.png", link: { path: "/pages/mine/index" } }
   ]
 };
@@ -86,7 +86,7 @@ function normalizeTabbarItem(item) {
     unselected: (item == null ? void 0 : item.unselected) || (item == null ? void 0 : item.unselectedIcon) || ""
   };
 }
-const TABBAR_CACHE_VERSION = 4;
+const TABBAR_CACHE_VERSION = 8;
 function readTabbarCache() {
   const cached = common_vendor.index.getStorageSync("tabbarConfig");
   if (!cached || cached.version !== TABBAR_CACHE_VERSION)
