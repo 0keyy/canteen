@@ -258,6 +258,7 @@ $page-pad: 24rpx;
     position: relative;
     color: $text-white;
     overflow: hidden;
+	height:480rpx;
   }
 
   &__hero-bg {
@@ -279,14 +280,15 @@ $page-pad: 24rpx;
 
   /* ===== 用户信息栏 ===== */
   &__user-bar {
-	  margin-left: 40rpx;
     display: flex;
     align-items: center;
     justify-content: space-between;
-   background: linear-gradient(to right, #8b4a45, #3c120e);
-   border-radius: 15rpx 15rpx 0 0;
+    background: linear-gradient(to right, #8b4a45, #3c120e);
+    border-radius: 15rpx 15rpx 0 0;
     padding: 14rpx $page-pad;
-	width: 90%;
+    width: 90%;
+	margin-left: 40rpx;
+	height: 80rpx;
   }
 
   &__user-name {
@@ -377,8 +379,8 @@ $page-pad: 24rpx;
   }
 
   &__shortcut-icon {
-    width: 60rpx;
-    height: 60rpx;
+    width: 56rpx;
+    height: 56rpx;
   }
 
   &__shortcut-name {
@@ -447,6 +449,7 @@ $page-pad: 24rpx;
   &__dish-item {
 	margin: 0px 8px;
     display: flex;
+    align-items: center;
     gap: 24rpx;
     padding: 24rpx;
     background:#ffe8cd;
@@ -470,7 +473,7 @@ $page-pad: 24rpx;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 4rpx 0;
+    gap: 8rpx;
   }
 
   &__dish-name {
@@ -499,7 +502,6 @@ $page-pad: 24rpx;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 12rpx;
   }
 
   &__dish-price {

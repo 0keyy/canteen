@@ -9,7 +9,11 @@ export const authApi = {
   smsLogin: (mobile, code) => post('/front/auth/app/sms/login', { mobile, code }),
   mockPhoneLogin: (mobile) => post('/front/auth/mock/phone', { mobile }),
   profile: () => get('/front/auth/profile'),
+  
+  
   updateProfile: (data) => post('/front/auth/profile/update', data),
+  
+  
   logout: () => post('/front/auth/logout')
 }
 

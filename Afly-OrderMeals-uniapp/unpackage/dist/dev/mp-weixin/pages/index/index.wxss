@@ -35,6 +35,7 @@
   position: relative;
   color: #FFFFFF;
   overflow: hidden;
+  height: 480rpx;
 }
 .home__hero-bg.data-v-1cf27b2a {
   width: 100%;
@@ -52,7 +53,6 @@
   justify-content: flex-end;
 }
 .home__user-bar.data-v-1cf27b2a {
-  margin-left: 40rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -60,6 +60,8 @@
   border-radius: 15rpx 15rpx 0 0;
   padding: 14rpx 24rpx;
   width: 90%;
+  margin-left: 40rpx;
+  height: 80rpx;
 }
 .home__user-name.data-v-1cf27b2a {
   font-size: 24rpx;
@@ -134,8 +136,8 @@
   justify-content: center;
 }
 .home__shortcut-icon.data-v-1cf27b2a {
-  width: 60rpx;
-  height: 60rpx;
+  width: 56rpx;
+  height: 56rpx;
 }
 .home__shortcut-name.data-v-1cf27b2a {
   font-size: 22rpx;
@@ -192,6 +194,7 @@
 .home__dish-item.data-v-1cf27b2a {
   margin: 0px 8px;
   display: flex;
+  align-items: center;
   gap: 24rpx;
   padding: 24rpx;
   background: #ffe8cd;
@@ -214,7 +217,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 4rpx 0;
+  gap: 8rpx;
 }
 .home__dish-name.data-v-1cf27b2a {
   font-size: 30rpx;
@@ -240,7 +243,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12rpx;
 }
 .home__dish-price.data-v-1cf27b2a {
   font-size: 36rpx;
