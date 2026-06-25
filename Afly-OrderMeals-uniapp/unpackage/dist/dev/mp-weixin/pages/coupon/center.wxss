@@ -1,8 +1,6 @@
-/* 粮兴坊风格设计系统 v2 */
+/* 粮兴坊风格设计系统 */
 /* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
-/* ===== 我的页渐变背景 ===== */
-/* ===== 用户信息栏背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
 /* ===== 圆角 ===== */
@@ -19,7 +17,7 @@
 }
 .coupon-center__header.data-v-31f84e9e {
   padding: 40rpx 32rpx 24rpx;
-  background: linear-gradient(135deg, #C41E3A 0%, #FF8B1A 100%);
+  background: linear-gradient(135deg, #B10A0F 0%, #FF8B1A 100%);
 }
 .coupon-center__title.data-v-31f84e9e {
   display: block;
@@ -50,9 +48,9 @@
 .coupon-card.data-v-31f84e9e {
   display: flex;
   background: #fff;
-  border-radius: 24rpx;
+  border-radius: 32rpx;
   overflow: hidden;
-  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
+  box-shadow: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
 }
 .coupon-card--claimed.data-v-31f84e9e {
   opacity: 0.55;
@@ -64,13 +62,13 @@
   align-items: center;
   justify-content: center;
   padding: 32rpx 16rpx;
-  background: rgba(196, 30, 58, 0.06);
-  border-right: 2rpx dashed rgba(196, 30, 58, 0.2);
+  background: rgba(177, 10, 15, 0.06);
+  border-right: 2rpx dashed rgba(177, 10, 15, 0.2);
 }
 .coupon-card__amount.data-v-31f84e9e {
   font-size: 48rpx;
   font-weight: 900;
-  color: #C41E3A;
+  color: #B10A0F;
 }
 .coupon-card__condition.data-v-31f84e9e {
   margin-top: 8rpx;
@@ -94,9 +92,9 @@
   display: inline-block;
   padding: 4rpx 16rpx;
   border-radius: 999rpx;
-  background: rgba(196, 30, 58, 0.1);
+  background: rgba(177, 10, 15, 0.1);
   font-size: 20rpx;
-  color: #C41E3A;
+  color: #B10A0F;
   width: -webkit-fit-content;
   width: fit-content;
 }
@@ -113,7 +111,7 @@
   align-self: flex-end;
   padding: 12rpx 36rpx;
   border-radius: 999rpx;
-  background: #C41E3A;
+  background: #B10A0F;
 }
 .coupon-card__btn text.data-v-31f84e9e {
   font-size: 24rpx;

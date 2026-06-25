@@ -1,8 +1,6 @@
-/* 粮兴坊风格设计系统 v2 */
+/* 粮兴坊风格设计系统 */
 /* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
-/* ===== 我的页渐变背景 ===== */
-/* ===== 用户信息栏背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
 /* ===== 圆角 ===== */
@@ -26,9 +24,9 @@
 }
 .orders-page__header-card.data-v-456ecf67 {
   background: #FFFFFF;
-  border-radius: 24rpx;
+  border-radius: 32rpx;
   padding: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
+  box-shadow: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
 }
 .orders-page__store.data-v-456ecf67 {
   display: block;
@@ -45,8 +43,8 @@
 .orders-page__pending.data-v-456ecf67 {
   margin-top: 24rpx;
   padding: 24rpx;
-  border-radius: 24rpx;
-  background: linear-gradient(135deg, #C41E3A 0%, #FF8B1A 100%);
+  border-radius: 32rpx;
+  background: linear-gradient(135deg, #B10A0F 0%, #FF8B1A 100%);
 }
 .orders-page__pending-title.data-v-456ecf67 {
   display: block;
@@ -102,7 +100,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 32rpx;
-  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
+  box-shadow: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
 }
 .orders-page__empty-icon-inner.data-v-456ecf67 {
   width: 48rpx;
@@ -135,9 +133,9 @@
   display: flex;
   gap: 24rpx;
   background: #FFFFFF;
-  border-radius: 24rpx;
+  border-radius: 32rpx;
   padding: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
+  box-shadow: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
 }
 .order-card.data-v-456ecf67:active {
   opacity: 0.92;
@@ -150,12 +148,12 @@
   align-items: center;
   justify-content: center;
   background: rgba(177, 10, 15, 0.1);
-  border-radius: 24rpx;
+  border-radius: 32rpx;
 }
 .order-card__icon.data-v-456ecf67 {
   width: 36rpx;
   height: 44rpx;
-  border: 3rpx solid #C41E3A;
+  border: 3rpx solid #B10A0F;
   border-radius: 4rpx;
 }
 .order-card__icon.data-v-456ecf67::before {
@@ -164,8 +162,8 @@
   margin: 8rpx auto 0;
   width: 22rpx;
   height: 3rpx;
-  background: #C41E3A;
-  box-shadow: 0 8rpx 0 #C41E3A, 0 16rpx 0 #C41E3A;
+  background: #B10A0F;
+  box-shadow: 0 8rpx 0 #B10A0F, 0 16rpx 0 #B10A0F;
 }
 .order-card__body.data-v-456ecf67 {
   flex: 1;
@@ -189,7 +187,7 @@
 .order-card__status.data-v-456ecf67 {
   font-size: 22rpx;
   font-weight: 600;
-  color: #C41E3A;
+  color: #B10A0F;
   flex-shrink: 0;
 }
 .order-card__status--paid.data-v-456ecf67 {

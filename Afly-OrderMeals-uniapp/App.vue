@@ -120,6 +120,16 @@ view, text, image, scroll-view, swiper {
   justify-content: center;
   gap: 4rpx;
   min-height: 88rpx;
+  transition: transform $transition-fast;
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+.app-tab-item:not(.app-tab-item--active) .app-tab-icon {
+  filter: grayscale(100%);
+  opacity: 0.5;
 }
 
 .app-tab-icon-wrap {

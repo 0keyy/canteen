@@ -1,8 +1,6 @@
-/* 粮兴坊风格设计系统 v2 */
+/* 粮兴坊风格设计系统 */
 /* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
-/* ===== 我的页渐变背景 ===== */
-/* ===== 用户信息栏背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
 /* ===== 圆角 ===== */
@@ -24,9 +22,9 @@
 .checkout__section.data-v-aaa7ef6e {
   background: #FFFFFF;
   margin: 16rpx 24rpx;
-  border-radius: 24rpx;
+  border-radius: 32rpx;
   padding: 28rpx;
-  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
+  box-shadow: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
 }
 .checkout__section-title-row.data-v-aaa7ef6e {
   display: flex;
@@ -119,7 +117,7 @@
 }
 .checkout__summary-total.data-v-aaa7ef6e {
   font-size: 38rpx;
-  color: #1A1410;
+  color: #B10A0F;
   font-weight: bold;
 }
 .checkout__remark.data-v-aaa7ef6e {
@@ -158,7 +156,7 @@
 .checkout__submit-price.data-v-aaa7ef6e {
   font-size: 40rpx;
   font-weight: bold;
-  color: #1A1410;
+  color: #B10A0F;
 }
 .checkout__submit-saved.data-v-aaa7ef6e {
   display: block;
@@ -168,12 +166,12 @@
   margin-top: 2rpx;
 }
 .checkout__submit-btn.data-v-aaa7ef6e {
-  background: #C41E3A;
+  background: #B10A0F;
   padding: 24rpx 48rpx;
   border-radius: 999rpx;
 }
 .checkout__submit-btn.data-v-aaa7ef6e:active {
-  background: #8E1526;
+  background: #7A070A;
 }
 .checkout__submit-btn-text.data-v-aaa7ef6e {
   color: #FFFFFF;
@@ -186,7 +184,7 @@
 }
 .checkout__coupon-link.data-v-aaa7ef6e {
   font-size: 24rpx;
-  color: #C41E3A;
+  color: #B10A0F;
   font-weight: 600;
 }
 .checkout__coupon-applied.data-v-aaa7ef6e {
@@ -206,7 +204,7 @@
 }
 .checkout__coupon-discount.data-v-aaa7ef6e {
   font-size: 28rpx;
-  color: #1A1410;
+  color: #B10A0F;
   font-weight: 700;
 }
 .checkout__coupon-empty.data-v-aaa7ef6e {

@@ -1,45 +1,48 @@
 <template>
   <view class="order-page">
-    <!-- ===== Header: red gradient ===== -->
     <view class="order-page__header" :style="headerPaddingStyle">
-      <view class="order-page__brand-row">
-        <image class="order-page__logo" src="/static/白logo.png" mode="aspectFit" />
-        <image class="order-page__mascot" src="/static/点赞.png" mode="aspectFit" />
+      <view class="order-page__search-row" :style="searchRowStyle">
+        <view class="order-page__search" @tap.stop="goSearch">
+          <view class="order-page__search-icon"></view>
+          <text class="order-page__search-text">点击搜索</text>
+        </view>
       </view>
-      <text class="order-page__slogan">良心好食材</text>
-      <view class="order-page__store-status">
-        <text class="order-page__store-status-text">粮兴坊正在营业中</text>
-        <text class="order-page__store-hours">营业时间: 6:00-22:00</text>
+
+      <view class="order-page__banner">
+        <swiper
+          class="order-page__swiper"
+          :circular="displayBanners.length > 1"
+          :autoplay="true"
+          :interval="4000"
+          :duration="600"
+          indicator-dots
+          indicator-color="rgba(255,255,255,0.45)"
+          indicator-active-color="#FFFFFF"
+        >
+          <swiper-item
+            v-for="(item, index) in displayBanners"
+            :key="index"
+            class="order-page__swiper-item"
+          >
+            <image :src="item.image" class="order-page__banner-image" mode="aspectFill" />
+          </swiper-item>
+        </swiper>
       </view>
-      <!-- Hanging sign dining mode toggle -->
-      <view class="order-page__mode-sign">
-        <view class="order-page__mode-sign-rope"></view>
-        <view class="order-page__mode-sign-board">
-          <view
-            :class="['order-page__mode-tab', diningMode === 1 ? 'order-page__mode-tab--active' : '']"
-            @tap="switchMode(1)"
-          >
-            <text class="order-page__mode-tab-text">堂食</text>
-          </view>
-          <view
-            :class="[
-              'order-page__mode-tab',
-              diningMode === 3 ? 'order-page__mode-tab--active' : '',
-              shop && shop.deliveryEnable !== 1 ? 'order-page__mode-tab--disabled' : ''
-            ]"
-            @tap="switchMode(3)"
-          >
-            <text class="order-page__mode-tab-text">外卖</text>
-          </view>
+
+      <view class="order-page__store-card">
+        <view class="order-page__store-info">
+          <text class="order-page__store-open">{{ shopName }}正在营业中</text>
+          <text class="order-page__store-time">营业时间：6:00_22:00</text>
+        </view>
+        <view class="order-page__mode-board" @tap="toggleMode">
+          <image class="order-page__mode-board-bg" src="/static/tabbar/矢量 38.png" mode="aspectFit" />?
+          <text class="order-page__mode-board-text">{{ diningMode === 3 ? '外卖' : '堂食' }}</text>
         </view>
       </view>
     </view>
 
-    <!-- ===== Loading / Empty ===== -->
     <view v-if="loading" class="order-page__loading">加载中...</view>
     <view v-else-if="menu.length === 0" class="order-page__empty">暂无菜品，请先在后台添加菜品分类和菜品</view>
-
-    <!-- ===== Main: sidebar + dishes ===== -->
     <view v-else class="order-page__main">
       <menu-category-sidebar
         :menu="menu"
@@ -52,28 +55,32 @@
         <text class="order-page__section-title">{{ currentCategoryName }}</text>
         <view class="order-page__dish-list">
           <view v-for="(food, idx) in currentFoods" :key="food.id" class="menu-card">
-            <image :src="food.image" class="menu-card__image" mode="aspectFill" />
+            <view class="menu-card__image-wrap">
+              <image :src="food.image" class="menu-card__image" mode="aspectFill" />
+              <view class="menu-card__tag" v-if="foodTag(idx)">
+                <text class="menu-card__tag-text">{{ foodTag(idx) }}</text>
+              </view>
+            </view>
             <view class="menu-card__info">
               <text class="menu-card__name">{{ food.title }}</text>
-              <view class="menu-card__tags" v-if="foodTag(idx)">
-                <text class="menu-card__tag">{{ foodTag(idx) }}</text>
-              </view>
-              <text class="menu-card__sales">月销{{ food.sales || 13 }}</text>
+              <text class="menu-card__desc" v-if="food.intro">{{ food.intro }}</text>
               <view class="menu-card__bottom">
                 <text class="menu-card__price">¥{{ food.price }}</text>
                 <view class="menu-card__actions">
-                  <template v-if="getCount(food.id) > 0">
-                    <view class="menu-card__btn menu-card__btn--minus" @tap.stop="decFood(food)">
-                      <text class="menu-card__btn-icon">−</text>
-                    </view>
-                    <text class="menu-card__count">{{ getCount(food.id) }}</text>
-                  </template>
                   <view
-                    class="menu-card__spec-btn"
-                    :class="{ 'menu-card__spec-btn--disabled': cartBusy }"
+                    class="menu-card__btn menu-card__btn--minus"
+                    v-if="getCount(food.id) > 0"
+                    @tap.stop="decFood(food)"
+                  >
+                    <text class="menu-card__btn-icon">−</text>
+                  </view>
+                  <text class="menu-card__count" v-if="getCount(food.id) > 0">{{ getCount(food.id) }}</text>
+                  <view
+                    class="menu-card__btn menu-card__btn--plus"
+                    :class="{ 'menu-card__btn--disabled': cartBusy }"
                     @tap.stop="addFood(food)"
                   >
-                    <text class="menu-card__spec-btn-text">选规格</text>
+                    <text class="menu-card__btn-icon menu-card__btn-icon--plus">+</text>
                   </view>
                 </view>
               </view>
@@ -85,14 +92,13 @@
       </scroll-view>
     </view>
 
-    <!-- ===== Bottom Cart Bar ===== -->
     <view
       class="cart-bar"
       :class="{ 'cart-bar--disabled': !cartReady || cartItemCount === 0 }"
       @tap="goConfirm"
     >
-      <view class="cart-bar__avatar-wrap">
-        <image class="cart-bar__avatar" src="/static/新版小唐.png" mode="aspectFit" />
+      <view class="cart-bar__bag">
+        <image class="cart-bar__person" src="/static/新版小唐.png" mode="aspectFit" />
         <view class="cart-bar__badge" v-if="cartItemCount > 0">
           <text class="cart-bar__badge-text">{{ cartItemCount }}</text>
         </view>
@@ -106,7 +112,6 @@
       </view>
     </view>
 
-    <!-- ===== Bottom TabBar ===== -->
     <view class="app-tab-bar">
       <view
         v-for="(item, index) in tabbarList"
@@ -118,7 +123,6 @@
         <view class="app-tab-icon-wrap">
           <image
             class="app-tab-icon"
-            :class="{ 'app-tab-icon--inactive': tabbarSelected !== index }"
             :src="tabbarSelected === index ? item.selected : item.unselected"
             mode="aspectFit"
           />
@@ -135,7 +139,7 @@
 </template>
 
 <script>
-import { orderApi } from '../../api/index'
+import { orderApi, decorateApi } from '../../api/index'
 import { DEFAULT_SHOP_ID } from '../../utils/config'
 import { resolveImageUrl } from '../../utils/image'
 import tabbarPageMixin from '../../mixins/tabbar-page'
@@ -157,12 +161,16 @@ export default {
       loading: true,
       cartReady: false,
       cartBusy: false,
-      cartInitPromise: null
+      cartInitPromise: null,
+      banners: []
     }
   },
   computed: {
     headerPaddingStyle() {
       return { paddingTop: `${this.navMetrics.statusBarHeight + 8}px` }
+    },
+    searchRowStyle() {
+      return { paddingRight: `${this.menuButtonRight}px` }
     },
     shopName() {
       return this.shop?.name || '粮兴坊'
@@ -177,6 +185,10 @@ export default {
     currentCategoryName() {
       return this.menu[this.activeIndex]?.name || '推荐'
     },
+    displayBanners() {
+      if (this.banners.length) return this.banners
+      return [{ image: '/static/首页广告.png' }]
+    },
     totalPrice() {
       let total = 0
       Object.values(this.cartMap).forEach((item) => {
@@ -190,13 +202,14 @@ export default {
     cartSummary() {
       if (!this.cartReady) return '¥0.00'
       if (this.cartItemCount === 0) return '¥0.00'
-      return `¥${this.totalPrice}`
+      return `¥ ${this.totalPrice}`
     }
   },
   onLoad() {
     this.diningMode = Number(uni.getStorageSync('diningMode') || 1)
     this.updateNavPadding()
     this.loadShop()
+    this.loadBanners()
     this.bootstrap()
   },
   onShow() {
@@ -220,6 +233,13 @@ export default {
     selectCategory(index) {
       this.activeIndex = index
     },
+    goSearch() {
+      uni.showToast({ title: '搜索功能开发中', icon: 'none' })
+    },
+    toggleMode() {
+      const next = this.diningMode === 3 ? 1 : 3
+      this.switchMode(next)
+    },
     async switchMode(mode) {
       if (mode === this.diningMode) return
       if (mode === 3 && this.shop && this.shop.deliveryEnable !== 1) {
@@ -240,6 +260,42 @@ export default {
       } catch (e) {
         this.shop = null
       }
+    },
+    async loadBanners() {
+      try {
+        const page = await decorateApi.page(1)
+        const widgets = this.parsePageWidgets(page?.pageData)
+        const bannerWidget = widgets.find((item) => item.name === 'banner')
+        const data = bannerWidget?.content?.data
+        if (bannerWidget && this.isWidgetEnabled(bannerWidget.content?.enabled) && Array.isArray(data)) {
+          this.banners = data
+            .map((item) => this.normalizeBannerItem(item))
+            .filter(Boolean)
+        } else {
+          this.banners = []
+        }
+      } catch (e) {
+        this.banners = []
+      }
+    },
+    parsePageWidgets(pageData) {
+      if (!pageData) return []
+      if (Array.isArray(pageData)) return pageData
+      try {
+        const parsed = JSON.parse(pageData)
+        return Array.isArray(parsed) ? parsed : []
+      } catch (e) {
+        return []
+      }
+    },
+    isWidgetEnabled(enabled) {
+      if (enabled === undefined || enabled === null) return true
+      return enabled !== 0 && enabled !== false && enabled !== '0'
+    },
+    normalizeBannerItem(item) {
+      const rawImage = item?.image || item?.img || item?.url || ''
+      const image = resolveImageUrl(rawImage)
+      return image ? { ...item, image } : null
     },
     foodTag(index) {
       const tags = ['热销', '新品', '特价']
@@ -464,132 +520,200 @@ export default {
   height: 100vh;
   background: $bg-page;
 
-  /* ===== Header ===== */
   &__header {
     flex-shrink: 0;
-    padding: 0 32rpx 28rpx;
-    background: linear-gradient(135deg, #C41E3A 0%, #E8364E 60%, #F05A6E 100%);
     position: relative;
-    overflow: visible;
+    padding: 0 24rpx 0;
+    background: linear-gradient(180deg, #FFD7D7 0%, #F36F7B 100%);
+    overflow: hidden;
+    border-bottom: none;
   }
 
-  &__brand-row {
+  &__search-row {
+    position: relative;
+    z-index: 3;
+    margin-bottom: 18rpx;
+  }
+
+  &__search {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-  }
-
-  &__logo {
-    width: 160rpx;
     height: 64rpx;
+    padding: 0 24rpx;
+    border: none;
+    border-radius: 999rpx;
+    background: rgba(255, 255, 255, 0.82);
   }
 
-  &__mascot {
-    width: 72rpx;
-    height: 72rpx;
-  }
-
-  &__slogan {
-    display: block;
-    margin-top: 8rpx;
-    font-size: 24rpx;
-    font-weight: 600;
-    color: $text-white;
-    opacity: 0.9;
-    letter-spacing: 4rpx;
-  }
-
-  &__store-status {
-    display: flex;
-    align-items: center;
-    gap: 16rpx;
-    margin-top: 16rpx;
-  }
-
-  &__store-status-text {
-    font-size: 22rpx;
-    color: $text-white;
-    opacity: 0.85;
-  }
-
-  &__store-hours {
-    font-size: 22rpx;
-    color: $text-white;
-    opacity: 0.7;
-  }
-
-  /* Hanging sign toggle */
-  &__mode-sign {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20rpx;
-  }
-
-  &__mode-sign-rope {
-    width: 4rpx;
-    height: 24rpx;
-    background: rgba(255, 255, 255, 0.5);
-  }
-
-  &__mode-sign-board {
-    display: flex;
-    align-items: center;
-    background: $brand-yellow;
-    border-radius: 12rpx;
-    padding: 4rpx;
-    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+  &__search-icon {
+    width: 28rpx;
+    height: 28rpx;
+    border: 3rpx solid $text-tertiary;
+    border-radius: 50%;
     position: relative;
+    flex-shrink: 0;
+    margin-right: 12rpx;
 
-    &::before,
     &::after {
       content: '';
       position: absolute;
-      top: -12rpx;
-      width: 4rpx;
-      height: 14rpx;
-      background: rgba(255, 255, 255, 0.5);
-    }
-
-    &::before {
-      left: 40rpx;
-    }
-
-    &::after {
-      right: 40rpx;
+      width: 10rpx;
+      height: 3rpx;
+      background: $text-tertiary;
+      border-radius: 2rpx;
+      bottom: -2rpx;
+      right: -6rpx;
+      transform: rotate(45deg);
     }
   }
 
-  &__mode-tab {
+  &__search-text {
+    font-size: 24rpx;
+    font-weight: 600;
+    color: $text-secondary;
+  }
+
+  &__banner {
+    position: relative;
+    z-index: 2;
+    margin: 0 0 18rpx;
+    border-radius: 24rpx;
+    overflow: hidden;
+  }
+
+  &__swiper {
+    width: 100%;
+    height: 170rpx;
+    border-radius: 24rpx;
+  }
+
+  &__swiper-item {
+    width: 100%;
+    height: 170rpx;
+  }
+
+  &__banner-image {
+    width: 100%;
+    height: 170rpx;
+    display: block;
+  }
+
+  &__brand-hero {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    margin: 0 -24rpx;
+    height: 230rpx;
+    padding: 0 58rpx 0 24rpx;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: linear-gradient(180deg, #F78D94 0%, #E84D58 100%);
+  }
+
+  &__brand-hero::before {
+    content: '惠';
+    position: absolute;
+    left: 30rpx;
+    top: -18rpx;
+    font-size: 150rpx;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.18);
+    font-weight: 900;
+  }
+
+  &__brand-copy {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__brand-name {
+    font-size: 48rpx;
+    color: $brand-primary;
+    line-height: 1.1;
+    font-weight: 500;
+  }
+
+  &__brand-slogan {
+    margin-top: 18rpx;
+    font-size: 54rpx;
+    line-height: 1.1;
+    color: #FFFFFF;
+    font-weight: 900;
+  }
+
+  &__brand-bg-person {
+    position: relative;
+    z-index: 1;
+    width: 190rpx;
+    height: 222rpx;
+    opacity: 0.92;
+    flex-shrink: 0;
+  }
+
+  &__store-card {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 126rpx;
+    margin: 0 -24rpx;
+    padding: 22rpx 54rpx 22rpx 34rpx;
+    background: #FFFFFF;
+    border-radius: 18rpx 18rpx 0 0;
+  }
+
+  &__store-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__store-open {
+    display: block;
+    font-size: 32rpx;
+    color: #111111;
+    font-weight: 900;
+  }
+
+  &__store-time {
+    display: block;
+    margin-top: 8rpx;
+    font-size: 18rpx;
+    color: #999999;
+  }
+
+  &__mode-board {
+    position: relative;
+    width: 122rpx;
+    height: 110rpx;
+    flex-shrink: 0;
+    margin-top: -50rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 112rpx;
-    height: 56rpx;
-    border-radius: 8rpx;
-    transition: background $transition-fast;
-
-    &--active {
-      background: $brand-primary;
-      box-shadow: $shadow-sm;
-    }
-
-    &--disabled {
-      opacity: 0.45;
-    }
   }
 
-  &__mode-tab-text {
-    font-size: 26rpx;
-    font-weight: 700;
-    color: $text-primary;
+  &__mode-board-bg {
+    position: absolute;
+    inset: 0;
+    width: 122rpx;
+    height: 110rpx;
   }
 
-  &__mode-tab--active &__mode-tab-text {
-    color: $text-white;
+  &__mode-board-text {
+    position: relative;
+    z-index: 1;
+    margin-top: 30rpx;
+    font-size: 28rpx;
+    color: #111111;
+    font-weight: 900;
   }
 
-  /* ===== Loading / Empty ===== */
   &__loading,
   &__empty {
     flex: 1;
@@ -603,7 +727,6 @@ export default {
     font-size: 26rpx;
   }
 
-  /* ===== Main content ===== */
   &__main {
     flex: 1;
     display: flex;
@@ -645,28 +768,48 @@ export default {
   }
 }
 
-/* ===== Menu Card ===== */
 .menu-card {
   display: flex;
   padding: 16rpx;
   background: $bg-surface;
   border-radius: $radius-card;
-  border: 1rpx solid $border-light;
 
-  &__image {
+  &__image-wrap {
+    position: relative;
     width: 176rpx;
-    height: 176rpx;
+    height: 132rpx;
     flex-shrink: 0;
     border-radius: $radius-sm;
+    overflow: hidden;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+  }
+
+  &__tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 4rpx 12rpx;
+    background: $brand-red;
+    border-radius: 0 0 $radius-sm 0;
+  }
+
+  &__tag-text {
+    font-size: 18rpx;
+    color: $text-white;
+    font-weight: bold;
   }
 
   &__info {
     flex: 1;
-    margin-left: 20rpx;
+    margin-left: 16rpx;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 176rpx;
+    min-height: 132rpx;
     overflow: hidden;
   }
 
@@ -679,36 +822,27 @@ export default {
     white-space: nowrap;
   }
 
-  &__tags {
-    margin-top: 8rpx;
-  }
-
-  &__tag {
-    display: inline-block;
-    padding: 2rpx 12rpx;
-    font-size: 18rpx;
-    font-weight: 600;
-    color: $brand-primary;
-    border: 1rpx solid $brand-primary;
-    border-radius: $radius-tag;
-    background: rgba($brand-primary, 0.06);
-  }
-
-  &__sales {
+  &__desc {
     font-size: $font-size-desc;
-    color: $text-tertiary;
-    margin-top: 6rpx;
+    color: $text-desc;
+    margin-top: 8rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.4;
   }
 
   &__bottom {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 8rpx;
+    margin-top: 12rpx;
   }
 
   &__price {
-    color: $brand-primary;
+    color: $text-price;
     font-size: $font-size-price;
     font-weight: 900;
   }
@@ -716,12 +850,11 @@ export default {
   &__actions {
     display: flex;
     align-items: center;
-    gap: 8rpx;
   }
 
   &__btn {
-    width: 44rpx;
-    height: 44rpx;
+    width: 52rpx;
+    height: 52rpx;
     border-radius: 50%;
     border: 1rpx solid $border-light;
     background: $bg-surface;
@@ -729,93 +862,84 @@ export default {
     align-items: center;
     justify-content: center;
 
-    &--minus {
-      border-color: $text-tertiary;
-    }
-  }
-
-  &__btn-icon {
-    color: $text-secondary;
-    font-size: 28rpx;
-    font-weight: bold;
-    line-height: 1;
-  }
-
-  &__count {
-    min-width: 36rpx;
-    text-align: center;
-    font-size: 26rpx;
-    font-weight: bold;
-    color: $text-primary;
-  }
-
-  &__spec-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 48rpx;
-    padding: 0 20rpx;
-    border: 2rpx solid $brand-primary;
-    border-radius: $radius-btn;
-    background: rgba($brand-primary, 0.04);
-
     &--disabled {
       opacity: 0.5;
     }
   }
 
-  &__spec-btn-text {
-    font-size: 22rpx;
-    font-weight: 700;
-    color: $brand-primary;
+  &__btn-icon {
+    color: $text-secondary;
+    font-size: 32rpx;
+    font-weight: bold;
+    line-height: 1;
+
+    &--plus {
+      color: $brand-primary;
+    }
+  }
+
+  &__count {
+    min-width: 48rpx;
+    text-align: center;
+    font-size: 28rpx;
+    font-weight: bold;
+    color: $text-primary;
   }
 }
 
-/* ===== Cart Bar ===== */
 .cart-bar {
   position: fixed;
-  left: 32rpx;
-  right: 32rpx;
+  left: 52rpx;
+  right: 18rpx;
   bottom: calc(#{$tabbar-height} + 12rpx);
   z-index: 99;
   display: flex;
   align-items: center;
   gap: 16rpx;
-  padding: 12rpx 16rpx 12rpx 12rpx;
-  background: $text-primary;
-  border-radius: 999rpx;
-  box-shadow: $shadow-hero;
+  min-height: 88rpx;
+  padding: 10rpx 18rpx 10rpx 58rpx;
+  background: linear-gradient(90deg, #B80000 0%, #D00000 62%, #E33A30 100%);
+  border-radius: 12rpx;
+  box-shadow: 0 8rpx 20rpx rgba(208, 0, 0, 0.26);
+  overflow: visible;
 
   &--disabled {
-    opacity: 0.75;
+    opacity: 0.82;
   }
 
-  &__avatar-wrap {
+  &__bag {
     position: relative;
-    width: 88rpx;
-    height: 88rpx;
+    width: 100rpx;
+    height: 112rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+    background: transparent;
     flex-shrink: 0;
+    margin-left: -106rpx;
+    margin-top: -30rpx;
   }
 
-  &__avatar {
-    width: 88rpx;
-    height: 88rpx;
-    border-radius: 50%;
+  &__person {
+    width: 100rpx;
+    height: 112rpx;
+    display: block;
   }
 
   &__badge {
     position: absolute;
-    top: -6rpx;
-    right: -6rpx;
-    min-width: 36rpx;
-    height: 36rpx;
-    background: $brand-primary;
-    border-radius: 18rpx;
+    top: 22rpx;
+    right: 6rpx;
+    min-width: 30rpx;
+    height: 30rpx;
+    background: #FF4A3D;
+    border-radius: 15rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 8rpx;
-    border: 3rpx solid $text-primary;
+    padding: 0 6rpx;
+    border: 2rpx solid #FFFFFF;
   }
 
   &__badge-text {
@@ -827,82 +951,29 @@ export default {
   &__price {
     flex: 1;
     color: $text-white;
-    font-size: 40rpx;
+    font-size: 42rpx;
     font-weight: 900;
   }
 
   &__btn {
     flex-shrink: 0;
-    height: 80rpx;
-    padding: 0 48rpx;
-    background: $brand-primary;
-    border-radius: 999rpx;
+    height: 76rpx;
+    padding: 0 28rpx;
+    background: transparent;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   &__btn--disabled {
-    background: #666666;
+    background: transparent;
   }
 
   &__btn-text {
     color: $text-white;
-    font-size: 30rpx;
+    font-size: 28rpx;
     font-weight: 900;
   }
-}
-
-/* ===== Bottom TabBar ===== */
-.app-tab-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  height: $tabbar-height;
-  padding-bottom: env(safe-area-inset-bottom);
-  background: $bg-surface;
-  border-top: 1rpx solid $divider-color;
-}
-
-.app-tab-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  gap: 4rpx;
-
-  &--active {
-    .app-tab-text {
-      font-weight: 700;
-    }
-  }
-}
-
-.app-tab-icon-wrap {
-  width: 48rpx;
-  height: 48rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.app-tab-icon {
-  width: 44rpx;
-  height: 44rpx;
-
-  &--inactive {
-    filter: grayscale(1) opacity(0.45);
-  }
-}
-
-.app-tab-text {
-  font-size: 20rpx;
-  line-height: 1.2;
 }
 </style>

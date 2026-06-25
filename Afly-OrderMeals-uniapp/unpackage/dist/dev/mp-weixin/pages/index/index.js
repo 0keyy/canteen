@@ -17,20 +17,26 @@ const _sfc_main = {
       recommendDishes: [],
       recommendLoading: false,
       shortcuts: [
-        { name: "充值中心", icon: "/static/tabbar/充值 1.png" },
-        { name: "红包卡券", icon: "/static/tabbar/卡券 1.png" },
-        { name: "订单详情", icon: "/static/tabbar/全部订单 1.png" },
-        { name: "客服中心", icon: "/static/tabbar/客服 1.png" }
+        { name: "积分商城", desc: "神秘好物等你来", iconClass: "home__icon--points" },
+        { name: "领券中心", desc: "限时领取优惠", iconClass: "home__icon--coupon" },
+        { name: "优惠券包", desc: "享多重优惠", iconClass: "home__icon--wallet" }
       ]
     };
   },
   computed: {
-    nickname() {
-      return common_vendor.index.getStorageSync("nickname") || "";
-    },
     heroPaddingStyle() {
       const { statusBarHeight } = this.navMetrics;
-      return { paddingTop: `${statusBarHeight + 8}px` };
+      return {
+        paddingTop: `${statusBarHeight + 10}px`
+      };
+    },
+    searchRowStyle() {
+      return { paddingRight: `${this.menuButtonRight}px` };
+    },
+    displayBanners() {
+      if (this.banners.length)
+        return this.banners;
+      return [{ image: "" }];
     },
     homeRecommendDishes() {
       return this.recommendDishes.slice(0, 2);
@@ -57,38 +63,14 @@ const _sfc_main = {
       await this.loadDecoration();
       this.loadRecommend();
     },
-    async loadShop() {
-      try {
-        const shop = await api_index.orderApi.shop(this.aid);
-        if (shop == null ? void 0 : shop.image)
-          shop.image = utils_image.resolveImageUrl(shop.image);
-        this.shop = shop;
-      } catch (e) {
-        common_vendor.index.showToast({ title: e.message || e, icon: "none" });
-      }
-    },
-    async loadDecoration() {
-      var _a, _b;
-      try {
-        const page = await api_index.decorateApi.page(1);
-        const widgets = this.parsePageWidgets(page == null ? void 0 : page.pageData);
-        const bannerWidget = widgets.find((item) => item.name === "banner");
-        const data = (_a = bannerWidget == null ? void 0 : bannerWidget.content) == null ? void 0 : _a.data;
-        if (bannerWidget && this.isWidgetEnabled((_b = bannerWidget.content) == null ? void 0 : _b.enabled) && Array.isArray(data)) {
-          this.banners = data.map((item) => this.normalizeBannerItem(item)).filter(Boolean);
-        }
-      } catch (e) {
-        this.banners = [];
-      }
-    },
     parsePageWidgets(pageData) {
       if (!pageData)
         return [];
       if (Array.isArray(pageData))
         return pageData;
       try {
-        const p = JSON.parse(pageData);
-        return Array.isArray(p) ? p : [];
+        const parsed = JSON.parse(pageData);
+        return Array.isArray(parsed) ? parsed : [];
       } catch (e) {
         return [];
       }
@@ -103,6 +85,33 @@ const _sfc_main = {
       const image = utils_image.resolveImageUrl(rawImage);
       return image ? { ...item, image } : null;
     },
+    async loadShop() {
+      try {
+        const shop = await api_index.orderApi.shop(this.aid);
+        if (shop == null ? void 0 : shop.image) {
+          shop.image = utils_image.resolveImageUrl(shop.image);
+        }
+        this.shop = shop;
+      } catch (e) {
+        common_vendor.index.showToast({ title: e.message || e, icon: "none" });
+      }
+    },
+    async loadDecoration() {
+      var _a, _b;
+      try {
+        const page = await api_index.decorateApi.page(1);
+        const widgets = this.parsePageWidgets(page == null ? void 0 : page.pageData);
+        const bannerWidget = widgets.find((item) => item.name === "banner");
+        const data = (_a = bannerWidget == null ? void 0 : bannerWidget.content) == null ? void 0 : _a.data;
+        if (bannerWidget && this.isWidgetEnabled((_b = bannerWidget.content) == null ? void 0 : _b.enabled) && Array.isArray(data)) {
+          this.banners = data.map((item) => this.normalizeBannerItem(item)).filter(Boolean);
+        } else {
+          this.banners = [];
+        }
+      } catch (e) {
+        this.banners = [];
+      }
+    },
     async loadRecommend() {
       this.recommendLoading = true;
       try {
@@ -111,10 +120,16 @@ const _sfc_main = {
         (Array.isArray(list) ? list : []).forEach((cate) => {
           ;
           (cate.foods || []).forEach((food) => {
-            foods.push({ ...food, image: utils_image.resolveImageUrl(food.image) });
+            foods.push({
+              ...food,
+              image: utils_image.resolveImageUrl(food.image)
+            });
           });
         });
-        this.recommendDishes = foods.slice(0, 5);
+        this.recommendDishes = foods.slice(0, 5).map((food, index) => ({
+          ...food,
+          badge: index === 0 ? "招牌" : index === 1 ? "热卖" : ""
+        }));
       } catch (e) {
         this.recommendDishes = [];
       } finally {
@@ -137,58 +152,85 @@ const _sfc_main = {
       common_vendor.index.setStorageSync("diningMode", 1);
       common_vendor.index.switchTab({ url: "/pages/menu/index" });
     },
+    selectSpec() {
+      this.goMenu();
+    },
+    goSearch() {
+      common_vendor.index.showToast({ title: "搜索功能开发中", icon: "none" });
+    },
     onShortcutTap(item) {
-      if ((item == null ? void 0 : item.name) === "红包卡券") {
+      if ((item == null ? void 0 : item.name) === "优惠券包") {
         common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
         return;
       }
-      if ((item == null ? void 0 : item.name) === "订单详情") {
-        common_vendor.index.switchTab({ url: "/pages/order/list" });
+      if ((item == null ? void 0 : item.name) === "领券中心") {
+        common_vendor.index.navigateTo({ url: "/pages/coupon/center" });
         return;
       }
       common_vendor.index.showToast({ title: "功能开发中", icon: "none" });
+    },
+    goCouponCenter() {
+      common_vendor.index.navigateTo({ url: "/pages/coupon/center" });
     }
   }
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.t($options.nickname || "用户"),
-    b: common_vendor.s($options.heroPaddingStyle),
-    c: common_vendor.o(($event) => $options.selectMode(1), "36"),
-    d: common_vendor.o(($event) => $options.selectMode(3), "46"),
-    e: common_vendor.f($data.shortcuts, (item, k0, i0) => {
+    a: common_vendor.o((...args) => $options.goSearch && $options.goSearch(...args), "81"),
+    b: common_vendor.s($options.searchRowStyle),
+    c: common_vendor.f($options.displayBanners, (item, index, i0) => {
+      return common_vendor.e({
+        a: item.image
+      }, item.image ? {
+        b: item.image
+      } : {}, {
+        c: index
+      });
+    }),
+    d: $options.displayBanners.length > 1,
+    e: $options.displayBanners.length > 0,
+    f: common_vendor.o(($event) => $options.selectMode(1), "6b"),
+    g: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
+    h: common_vendor.o(($event) => $options.selectMode(3), "0d"),
+    i: common_vendor.s($options.heroPaddingStyle),
+    j: common_vendor.f($data.shortcuts, (item, k0, i0) => {
       return {
-        a: item.icon,
+        a: common_vendor.n(item.iconClass),
         b: common_vendor.t(item.name),
-        c: item.name,
-        d: common_vendor.o(($event) => $options.onShortcutTap(item), item.name)
+        c: common_vendor.t(item.desc),
+        d: item.name,
+        e: common_vendor.o(($event) => $options.onShortcutTap(item), item.name)
       };
     }),
-    f: $options.homeRecommendDishes.length
+    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "00"),
+    l: $options.homeRecommendDishes.length
   }, $options.homeRecommendDishes.length ? {
-    g: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
-      return {
+    m: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
+      return common_vendor.e({
         a: dish.image,
-        b: common_vendor.t(dish.title),
-        c: common_vendor.t(dish.intro || "匠心制作，每日新鲜"),
-        d: common_vendor.t(dish.price),
-        e: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), dish.id),
-        f: dish.id,
-        g: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), dish.id)
-      };
+        b: dish.badge
+      }, dish.badge ? {
+        c: common_vendor.t(dish.badge)
+      } : {}, {
+        d: common_vendor.t(dish.title),
+        e: common_vendor.t(dish.intro || "匠心制作，每日新鲜"),
+        f: common_vendor.t(dish.price),
+        g: common_vendor.o(($event) => $options.selectSpec(dish), dish.id),
+        h: dish.id,
+        i: common_vendor.o(($event) => $options.selectSpec(dish), dish.id)
+      });
     })
   } : {}, {
-    h: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
+    n: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
   }, !$data.recommendLoading && $options.homeRecommendDishes.length === 0 ? {} : {}, {
-    i: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    o: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
-        a: _ctx.tabbarSelected !== index ? 1 : "",
-        b: _ctx.tabbarSelected === index ? item.selected : item.unselected,
-        c: common_vendor.t(item.name),
-        d: _ctx.tabbarSelected === index ? _ctx.tabbarSelectedColor : _ctx.tabbarDefaultColor,
-        e: index,
-        f: _ctx.tabbarSelected === index ? 1 : "",
-        g: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
+        a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
+        b: common_vendor.t(item.name),
+        c: _ctx.tabbarSelected === index ? _ctx.tabbarSelectedColor : _ctx.tabbarDefaultColor,
+        d: index,
+        e: _ctx.tabbarSelected === index ? 1 : "",
+        f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
       };
     })
   });
