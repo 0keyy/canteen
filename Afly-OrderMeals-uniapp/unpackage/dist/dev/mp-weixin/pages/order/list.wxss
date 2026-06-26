@@ -23,6 +23,7 @@
   height: 0;
   padding: 24rpx;
   box-sizing: border-box;
+  margin-top: 80rpx;
 }
 .orders-page__header-card.data-v-456ecf67 {
   background: #FFFFFF;

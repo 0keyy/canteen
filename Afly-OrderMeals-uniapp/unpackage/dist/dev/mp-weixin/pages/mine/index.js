@@ -29,6 +29,8 @@ const _sfc_main = {
       companyDeptName: "",
       balance: 0,
       couponCount: 0,
+      pointCount: 0,
+      // 新增积分变量
       primaryActions: PRIMARY_ACTIONS,
       secondaryActions: SECONDARY_ACTIONS,
       avatarKey: "",
@@ -63,6 +65,7 @@ const _sfc_main = {
           this.companyVerified = !!profile.companyVerified;
           this.companyDeptName = profile.companyDeptName || "";
           this.balance = profile.balance != null ? profile.balance : 0;
+          this.pointCount = profile.point ?? 0;
           common_vendor.index.setStorageSync("companyVerified", this.companyVerified);
           common_vendor.index.setStorageSync("companyDeptName", this.companyDeptName);
         }
@@ -132,9 +135,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   } : {}, {
     h: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "5f"),
     i: common_vendor.t($data.balance),
-    j: common_vendor.t($data.couponCount),
-    k: common_vendor.s($options.heroPaddingStyle),
-    l: common_vendor.f($data.primaryActions, (item, k0, i0) => {
+    j: common_vendor.t($data.pointCount),
+    k: common_vendor.t($data.couponCount),
+    l: common_vendor.s($options.heroPaddingStyle),
+    m: common_vendor.f($data.primaryActions, (item, k0, i0) => {
       return {
         a: common_vendor.n(`profile-page__action-icon--${item.icon}`),
         b: common_vendor.t(item.title),
@@ -142,7 +146,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       };
     }),
-    m: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
+    n: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
       return common_vendor.e({
         a: item.iconImg
       }, item.iconImg ? {
@@ -155,18 +159,18 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         f: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       });
     }),
-    n: $data.showAvatarPicker
+    o: $data.showAvatarPicker
   }, $data.showAvatarPicker ? {
-    o: $data.avatarKey === "1" ? 1 : "",
-    p: common_vendor.o(($event) => $options.selectAvatar("1"), "4c"),
-    q: $data.avatarKey === "2" ? 1 : "",
-    r: common_vendor.o(($event) => $options.selectAvatar("2"), "15"),
-    s: common_vendor.o(($event) => $data.showAvatarPicker = false, "45"),
-    t: common_vendor.o(() => {
-    }, "4b"),
-    v: common_vendor.o(($event) => $data.showAvatarPicker = false, "61")
+    p: $data.avatarKey === "1" ? 1 : "",
+    q: common_vendor.o(($event) => $options.selectAvatar("1"), "f8"),
+    r: $data.avatarKey === "2" ? 1 : "",
+    s: common_vendor.o(($event) => $options.selectAvatar("2"), "b5"),
+    t: common_vendor.o(($event) => $data.showAvatarPicker = false, "88"),
+    v: common_vendor.o(() => {
+    }, "92"),
+    w: common_vendor.o(($event) => $data.showAvatarPicker = false, "aa")
   } : {}, {
-    w: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    x: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),

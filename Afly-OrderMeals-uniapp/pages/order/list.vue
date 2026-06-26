@@ -171,6 +171,7 @@ export default {
     height: 0;
     padding: 24rpx;
     box-sizing: border-box;
+    margin-top: 80rpx; 
   }
 
   &__header-card {
@@ -292,6 +293,7 @@ export default {
     font-size: 24rpx;
     color: $text-tertiary;
   }
+
 
   &__bottom-space {
     height: $tabbar-height;
