@@ -34,7 +34,9 @@ const _sfc_main = {
       primaryActions: PRIMARY_ACTIONS,
       secondaryActions: SECONDARY_ACTIONS,
       avatarKey: "",
-      showAvatarPicker: false
+      showAvatarPicker: false,
+      showServicePicker: false,
+      servicePhones: [{ phone: "400-800-1234", name: "客服热线" }]
     };
   },
   computed: {
@@ -89,12 +91,20 @@ const _sfc_main = {
         common_vendor.index.navigateTo({ url: "/pages/address/list" });
         return;
       }
+      if (item.title === "联系客服") {
+        this.callService();
+        return;
+      }
       if (item.title === "公司认证") {
         common_vendor.index.navigateTo({ url: "/pages/mine/company-auth" });
         return;
       }
       if (item.title === "优惠券包") {
         common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
+        return;
+      }
+      if (item.title === "充值中心") {
+        common_vendor.index.navigateTo({ url: "/pages/coupon/recharge" });
         return;
       }
       if (item.title === "退出登录") {
@@ -105,6 +115,33 @@ const _sfc_main = {
     },
     onFeatureTap(title) {
       common_vendor.index.showToast({ title: `${title}功能开发中`, icon: "none" });
+    },
+    async callService() {
+      try {
+        const data = await api_index.serviceApi.hotline();
+        if (data && Array.isArray(data.list) && data.list.length) {
+          this.servicePhones = data.list;
+        } else if (data && data.phone) {
+          this.servicePhones = [{ phone: data.phone, name: data.name || "客服热线" }];
+        }
+      } catch (e) {
+      }
+      this.showServicePicker = true;
+    },
+    makeCall(phone) {
+      if (!phone)
+        return;
+      this.showServicePicker = false;
+      setTimeout(() => {
+        common_vendor.index.makePhoneCall({
+          phoneNumber: phone,
+          fail: (err) => {
+            if (err.errMsg && err.errMsg.includes("cancel"))
+              return;
+            common_vendor.index.showToast({ title: "拨打失败", icon: "none" });
+          }
+        });
+      }, 200);
     },
     selectAvatar(key) {
       this.avatarKey = key;
@@ -170,7 +207,22 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }, "92"),
     w: common_vendor.o(($event) => $data.showAvatarPicker = false, "aa")
   } : {}, {
-    x: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    x: $data.showServicePicker
+  }, $data.showServicePicker ? {
+    y: common_vendor.f($data.servicePhones, (item, index, i0) => {
+      return {
+        a: common_vendor.t(item.name || "客服热线"),
+        b: common_vendor.t(item.phone),
+        c: index,
+        d: common_vendor.o(($event) => $options.makeCall(item.phone), index)
+      };
+    }),
+    z: common_vendor.o(($event) => $data.showServicePicker = false, "9f"),
+    A: common_vendor.o(() => {
+    }, "a2"),
+    B: common_vendor.o(($event) => $data.showServicePicker = false, "49")
+  } : {}, {
+    C: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),

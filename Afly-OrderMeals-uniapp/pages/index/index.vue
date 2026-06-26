@@ -348,13 +348,28 @@ $section-gap: 20rpx;
 
   /* ===== 顶部渐变区（对齐 HomeView 结构） ===== */
   &__hero {
-    background:#c82d24;
+    background: linear-gradient(135deg, #C82D24 0%, #E8453A 50%, #FF6B5B 100%);
     color: $text-white;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(255, 200, 150, 0.12) 0%, transparent 40%);
+      pointer-events: none;
+    }
   }
 
   &__hero-inner {
     padding: 0 $page-pad 24rpx;
     box-sizing: border-box;
+    position: relative;
+    z-index: 1;
   }
 
   &__nav-row {
@@ -429,7 +444,7 @@ $section-gap: 20rpx;
   &__swiper {
     width: 100%;
     height: 280rpx;
-    border-radius: 40rpx;
+    border-radius: $radius-card;
     overflow: hidden;
     background: linear-gradient(135deg, $brand-primary-dark 0%, $brand-primary 50%, $brand-orange-light 100%);
   }
@@ -851,8 +866,8 @@ $section-gap: 20rpx;
     position: absolute;
     top: 0;
     left: 0;
-    background: $brand-primary;
-    border-radius: 8rpx 0 8rpx 0;
+    background: #c82d24;
+    border-radius: 8rpx;
     padding: 4rpx 12rpx;
   }
 
@@ -911,7 +926,7 @@ $section-gap: 20rpx;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-    background: $brand-primary;
+    background: #c82d24;
     border-radius: 999rpx;
     padding: 12rpx 28rpx;
     box-shadow: none;

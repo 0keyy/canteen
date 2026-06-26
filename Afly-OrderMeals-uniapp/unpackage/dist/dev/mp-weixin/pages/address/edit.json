@@ -1,4 +1,6 @@
 {
-  "navigationStyle": "custom",
+  "navigationBarTitleText": "编辑地址",
+  "navigationBarBackgroundColor": "#FFFCF8",
+  "navigationBarTextStyle": "black",
   "usingComponents": {}
 }

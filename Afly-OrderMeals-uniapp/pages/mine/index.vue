@@ -124,6 +124,29 @@
       </view>
     </view>
 
+    <!-- 客服电话选择面板 -->
+    <view class="profile-page__service-mask" v-if="showServicePicker" @tap="showServicePicker = false">
+      <view class="profile-page__service-picker" @tap.stop>
+        <text class="profile-page__service-title">联系客服</text>
+        <view class="profile-page__service-list">
+          <view
+            v-for="(item, index) in servicePhones"
+            :key="index"
+            class="profile-page__service-item"
+            @tap="makeCall(item.phone)"
+          >
+            <view class="profile-page__service-icon"></view>
+            <view class="profile-page__service-info">
+              <text class="profile-page__service-name">{{ item.name || '客服热线' }}</text>
+              <text class="profile-page__service-phone">{{ item.phone }}</text>
+            </view>
+            <text class="profile-page__service-arrow">›</text>
+          </view>
+        </view>
+        <view class="profile-page__service-cancel" @tap="showServicePicker = false">取消</view>
+      </view>
+    </view>
+
     <view class="app-tab-bar">
       <view
         v-for="(item, index) in tabbarList"
@@ -151,7 +174,7 @@
 </template>
 
 <script>
-import { authApi, couponApi } from '../../api/index'
+import { authApi, couponApi, serviceApi } from '../../api/index'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getNavMetrics } from '../../utils/navbar'
 
@@ -187,7 +210,9 @@ export default {
       primaryActions: PRIMARY_ACTIONS,
       secondaryActions: SECONDARY_ACTIONS,
       avatarKey: '',
-      showAvatarPicker: false
+      showAvatarPicker: false,
+      showServicePicker: false,
+      servicePhones: [{ phone: '400-800-1234', name: '客服热线' }]
     }
   },
   computed: {
@@ -243,12 +268,20 @@ export default {
         uni.navigateTo({ url: '/pages/address/list' })
         return
       }
+      if (item.title === '联系客服') {
+        this.callService()
+        return
+      }
       if (item.title === '公司认证') {
         uni.navigateTo({ url: '/pages/mine/company-auth' })
         return
       }
       if (item.title === '优惠券包') {
         uni.navigateTo({ url: '/pages/coupon/wallet' })
+        return
+      }
+      if (item.title === '充值中心') {
+        uni.navigateTo({ url: '/pages/coupon/recharge' })
         return
       }
       if (item.title === '退出登录') {
@@ -259,6 +292,30 @@ export default {
     },
     onFeatureTap(title) {
       uni.showToast({ title: `${title}功能开发中`, icon: 'none' })
+    },
+    async callService() {
+      try {
+        const data = await serviceApi.hotline()
+        if (data && Array.isArray(data.list) && data.list.length) {
+          this.servicePhones = data.list
+        } else if (data && data.phone) {
+          this.servicePhones = [{ phone: data.phone, name: data.name || '客服热线' }]
+        }
+      } catch (e) {}
+      this.showServicePicker = true
+    },
+    makeCall(phone) {
+      if (!phone) return
+      this.showServicePicker = false
+      setTimeout(() => {
+        uni.makePhoneCall({
+          phoneNumber: phone,
+          fail: (err) => {
+            if (err.errMsg && err.errMsg.includes('cancel')) return
+            uni.showToast({ title: '拨打失败', icon: 'none' })
+          }
+        })
+      }, 200)
     },
     selectAvatar(key) {
       this.avatarKey = key
@@ -393,6 +450,120 @@ export default {
     font-size: 28rpx;
     color: $text-secondary;
     padding: 12rpx 48rpx;
+  }
+
+  &__service-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  &__service-picker {
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 24rpx 24rpx 0 0;
+    padding: 32rpx 0 24rpx;
+    padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  }
+
+  &__service-title {
+    display: block;
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #111111;
+    text-align: center;
+    margin-bottom: 16rpx;
+  }
+
+  &__service-list {
+    padding: 12rpx 0;
+  }
+
+  &__service-item {
+    display: flex;
+    align-items: center;
+    padding: 24rpx 32rpx;
+
+    &:active {
+      background: #F5F5F5;
+    }
+  }
+
+  &__service-icon {
+    width: 56rpx;
+    height: 56rpx;
+    border-radius: 50%;
+    background: #FFF0F0;
+    position: relative;
+    margin-right: 24rpx;
+    flex-shrink: 0;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 28rpx;
+      height: 28rpx;
+      border: 3rpx solid #C41E3A;
+      border-radius: 6rpx;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      width: 20rpx;
+      height: 20rpx;
+      border-left: 3rpx solid #C41E3A;
+      border-bottom: 3rpx solid #C41E3A;
+    }
+  }
+
+  &__service-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__service-name {
+    display: block;
+    font-size: 28rpx;
+    color: #333333;
+    font-weight: 500;
+  }
+
+  &__service-phone {
+    display: block;
+    font-size: 24rpx;
+    color: #999999;
+    margin-top: 6rpx;
+  }
+
+  &__service-arrow {
+    font-size: 36rpx;
+    color: #CCCCCC;
+    font-weight: 400;
+    line-height: 1;
+    margin-left: 16rpx;
+  }
+
+  &__service-cancel {
+    font-size: 28rpx;
+    color: #999999;
+    text-align: center;
+    padding: 20rpx 0 0;
+    border-top: 1rpx solid #F0F0F0;
+    margin-top: 12rpx;
   }
 
   &__user-info {

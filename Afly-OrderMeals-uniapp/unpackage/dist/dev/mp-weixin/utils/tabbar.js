@@ -9,8 +9,14 @@ const TAB_PAGES = [
 const TAB_NAME_PATH_MAP = {
   "首页": "pages/index/index",
   "点餐": "pages/menu/index",
+  "点单": "pages/menu/index",
+  "菜单": "pages/menu/index",
+  "堂食": "pages/menu/index",
   "订单": "pages/order/list",
-  "我的": "pages/mine/index"
+  "我的订单": "pages/order/list",
+  "我的": "pages/mine/index",
+  "个人中心": "pages/mine/index",
+  "我的主页": "pages/mine/index"
 };
 const DEFAULT_TABBAR = {
   style: {
@@ -75,6 +81,8 @@ function hideNativeTabBar() {
 function normalizeTabbarItem(item) {
   const link = (item == null ? void 0 : item.link) || {};
   const pagePath = resolveTabPagePath(item);
+  const selectedImg = (item == null ? void 0 : item.selected) || (item == null ? void 0 : item.selectedIcon) || (item == null ? void 0 : item.selectedIconPath) || (item == null ? void 0 : item.activeIcon) || (item == null ? void 0 : item.iconSelected) || (item == null ? void 0 : item.selectIcon) || (item == null ? void 0 : item.icon) || "";
+  const unselectedImg = (item == null ? void 0 : item.unselected) || (item == null ? void 0 : item.unselectedIcon) || (item == null ? void 0 : item.unselectedIconPath) || (item == null ? void 0 : item.inactiveIcon) || (item == null ? void 0 : item.iconUnselected) || (item == null ? void 0 : item.defaultIcon) || (item == null ? void 0 : item.icon) || "";
   return {
     ...item,
     pagePath,
@@ -82,11 +90,11 @@ function normalizeTabbarItem(item) {
       ...link,
       path: link.path || link.url || (pagePath ? `/${pagePath}` : "")
     },
-    selected: (item == null ? void 0 : item.selected) || (item == null ? void 0 : item.selectedIcon) || "",
-    unselected: (item == null ? void 0 : item.unselected) || (item == null ? void 0 : item.unselectedIcon) || ""
+    selected: selectedImg,
+    unselected: unselectedImg
   };
 }
-const TABBAR_CACHE_VERSION = 8;
+const TABBAR_CACHE_VERSION = 9;
 function readTabbarCache() {
   const cached = common_vendor.index.getStorageSync("tabbarConfig");
   if (!cached || cached.version !== TABBAR_CACHE_VERSION)

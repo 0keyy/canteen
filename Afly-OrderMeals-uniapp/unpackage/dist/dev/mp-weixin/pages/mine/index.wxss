@@ -115,6 +115,106 @@
   color: #7F7368;
   padding: 12rpx 48rpx;
 }
+.profile-page__service-mask.data-v-569e925a {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+}
+.profile-page__service-picker.data-v-569e925a {
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 32rpx 0 24rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+}
+.profile-page__service-title.data-v-569e925a {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #111111;
+  text-align: center;
+  margin-bottom: 16rpx;
+}
+.profile-page__service-list.data-v-569e925a {
+  padding: 12rpx 0;
+}
+.profile-page__service-item.data-v-569e925a {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx;
+}
+.profile-page__service-item.data-v-569e925a:active {
+  background: #F5F5F5;
+}
+.profile-page__service-icon.data-v-569e925a {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: #FFF0F0;
+  position: relative;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+.profile-page__service-icon.data-v-569e925a::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 28rpx;
+  height: 28rpx;
+  border: 3rpx solid #C41E3A;
+  border-radius: 6rpx;
+}
+.profile-page__service-icon.data-v-569e925a::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 20rpx;
+  height: 20rpx;
+  border-left: 3rpx solid #C41E3A;
+  border-bottom: 3rpx solid #C41E3A;
+}
+.profile-page__service-info.data-v-569e925a {
+  flex: 1;
+  min-width: 0;
+}
+.profile-page__service-name.data-v-569e925a {
+  display: block;
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+}
+.profile-page__service-phone.data-v-569e925a {
+  display: block;
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 6rpx;
+}
+.profile-page__service-arrow.data-v-569e925a {
+  font-size: 36rpx;
+  color: #CCCCCC;
+  font-weight: 400;
+  line-height: 1;
+  margin-left: 16rpx;
+}
+.profile-page__service-cancel.data-v-569e925a {
+  font-size: 28rpx;
+  color: #999999;
+  text-align: center;
+  padding: 20rpx 0 0;
+  border-top: 1rpx solid #F0F0F0;
+  margin-top: 12rpx;
+}
 .profile-page__user-info.data-v-569e925a {
   flex: 1;
   min-width: 0;

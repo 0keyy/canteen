@@ -56,6 +56,15 @@ const couponApi = {
   bestForOrder: (orderId) => utils_request.get("/front/coupon/bestForOrder", { orderId }),
   verifyCode: (userCouponId) => utils_request.get("/front/coupon/verifyCode", { userCouponId })
 };
+const walletApi = {
+  balance: () => utils_request.get("/front/wallet/balance"),
+  rechargeCreate: (amount) => utils_request.post("/front/wallet/recharge/create", { amount }),
+  rechargeList: (page = 1, pageSize = 20) => utils_request.get("/front/wallet/recharge/list", { page, pageSize }),
+  transactionList: (page = 1, pageSize = 20) => utils_request.get("/front/wallet/transaction/list", { page, pageSize })
+};
+const serviceApi = {
+  hotline: () => utils_request.get("/front/service/hotline")
+};
 exports.addressApi = addressApi;
 exports.authApi = authApi;
 exports.companyApi = companyApi;
@@ -63,4 +72,6 @@ exports.couponApi = couponApi;
 exports.decorateApi = decorateApi;
 exports.orderApi = orderApi;
 exports.payApi = payApi;
+exports.serviceApi = serviceApi;
+exports.walletApi = walletApi;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/index.js.map

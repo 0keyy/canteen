@@ -13,6 +13,7 @@
     "pages/mine/profile",
     "pages/coupon/center",
     "pages/coupon/wallet",
+    "pages/coupon/recharge",
     "pages/coupon/verify-code",
     "pages/points/index"
   ],

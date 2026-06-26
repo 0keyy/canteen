@@ -2,7 +2,6 @@
   <view class="orders-page">
     <scroll-view class="orders-page__content" scroll-y :show-scrollbar="false">
       <view class="orders-page__header-card">
-        <text class="orders-page__store">{{ shopName }}</text>
         <text class="orders-page__title">我的订单</text>
 
         <view v-if="pendingTotal > 0" class="orders-page__pending">
@@ -90,25 +89,15 @@ export default {
   data() {
     return {
       list: [],
-      shopName: '粮兴坊',
       pendingTotal: 0
     }
   },
   onShow() {
     this.setupTabbar(2)
-    this.loadShop()
     this.loadList()
     this.loadPendingCart()
   },
   methods: {
-    async loadShop() {
-      try {
-        const shop = await orderApi.shop(DEFAULT_SHOP_ID)
-        if (shop?.name) this.shopName = shop.name
-      } catch (e) {
-        // keep default
-      }
-    },
     async loadPendingCart() {
       try {
         const has = await orderApi.cartHas(DEFAULT_SHOP_ID)
@@ -181,12 +170,6 @@ export default {
     border-radius: $radius-card;
     padding: 24rpx;
     box-shadow: $shadow-sm;
-  }
-
-  &__store {
-    display: block;
-    font-size: 22rpx;
-    color: $text-secondary;
   }
 
   &__title {

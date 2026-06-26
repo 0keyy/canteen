@@ -39,7 +39,9 @@
     {
       "path": "pages/address/edit",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "编辑地址",
+        "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black"
       }
     },
     {
@@ -89,6 +91,14 @@
       "style": {
         "navigationBarTitleText": "我的券包",
         "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black"
+      }
+    },
+    {
+      "path": "pages/coupon/recharge",
+      "style": {
+        "navigationBarTitleText": "充值中心",
+        "navigationBarBackgroundColor": "#FFFFFF",
         "navigationBarTextStyle": "black"
       }
     },

@@ -8,25 +8,15 @@ const _sfc_main = {
   data() {
     return {
       list: [],
-      shopName: "粮兴坊",
       pendingTotal: 0
     };
   },
   onShow() {
     this.setupTabbar(2);
-    this.loadShop();
     this.loadList();
     this.loadPendingCart();
   },
   methods: {
-    async loadShop() {
-      try {
-        const shop = await api_index.orderApi.shop(utils_config.DEFAULT_SHOP_ID);
-        if (shop == null ? void 0 : shop.name)
-          this.shopName = shop.name;
-      } catch (e) {
-      }
-    },
     async loadPendingCart() {
       try {
         const has = await api_index.orderApi.cartHas(utils_config.DEFAULT_SHOP_ID);
@@ -82,15 +72,14 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.t($data.shopName),
-    b: $data.pendingTotal > 0
+    a: $data.pendingTotal > 0
   }, $data.pendingTotal > 0 ? {
-    c: common_vendor.t($data.pendingTotal.toFixed(2)),
-    d: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "4f")
+    b: common_vendor.t($data.pendingTotal.toFixed(2)),
+    c: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "27")
   } : {}, {
-    e: $data.list.length > 0
+    d: $data.list.length > 0
   }, $data.list.length > 0 ? {
-    f: common_vendor.f($data.list, (item, k0, i0) => {
+    e: common_vendor.f($data.list, (item, k0, i0) => {
       return {
         a: common_vendor.t($options.orderTitle(item)),
         b: common_vendor.t($options.statusText(item)),
@@ -105,7 +94,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       };
     })
   } : {}, {
-    g: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    f: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),

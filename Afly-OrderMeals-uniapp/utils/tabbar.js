@@ -8,8 +8,14 @@ const TAB_PAGES = [
 const TAB_NAME_PATH_MAP = {
   '首页': 'pages/index/index',
   '点餐': 'pages/menu/index',
+  '点单': 'pages/menu/index',
+  '菜单': 'pages/menu/index',
+  '堂食': 'pages/menu/index',
   '订单': 'pages/order/list',
-  '我的': 'pages/mine/index'
+  '我的订单': 'pages/order/list',
+  '我的': 'pages/mine/index',
+  '个人中心': 'pages/mine/index',
+  '我的主页': 'pages/mine/index'
 }
 
 const DEFAULT_TABBAR = {
@@ -80,6 +86,24 @@ export function hideNativeTabBar() {
 export function normalizeTabbarItem(item) {
   const link = item?.link || {}
   const pagePath = resolveTabPagePath(item)
+  const selectedImg =
+    item?.selected ||
+    item?.selectedIcon ||
+    item?.selectedIconPath ||
+    item?.activeIcon ||
+    item?.iconSelected ||
+    item?.selectIcon ||
+    item?.icon ||
+    ''
+  const unselectedImg =
+    item?.unselected ||
+    item?.unselectedIcon ||
+    item?.unselectedIconPath ||
+    item?.inactiveIcon ||
+    item?.iconUnselected ||
+    item?.defaultIcon ||
+    item?.icon ||
+    ''
   return {
     ...item,
     pagePath,
@@ -87,12 +111,12 @@ export function normalizeTabbarItem(item) {
       ...link,
       path: link.path || link.url || (pagePath ? `/${pagePath}` : '')
     },
-    selected: item?.selected || item?.selectedIcon || '',
-    unselected: item?.unselected || item?.unselectedIcon || ''
+    selected: selectedImg,
+    unselected: unselectedImg
   }
 }
 
-export const TABBAR_CACHE_VERSION = 8
+export const TABBAR_CACHE_VERSION = 9
 
 export function readTabbarCache() {
   const cached = uni.getStorageSync('tabbarConfig')

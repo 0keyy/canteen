@@ -66,3 +66,14 @@ export const couponApi = {
   bestForOrder: (orderId) => get('/front/coupon/bestForOrder', { orderId }),
   verifyCode: (userCouponId) => get('/front/coupon/verifyCode', { userCouponId })
 }
+
+export const walletApi = {
+  balance: () => get('/front/wallet/balance'),
+  rechargeCreate: (amount) => post('/front/wallet/recharge/create', { amount }),
+  rechargeList: (page = 1, pageSize = 20) => get('/front/wallet/recharge/list', { page, pageSize }),
+  transactionList: (page = 1, pageSize = 20) => get('/front/wallet/transaction/list', { page, pageSize })
+}
+
+export const serviceApi = {
+  hotline: () => get('/front/service/hotline')
+}

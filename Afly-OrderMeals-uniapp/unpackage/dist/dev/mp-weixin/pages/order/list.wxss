@@ -33,11 +33,6 @@
   padding: 24rpx;
   box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
 }
-.orders-page__store.data-v-456ecf67 {
-  display: block;
-  font-size: 22rpx;
-  color: #7F7368;
-}
 .orders-page__title.data-v-456ecf67 {
   display: block;
   margin-top: 4rpx;
