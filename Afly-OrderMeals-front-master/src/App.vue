@@ -10,6 +10,7 @@ const elConfig = {
     zIndex: 3000,
     locale: zhCn
 }
+// 1223
 const isDark = useDark()
 onMounted(async () => {
     //设置主题色
