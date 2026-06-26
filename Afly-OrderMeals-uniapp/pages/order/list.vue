@@ -171,7 +171,9 @@ export default {
     height: 0;
     padding: 24rpx;
     box-sizing: border-box;
-    margin-top: 80rpx; 
+    /* ========== 新增控制整体上下偏移的代码 ========== */
+    margin-top: 40rpx; 
+    /* 调整说明：40rpx是下移距离，数值越大页面整体越往下，改成0就恢复原位 */
   }
 
   &__header-card {

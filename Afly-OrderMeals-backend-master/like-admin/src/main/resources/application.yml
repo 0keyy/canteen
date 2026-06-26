@@ -1,7 +1,7 @@
 # 项目配置
 like:
-#  upload-directory: /www/uploads/
-  upload-directory: D:\www\uploads\
+  upload-directory: /www/uploads/
+#  upload-directory: D:\www\uploads\
   admin-notify-url: http://localhost:8082/api/internal/notify
   app-mock-login: false
   app-mock-login-mobile: "13800138000"
@@ -23,7 +23,7 @@ server:
 # 框架配置
 spring:
   profiles:
-    active: dev
+    active: prod
   mvc:
     static-path-pattern: /api/static/**
     throw-exception-if-no-handler-found: true
