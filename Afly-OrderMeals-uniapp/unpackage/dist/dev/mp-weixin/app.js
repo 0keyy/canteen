@@ -14,11 +14,9 @@ if (!Math) {
   "./pages/order/detail.js";
   "./pages/mine/index.js";
   "./pages/mine/company-auth.js";
-  "./pages/mine/profile.js";
   "./pages/coupon/center.js";
   "./pages/coupon/wallet.js";
   "./pages/coupon/verify-code.js";
-  "./pages/points/index.js";
 }
 async function preloadTabbar() {
   try {
