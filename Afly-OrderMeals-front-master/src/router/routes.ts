@@ -35,6 +35,20 @@ export const constantRoutes: Array<RouteRecordRaw> = [
         component: () => import('@/views/account/login.vue')
     },
     {
+        path: '/order',
+        component: LAYOUT,
+        children: [
+            {
+                path: '',
+                name: Symbol(),
+                component: () => import('@/views/order/index.vue'),
+                meta: {
+                    title: '点餐'
+                }
+            }
+        ]
+    },
+    {
         path: '/user',
         component: LAYOUT,
         children: [
@@ -53,5 +67,6 @@ export const constantRoutes: Array<RouteRecordRaw> = [
 export const INDEX_ROUTE: RouteRecordRaw = {
     path: PageEnum.INDEX,
     component: LAYOUT,
-    name: INDEX_ROUTE_NAME
+    name: INDEX_ROUTE_NAME,
+    redirect: '/order'
 }

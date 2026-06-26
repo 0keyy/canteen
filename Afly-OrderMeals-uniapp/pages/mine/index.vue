@@ -28,6 +28,11 @@
             <text class="profile-page__stat-value">{{ balance }}</text>
             <text class="profile-page__stat-label">余额</text>
           </view>
+          <!-- 新增积分项 -->
+          <view class="profile-page__stat-item">
+            <text class="profile-page__stat-value">{{ pointCount }}</text>
+            <text class="profile-page__stat-label">积分</text>
+          </view>
           <view class="profile-page__stat-item">
             <text class="profile-page__stat-value">{{ couponCount }}</text>
             <text class="profile-page__stat-label">优惠券</text>
@@ -88,8 +93,7 @@
         </view>
 
         <view class="profile-page__footer">
-          <text class="profile-page__footer-text">小程序餐饮系统</text>
-          <text class="profile-page__footer-sub">点击了解详情</text>
+          <text class="profile-page__footer-text">小程序餐饮系统 点击了解详情</text>
         </view>
 
         <view class="profile-page__bottom-space"></view>
@@ -179,6 +183,7 @@ export default {
       companyDeptName: '',
       balance: 0,
       couponCount: 0,
+      pointCount: 0, // 新增积分变量
       primaryActions: PRIMARY_ACTIONS,
       secondaryActions: SECONDARY_ACTIONS,
       avatarKey: '',
@@ -212,6 +217,7 @@ export default {
           this.companyVerified = !!profile.companyVerified
           this.companyDeptName = profile.companyDeptName || ''
           this.balance = profile.balance != null ? profile.balance : 0
+          this.pointCount = profile.point ?? 0 // 接口赋值积分
           uni.setStorageSync('companyVerified', this.companyVerified)
           uni.setStorageSync('companyDeptName', this.companyDeptName)
         }
@@ -283,8 +289,8 @@ export default {
   }
 
   &__hero {
-    padding: 0 32rpx 32rpx;
-    background: linear-gradient(135deg, rgba(177, 10, 15, 0.15) 0%, rgba(255, 139, 26, 0.1) 40%, $bg-page 100%);
+      padding: 0 32rpx 32rpx;
+      background: linear-gradient(135deg, rgba(177, 10, 15, 0.15) 0%, rgba(255, 139, 26, 0.1) 40%, $bg-page 100%);
   }
 
   &__user-row {
@@ -474,101 +480,94 @@ export default {
   }
 
   &__stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24rpx;
-    margin-top: 32rpx;
-    text-align: center;
-  }
-
-  &__stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__stat-value {
-    display: block;
-    font-size: 36rpx;
-    font-weight: 900;
-    color: $text-primary;
-  }
-
-  &__stat-label {
-    display: block;
-    margin-top: 4rpx;
-    font-size: 24rpx;
-    font-weight: 600;
-    color: $text-secondary;
-  }
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16rpx;
+      margin-top: 32rpx;
+      text-align: center;
+    }
+  
+    &__stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    &__stat-value {
+      display: block;
+      font-size: 36rpx;
+      font-weight: 900;
+      color: $text-primary;
+    }
+  
+    &__stat-label {
+      display: block;
+      margin-top: 4rpx;
+      font-size: 24rpx;
+      font-weight: 600;
+      color: $text-secondary;
+    }
 
   &__vip-card {
-    margin-top: 32rpx;
+    margin-top: 35rpx;
+    margin-bottom: 10rpx; /* 新增这一行，控制下方和订单卡片距离 */
     padding: 24rpx;
     border-radius: $radius-card;
-    background: linear-gradient(135deg, $brand-primary-dark 0%, $brand-primary 60%, $brand-orange-light 100%);
-    box-shadow: $shadow-card;
+    background: linear-gradient(135deg, #d9c8b8 0%, #e9ddcf 100%);
+    box-shadow: 0 4rpx 14rpx rgba(160, 130, 100, 0.15);
   }
-
   &__vip-top {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
   }
-
   &__vip-title {
     display: block;
     font-size: 32rpx;
     font-weight: 900;
-    color: $text-white;
+    color: #5c422e;
   }
-
   &__vip-desc {
     display: block;
     margin-top: 4rpx;
     font-size: 22rpx;
-    color: rgba(255, 252, 248, 0.8);
+    color: rgba(92, 66, 46, 0.7);
   }
-
   &__vip-crown {
     width: 64rpx;
     height: 64rpx;
     position: relative;
-
     &::before {
       content: '♛';
       font-size: 64rpx;
-      color: $brand-orange-light;
+      color: #b88c64;
       line-height: 1;
     }
   }
-
   &__vip-progress {
     margin-top: 24rpx;
     height: 12rpx;
     border-radius: 999rpx;
-    background: rgba(255, 252, 248, 0.2);
+    background: rgba(92, 66, 46, 0.1);
     overflow: hidden;
   }
-
   &__vip-progress-bar {
     width: 18%;
     height: 100%;
     border-radius: 999rpx;
-    background: $brand-orange-light;
+    background: #b88c64;
   }
-
   &__vip-progress-text {
     display: block;
     margin-top: 4rpx;
     text-align: right;
     font-size: 20rpx;
-    color: rgba(255, 252, 248, 0.8);
+    color: rgba(92, 66, 46, 0.65);
   }
 
   &__sections {
-    padding: 20rpx 24rpx 0;
+    padding: 30rpx 20rpx 0;
   }
 
   &__card {
@@ -576,7 +575,7 @@ export default {
     border-radius: $radius-card;
     padding: 24rpx;
     box-shadow: $shadow-sm;
-    margin-bottom: 20rpx;
+    margin-bottom: 30rpx;
 
     &--grid {
       display: grid;
