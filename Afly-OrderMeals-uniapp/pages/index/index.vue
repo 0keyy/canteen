@@ -11,7 +11,6 @@
                 <text class="home__search-text">点击搜索</text>
               </view>
             </view>
-            <text class="home__slogan">食材当日现备 · 好滋味有温度 · 新鲜现做</text>
 
             <view class="home__banner-section">
               <view class="home__banner-wrap">
@@ -46,7 +45,6 @@
               <view class="home__primary-card-item" @click="selectMode(1)">
                 <view class="home__primary-card-text">
                   <text class="home__primary-name">到店堂食</text>
-                  <text class="home__primary-desc">下单免排队</text>
                 </view>
                 <image class="home__primary-card-img" src="/static/图层 2.png" mode="aspectFit" />
               </view>
@@ -371,7 +369,7 @@ $section-gap: 20rpx;
     align-items: center;
     height: 56rpx;
     padding: 0 24rpx;
-    background: rgba(255, 252, 248, 0.9);
+    background: rgba(255,252,248,0.9);
     border-radius: 999rpx;
     box-sizing: border-box;
     transition: transform $transition-fast;
@@ -413,7 +411,7 @@ $section-gap: 20rpx;
     display: block;
     margin-bottom: 12rpx;
     font-size: 20rpx;
-    color: rgba(255, 252, 248, 0.9);
+    color: rgba(255,252,248,0.9);
     line-height: 1.4;
   }
 
@@ -424,8 +422,8 @@ $section-gap: 20rpx;
   &__banner-wrap {
     padding: 4rpx;
     border-radius: $radius-lg;
-    background: rgba(255, 252, 248, 0.15);
-    border: 2rpx solid rgba(255, 255, 255, 0.3);
+    background: rgba(255,252,248,0.15);
+    border: 2rpx solid rgba(255,255,255,0.3);
   }
 
   &__swiper {
@@ -497,15 +495,9 @@ $section-gap: 20rpx;
   }
 
   &__primary-name {
-    font-size: 30rpx;
+    font-size: 36rpx;
     font-weight: 900;
     color: $text-primary;
-  }
-
-  &__primary-desc {
-    display: none;
-    font-size: 20rpx;
-    color: $text-secondary;
   }
 
   /* ===== 内容区 ===== */
@@ -561,7 +553,7 @@ $section-gap: 20rpx;
     height: 48rpx;
     position: relative;
     box-sizing: border-box;
-    background: rgba(177, 10, 15, 0.08);
+    background: rgba(177,10,15,0.08);
     border-radius: 50%;
 
     &--store {
@@ -968,11 +960,11 @@ $section-gap: 20rpx;
 
   &__promo-icon {
     flex-shrink: 0;
-    border-color: rgba(255, 252, 248, 0.85) !important;
+    border-color: rgba(255,252,248,0.85) !important;
 
     &::before,
     &::after {
-      border-color: rgba(255, 252, 248, 0.85) !important;
+      border-color: rgba(255,252,248,0.85) !important;
     }
   }
 
@@ -984,7 +976,7 @@ $section-gap: 20rpx;
   &__promo-sub {
     display: block;
     font-size: 24rpx;
-    color: rgba(255, 252, 248, 0.8);
+    color: rgba(255,252,248,0.8);
     line-height: 1.4;
   }
 

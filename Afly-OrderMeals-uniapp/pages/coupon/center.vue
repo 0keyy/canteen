@@ -1,8 +1,13 @@
 <template>
   <view class="coupon-center">
     <view class="coupon-center__header">
-      <text class="coupon-center__title">领券中心</text>
-      <text class="coupon-center__sub">领取优惠券，下单更优惠</text>
+		<view class="coupon-center__header-left">
+			<text class="coupon-center__title">领券中心</text>
+			<text class="coupon-center__sub">领取优惠券，下单更优惠</text>
+		</view>
+		<view class="coupon-center__header-right">
+			<image src="/static/拱手.png" mode="" class="coupon-center__header-image"></image>
+		</view>
     </view>
 
     <view v-if="loading" class="coupon-center__status">
@@ -118,9 +123,19 @@ export default {
 
   &__header {
     padding: 40rpx 32rpx 24rpx;
-    background: linear-gradient(135deg, $brand-primary 0%, $brand-orange-light 100%);
+    background: linear-gradient(170deg, #c41e3a 0%, #fffcf8 100%);
+	display: flex;
+	justify-content: space-between;
   }
-
+  &__header-left{
+	  line-height: 70rpx;
+  }
+  &__header-image{
+	width: 90rpx;
+	height:145rpx;
+	margin-right: 100rpx;
+  }
+	
   &__title {
     display: block;
     font-size: 40rpx;

@@ -364,10 +364,6 @@ const _sfc_main = {
       }
     },
     async goConfirm() {
-      if (!this.cartReady) {
-        common_vendor.index.showToast({ title: "购物车准备中，请稍候", icon: "none" });
-        return;
-      }
       if (this.cartItemCount === 0) {
         common_vendor.index.showToast({ title: "请先选择菜品", icon: "none" });
         return;

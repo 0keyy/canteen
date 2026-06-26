@@ -1,6 +1,8 @@
-/* 粮兴坊风格设计系统 */
+/* 粮兴坊风格设计系统 v2 */
 /* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
+/* ===== 我的页渐变背景 ===== */
+/* ===== 用户信息栏背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
 /* ===== 圆角 ===== */
@@ -12,48 +14,133 @@
 /* ===== 兼容旧变量 ===== */
 .edit-page.data-v-dcb1f0d8 {
   min-height: 100vh;
-  background: #FFFCF8;
-  padding: 16rpx 0 120rpx;
+  background: #FFF9F7;
+  display: flex;
+  flex-direction: column;
 }
-.edit-page__card.data-v-dcb1f0d8 {
-  background: #FFFFFF;
-  border-radius: 32rpx;
-  margin: 16rpx 24rpx;
-  padding: 8rpx 28rpx 28rpx;
-  box-shadow: 0 4rpx 12rpx rgba(112, 21, 16, 0.06);
+.edit-page__header.data-v-dcb1f0d8 {
+  background: linear-gradient(135deg, #FFE4E1 0%, #FFF5F5 100%);
+  flex-shrink: 0;
+  padding-top: var(--status-bar-height, 44rpx);
 }
-.edit-page__input.data-v-dcb1f0d8 {
-  padding: 28rpx 0;
-  border-bottom: 1rpx solid #F0F0F0;
-  font-size: 28rpx;
-  color: #333333;
-}
-.edit-page__default-row.data-v-dcb1f0d8 {
+.edit-page__nav.data-v-dcb1f0d8 {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  margin-top: 28rpx;
+  justify-content: space-between;
+  height: 88rpx;
+  padding: 0 24rpx;
 }
-.edit-page__default-text.data-v-dcb1f0d8 {
-  font-size: 28rpx;
+.edit-page__back-btn.data-v-dcb1f0d8 {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.edit-page__back-icon.data-v-dcb1f0d8 {
+  font-size: 48rpx;
+  color: #333333;
+  font-weight: 300;
+  line-height: 1;
+}
+.edit-page__title.data-v-dcb1f0d8 {
+  font-size: 32rpx;
+  font-weight: 600;
   color: #333333;
 }
-.edit-page__footer.data-v-dcb1f0d8 {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+.edit-page__nav-empty.data-v-dcb1f0d8 {
+  width: 64rpx;
+}
+.edit-page__content.data-v-dcb1f0d8 {
+  flex: 1;
+  padding: 24rpx 0;
+}
+.edit-page__section.data-v-dcb1f0d8 {
   background: #FFFFFF;
-  padding: 16rpx 24rpx;
-  border-top: 1rpx solid #E8DDD4;
+  margin: 16rpx 24rpx;
+  border-radius: 24rpx;
+  padding: 0;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+.edit-page__form-item.data-v-dcb1f0d8 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 28rpx;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+.edit-page__form-item.data-v-dcb1f0d8:last-child {
+  border-bottom: none;
+}
+.edit-page__label.data-v-dcb1f0d8 {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.edit-page__input.data-v-dcb1f0d8 {
+  flex: 1;
+  text-align: right;
+  font-size: 28rpx;
+  color: #333333;
+  margin-left: 16rpx;
+}
+.edit-page__input--name.data-v-dcb1f0d8 {
+  flex: none;
+  width: 200rpx;
+}
+.edit-page__placeholder.data-v-dcb1f0d8 {
+  color: #CCCCCC;
+}
+.edit-page__contact-row.data-v-dcb1f0d8 {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+}
+.edit-page__gender-selector.data-v-dcb1f0d8 {
+  display: flex;
+  gap: 16rpx;
+  margin-left: 16rpx;
+}
+.edit-page__gender-option.data-v-dcb1f0d8 {
+  padding: 8rpx 20rpx;
+  border: 1rpx solid #E8E8E8;
+  border-radius: 999rpx;
+  transition: all 0.2s;
+}
+.edit-page__gender-option--active.data-v-dcb1f0d8 {
+  border-color: #C41E3A;
+  background: #FFF5F5;
+}
+.edit-page__gender-text.data-v-dcb1f0d8 {
+  font-size: 24rpx;
+  color: #666666;
+}
+.edit-page__gender-option--active .edit-page__gender-text.data-v-dcb1f0d8 {
+  color: #C41E3A;
+}
+.edit-page__footer.data-v-dcb1f0d8 {
+  background: #FFFFFF;
+  padding: 24rpx 24rpx;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 .edit-page__save-btn.data-v-dcb1f0d8 {
-  background: #B10A0F;
-  color: #FFFFFF;
+  background: #a01e1e;
   border-radius: 999rpx;
-  font-size: 30rpx;
-  font-weight: bold;
+  padding: 28rpx;
+  text-align: center;
+  box-shadow: 0 8rpx 24rpx rgba(196, 30, 58, 0.3);
 }
 .edit-page__save-btn.data-v-dcb1f0d8:active {
-  background: #7A070A;
+  opacity: 0.9;
+}
+.edit-page__save-text.data-v-dcb1f0d8 {
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+.edit-page__bottom-space.data-v-dcb1f0d8 {
+  height: 40rpx;
 }

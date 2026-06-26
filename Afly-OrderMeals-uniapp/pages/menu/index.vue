@@ -488,10 +488,6 @@ export default {
       }
     },
     async goConfirm() {
-      if (!this.cartReady) {
-        uni.showToast({ title: '购物车准备中，请稍候', icon: 'none' })
-        return
-      }
       if (this.cartItemCount === 0) {
         uni.showToast({ title: '请先选择菜品', icon: 'none' })
         return
@@ -577,24 +573,24 @@ export default {
     position: relative;
     z-index: 2;
     margin: 0 0 18rpx;
-    border-radius: 24rpx;
+    border-radius: $radius-card;
     overflow: hidden;
   }
 
   &__swiper {
     width: 100%;
-    height: 170rpx;
-    border-radius: 24rpx;
+    height: 280rpx;
+    border-radius: $radius-card;
   }
 
   &__swiper-item {
     width: 100%;
-    height: 170rpx;
+    height: 280rpx;
   }
 
   &__banner-image {
     width: 100%;
-    height: 170rpx;
+    height: 280rpx;
     display: block;
   }
 

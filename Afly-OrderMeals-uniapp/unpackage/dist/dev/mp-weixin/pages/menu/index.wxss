@@ -1,6 +1,8 @@
-/* 粮兴坊风格设计系统 */
+/* 粮兴坊风格设计系统 v2 */
 /* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
+/* ===== 我的页渐变背景 ===== */
+/* ===== 用户信息栏背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
 /* ===== 圆角 ===== */
@@ -72,16 +74,16 @@
 }
 .order-page__swiper.data-v-1f245baa {
   width: 100%;
-  height: 170rpx;
+  height: 280rpx;
   border-radius: 24rpx;
 }
 .order-page__swiper-item.data-v-1f245baa {
   width: 100%;
-  height: 170rpx;
+  height: 280rpx;
 }
 .order-page__banner-image.data-v-1f245baa {
   width: 100%;
-  height: 170rpx;
+  height: 280rpx;
   display: block;
 }
 .order-page__brand-hero.data-v-1f245baa {
@@ -116,7 +118,7 @@
 }
 .order-page__brand-name.data-v-1f245baa {
   font-size: 48rpx;
-  color: #B10A0F;
+  color: #C41E3A;
   line-height: 1.1;
   font-weight: 500;
 }
@@ -236,14 +238,14 @@
   display: flex;
   padding: 16rpx;
   background: #FFFFFF;
-  border-radius: 32rpx;
+  border-radius: 24rpx;
 }
 .menu-card__image-wrap.data-v-1f245baa {
   position: relative;
   width: 176rpx;
   height: 132rpx;
   flex-shrink: 0;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   overflow: hidden;
 }
 .menu-card__image.data-v-1f245baa {
@@ -255,8 +257,8 @@
   top: 0;
   left: 0;
   padding: 4rpx 12rpx;
-  background: #B10A0F;
-  border-radius: 0 0 16rpx 0;
+  background: #C41E3A;
+  border-radius: 0 0 12rpx 0;
 }
 .menu-card__tag-text.data-v-1f245baa {
   font-size: 18rpx;
@@ -273,7 +275,7 @@
   overflow: hidden;
 }
 .menu-card__name.data-v-1f245baa {
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 900;
   color: #1A1410;
   overflow: hidden;
@@ -298,8 +300,8 @@
   margin-top: 12rpx;
 }
 .menu-card__price.data-v-1f245baa {
-  color: #B10A0F;
-  font-size: 36rpx;
+  color: #C41E3A;
+  font-size: 34rpx;
   font-weight: 900;
 }
 .menu-card__actions.data-v-1f245baa {
@@ -326,7 +328,7 @@
   line-height: 1;
 }
 .menu-card__btn-icon--plus.data-v-1f245baa {
-  color: #B10A0F;
+  color: #C41E3A;
 }
 .menu-card__count.data-v-1f245baa {
   min-width: 48rpx;

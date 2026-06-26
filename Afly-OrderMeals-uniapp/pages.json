@@ -22,6 +22,7 @@
     {
       "path": "pages/cart/confirm",
       "style": {
+        "navigationStyle": "custom",
         "navigationBarTitleText": "确认订单",
         "navigationBarBackgroundColor": "#FFFCF8",
         "navigationBarTextStyle": "black"
@@ -38,9 +39,7 @@
     {
       "path": "pages/address/edit",
       "style": {
-        "navigationBarTitleText": "编辑地址",
-        "navigationBarBackgroundColor": "#FFFCF8",
-        "navigationBarTextStyle": "black"
+        "navigationStyle": "custom"
       }
     },
     {

@@ -1,6 +1,8 @@
-/* 粮兴坊风格设计系统 */
+/* 粮兴坊风格设计系统 v2 */
 /* ===== 主色：正红 / 暖橙 ===== */
 /* ===== 背景 ===== */
+/* ===== 我的页渐变背景 ===== */
+/* ===== 用户信息栏背景 ===== */
 /* ===== 文字 ===== */
 /* ===== 边框 / 分割 ===== */
 /* ===== 圆角 ===== */
@@ -37,8 +39,8 @@
   width: 112rpx;
   height: 112rpx;
   border-radius: 50%;
-  border: 4rpx solid #B10A0F;
-  box-shadow: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
+  border: 4rpx solid #C41E3A;
+  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
   display: block;
 }
 .profile-page__avatar-edit.data-v-569e925a {
@@ -48,7 +50,7 @@
   width: 36rpx;
   height: 36rpx;
   border-radius: 50%;
-  background: #B10A0F;
+  background: #C41E3A;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,7 +77,7 @@
 .profile-page__avatar-picker.data-v-569e925a {
   width: 560rpx;
   background: #FFFFFF;
-  border-radius: 48rpx;
+  border-radius: 32rpx;
   padding: 40rpx 32rpx;
   display: flex;
   flex-direction: column;
@@ -101,7 +103,7 @@
   transition: border-color 0.15s ease;
 }
 .profile-page__avatar-option--active.data-v-569e925a {
-  border-color: #B10A0F;
+  border-color: #C41E3A;
 }
 .profile-page__avatar-option-img.data-v-569e925a {
   width: 100%;
@@ -133,7 +135,7 @@
   border-radius: 999rpx;
   background: rgba(177, 10, 15, 0.1);
   font-size: 20rpx;
-  color: #B10A0F;
+  color: #C41E3A;
 }
 .profile-page__level-tag--verified.data-v-569e925a {
   background: rgba(34, 139, 34, 0.12);
@@ -154,9 +156,9 @@
 .profile-page__qr-btn.data-v-569e925a {
   width: 80rpx;
   height: 80rpx;
-  border-radius: 32rpx;
+  border-radius: 24rpx;
   background: #FFFFFF;
-  box-shadow: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
+  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -213,9 +215,9 @@
 .profile-page__vip-card.data-v-569e925a {
   margin-top: 32rpx;
   padding: 24rpx;
-  border-radius: 32rpx;
-  background: linear-gradient(135deg, #8E080C 0%, #B10A0F 60%, #FF8B1A 100%);
-  box-shadow: 0 4rpx 12rpx rgba(112, 21, 16, 0.06);
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #A01829 0%, #C41E3A 60%, #FF8B1A 100%);
+  box-shadow: 0 4rpx 16rpx rgba(196, 30, 58, 0.08);
 }
 .profile-page__vip-top.data-v-569e925a {
   display: flex;
@@ -270,9 +272,9 @@
 }
 .profile-page__card.data-v-569e925a {
   background: #FFFFFF;
-  border-radius: 32rpx;
+  border-radius: 24rpx;
   padding: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(112, 21, 16, 0.04);
+  box-shadow: 0 2rpx 8rpx rgba(196, 30, 58, 0.05);
   margin-bottom: 20rpx;
 }
 .profile-page__card--grid.data-v-569e925a {
@@ -305,7 +307,7 @@
 .profile-page__grid-icon.data-v-569e925a {
   width: 80rpx;
   height: 80rpx;
-  border-radius: 32rpx;
+  border-radius: 24rpx;
   background: rgba(177, 10, 15, 0.08);
   display: flex;
   align-items: center;
@@ -326,7 +328,7 @@
   position: relative;
 }
 .profile-page__action-icon--orders.data-v-569e925a {
-  border: 3rpx solid #B10A0F;
+  border: 3rpx solid #C41E3A;
   border-radius: 4rpx;
 }
 .profile-page__action-icon--orders.data-v-569e925a::before {
@@ -336,16 +338,16 @@
   left: 6rpx;
   right: 6rpx;
   height: 3rpx;
-  background: #B10A0F;
-  box-shadow: 0 8rpx 0 #B10A0F;
+  background: #C41E3A;
+  box-shadow: 0 8rpx 0 #C41E3A;
 }
 .profile-page__action-icon--address.data-v-569e925a {
-  border: 3rpx solid #B10A0F;
+  border: 3rpx solid #C41E3A;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
 }
 .profile-page__action-icon--service.data-v-569e925a {
-  border: 3rpx solid #B10A0F;
+  border: 3rpx solid #C41E3A;
   border-radius: 50%;
 }
 .profile-page__action-icon--service.data-v-569e925a::before {
@@ -356,20 +358,20 @@
   transform: translateX(-50%);
   width: 16rpx;
   height: 10rpx;
-  border: 3rpx solid #B10A0F;
+  border: 3rpx solid #C41E3A;
   border-top: none;
   border-radius: 0 0 12rpx 12rpx;
 }
 .profile-page__action-icon--code.data-v-569e925a {
-  border: 3rpx solid #B10A0F;
+  border: 3rpx solid #C41E3A;
   border-radius: 4rpx;
 }
 .profile-page__action-icon--wallet.data-v-569e925a {
-  border: 3rpx solid #B10A0F;
+  border: 3rpx solid #C41E3A;
   border-radius: 8rpx;
 }
 .profile-page__action-icon--check.data-v-569e925a, .profile-page__action-icon--coins.data-v-569e925a, .profile-page__action-icon--star.data-v-569e925a, .profile-page__action-icon--ticket.data-v-569e925a, .profile-page__action-icon--crown.data-v-569e925a, .profile-page__action-icon--logout.data-v-569e925a {
-  border: 3rpx solid #B10A0F;
+  border: 3rpx solid #C41E3A;
   border-radius: 50%;
 }
 .profile-page__action-img.data-v-569e925a {

@@ -17,7 +17,7 @@
     </view>
 
     <view v-else-if="coupons.length === 0" class="coupon-wallet__status">
-      <text class="coupon-wallet__empty-icon">🎫</text>
+      <image src="/static/tabbar/优惠券.png" mode="" class="coupon-wallet__empty-icon"></image>
       <text class="coupon-wallet__empty-text">暂无优惠券</text>
       <text class="coupon-wallet__empty-sub">去领券中心看看吧</text>
     </view>
@@ -178,7 +178,8 @@ export default {
   }
 
   &__empty-icon {
-    font-size: 80rpx;
+    width: 80rpx;
+	height: 80rpx;
   }
 
   &__empty-text {

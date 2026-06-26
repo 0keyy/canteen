@@ -19,7 +19,7 @@
       </view>
 
       <view class="address-page__empty" v-if="list.length === 0">
-        <text class="address-page__empty-emoji">📍</text>
+        <image class="address-page__empty-emoji" src="/static/tabbar/暂无收货地址.png" mode=""></image>
         <text class="address-page__empty-text">暂无收货地址</text>
       </view>
 
@@ -90,7 +90,8 @@ export default {
   }
 
   &__empty-emoji {
-    font-size: 72rpx;
+	width: 80rpx;
+	height: 80rpx;
     margin-bottom: 24rpx;
   }
 
@@ -106,7 +107,7 @@ export default {
   }
 
   &__add-btn {
-    background: $brand-primary;
+    background: #a01e1e;
     color: $text-white;
     border-radius: $radius-btn;
     font-size: 30rpx;

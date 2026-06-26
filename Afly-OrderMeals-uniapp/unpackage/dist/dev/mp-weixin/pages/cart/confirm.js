@@ -16,12 +16,18 @@ const _sfc_main = {
       payChannel: utils_pay_channels.DEFAULT_PAY_CHANNEL,
       couponInfo: null,
       selectedCouponId: 0,
-      couponDiscount: 0
+      couponDiscount: 0,
+      showPayPicker: false,
+      payMethodList: []
     };
   },
   computed: {
     diningModeText() {
       return { 1: "堂食", 3: "外卖配送" }[this.diningMode] || "堂食";
+    },
+    payChannelText() {
+      const m = this.payMethodList.find((item) => item.channel === this.payChannel);
+      return m ? m.name : "请选择";
     },
     finalAmount() {
       const raw = Number(this.totalAmount);
@@ -35,6 +41,13 @@ const _sfc_main = {
         return Number(orderAmount).toFixed(2);
       }
       return this.calcDishesAmount(this.order.dishes);
+    },
+    addressInfo() {
+      var _a;
+      if ((_a = this.order) == null ? void 0 : _a.addressSnapshot) {
+        return this.formatAddress(this.order.addressSnapshot);
+      }
+      return null;
     }
   },
   onLoad() {
@@ -44,6 +57,12 @@ const _sfc_main = {
     this.loadBestCoupon();
   },
   methods: {
+    goBack() {
+      common_vendor.index.navigateBack();
+    },
+    goAddress() {
+      common_vendor.index.navigateTo({ url: "/pages/address/list?select=1" });
+    },
     calcDishesAmount(dishes) {
       if (!Array.isArray(dishes) || dishes.length === 0)
         return "0.00";
@@ -62,9 +81,6 @@ const _sfc_main = {
       } catch (e) {
         return snapshot;
       }
-    },
-    goCouponCenter() {
-      common_vendor.index.navigateTo({ url: "/pages/coupon/center" });
     },
     async loadDetail() {
       try {
@@ -86,6 +102,13 @@ const _sfc_main = {
         this.selectedCouponId = 0;
         this.couponDiscount = 0;
       }
+    },
+    onPayMethodChange(channel) {
+      this.payChannel = channel;
+      this.showPayPicker = false;
+    },
+    onPayMethodsLoaded(list) {
+      this.payMethodList = list || [];
     },
     async handleSubmit() {
       if (!this.payChannel) {
@@ -123,50 +146,50 @@ if (!Math) {
   _easycom_pay_method_picker();
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _a;
   return common_vendor.e({
     a: $data.order
   }, $data.order ? common_vendor.e({
-    b: common_vendor.t($options.diningModeText),
-    c: $data.order.contactMobile
-  }, $data.order.contactMobile ? {
-    d: common_vendor.t($data.order.contactMobile)
+    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "26"),
+    c: $options.addressInfo
+  }, $options.addressInfo ? {
+    d: common_vendor.t($options.addressInfo)
   } : {}, {
-    e: $data.order.addressSnapshot
-  }, $data.order.addressSnapshot ? {
-    f: common_vendor.t($options.formatAddress($data.order.addressSnapshot))
-  } : {}, {
-    g: common_vendor.t(((_a = $data.order.dishes) == null ? void 0 : _a.length) || 0),
-    h: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
+    e: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args), "79"),
+    f: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
       return {
-        a: common_vendor.t(dish.dishName),
-        b: common_vendor.t($options.lineAmount(dish)),
-        c: common_vendor.t(dish.quantity),
+        a: dish.image || "/static/placeholder.png",
+        b: common_vendor.t(dish.dishName),
+        c: common_vendor.t($options.lineAmount(dish)),
         d: dish.id
       };
     }),
-    i: common_vendor.t($options.totalAmount),
-    j: common_vendor.o((...args) => $options.goCouponCenter && $options.goCouponCenter(...args), "4d"),
-    k: $data.couponInfo
-  }, $data.couponInfo ? {
-    l: common_vendor.t($data.couponInfo.templateName),
-    m: common_vendor.t($data.couponInfo.discountAmount)
+    g: common_vendor.t($options.totalAmount),
+    h: $data.couponDiscount > 0
+  }, $data.couponDiscount > 0 ? {
+    i: common_vendor.t($data.couponDiscount.toFixed(2))
   } : {}, {
-    n: common_vendor.o(($event) => $data.payChannel = $event, "4f"),
-    o: common_vendor.p({
+    j: common_vendor.t($options.finalAmount),
+    k: common_vendor.t($options.payChannelText),
+    l: common_vendor.o(($event) => $data.showPayPicker = true, "8b"),
+    m: $data.remark,
+    n: common_vendor.o(($event) => $data.remark = $event.detail.value, "9a"),
+    o: common_vendor.t($options.finalAmount),
+    p: common_vendor.t($data.loading ? "提交中..." : "去支付"),
+    q: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "99"),
+    r: $data.showPayPicker
+  }, $data.showPayPicker ? {
+    s: common_vendor.o($options.onPayMethodChange, "47"),
+    t: common_vendor.o($options.onPayMethodsLoaded, "30"),
+    v: common_vendor.o(($event) => $data.payChannel = $event, "0c"),
+    w: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    p: $data.remark,
-    q: common_vendor.o(($event) => $data.remark = $event.detail.value, "5b"),
-    r: common_vendor.t($options.finalAmount),
-    s: $data.couponDiscount > 0
-  }, $data.couponDiscount > 0 ? {
-    t: common_vendor.t($data.couponDiscount.toFixed(2))
-  } : {}, {
-    v: common_vendor.t($data.loading ? "提交中..." : "提交并支付"),
-    w: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "9d")
-  }) : {});
+    x: common_vendor.o(($event) => $data.showPayPicker = false, "92"),
+    y: common_vendor.o(() => {
+    }, "13"),
+    z: common_vendor.o(($event) => $data.showPayPicker = false, "51")
+  } : {}) : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-aaa7ef6e"]]);
 wx.createPage(MiniProgramPage);
