@@ -67,7 +67,7 @@ export default {
     return {
       userScore: 0,
       // 兜底本地商品（后端接口异常时展示）
-      goodsList: [
+      defaultGoods: [
         {
           id: 1,
           img: "",
@@ -96,15 +96,17 @@ export default {
           point: 150,
           sold: 0
         }
-      ]
+      ],
+      goodsList: []
     }
   },
   onLoad() {
+    // 初始化先赋值本地兜底数据，避免空数组渲染报错
+    this.goodsList = this.defaultGoods
     this.getUserScore()
     this.getGoodsList()
   },
   onShow() {
-    // 每次切回页面刷新积分、商品
     this.getUserScore()
     this.getGoodsList()
   },
@@ -123,7 +125,7 @@ export default {
     async getUserScore() {
       try {
         const res = await authApi.profile()
-        if (res.code === 200 && res.data.point != null) {
+        if (res && res.code === 200 && res.data && res.data.point != null) {
           this.userScore = res.data.point
         }
       } catch (err) {
@@ -134,11 +136,13 @@ export default {
     async getGoodsList() {
       try {
         const res = await getIntegralGoodsList()
-        if (res.code === 200 && Array.isArray(res.data)) {
+        // 多层判空，杜绝null/undefined渲染崩溃
+        if (res && res.code === 200 && Array.isArray(res.data)) {
           this.goodsList = res.data
         }
       } catch (err) {
         // 接口失败自动使用本地模拟数据，不弹报错
+        this.goodsList = this.defaultGoods
         console.log('积分商品接口暂未开发', err)
       }
     },
