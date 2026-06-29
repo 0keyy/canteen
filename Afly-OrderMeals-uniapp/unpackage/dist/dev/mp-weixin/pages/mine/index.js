@@ -13,7 +13,6 @@ const SECONDARY_ACTIONS = [
   { title: "公司认证", icon: "check", iconImg: "/static/tabbar/公司认证.png" },
   { title: "充值中心", icon: "wallet", iconImg: "/static/tabbar/充值 1.png" },
   { title: "积分商城", icon: "coins", iconImg: "/static/tabbar/积分商城.png" },
-  { title: "集点有礼", icon: "star", iconImg: "/static/tabbar/签到 1.png" },
   { title: "优惠券包", icon: "ticket", iconImg: "/static/tabbar/卡券 1.png" },
   { title: "会员日", icon: "crown", iconImg: "/static/tabbar/名词 1.png" },
   { title: "退出登录", icon: "logout", iconImg: "/static/tabbar/退出 1.png" }
@@ -68,10 +67,12 @@ const _sfc_main = {
           this.companyDeptName = profile.companyDeptName || "";
           this.balance = profile.balance != null ? profile.balance : 0;
           this.pointCount = profile.point ?? 0;
+          common_vendor.index.setStorageSync("balance", this.balance);
           common_vendor.index.setStorageSync("companyVerified", this.companyVerified);
           common_vendor.index.setStorageSync("companyDeptName", this.companyDeptName);
         }
       } catch (e) {
+        this.balance = common_vendor.index.getStorageSync("balance") || 0;
         this.companyVerified = !!common_vendor.index.getStorageSync("companyVerified");
         this.companyDeptName = common_vendor.index.getStorageSync("companyDeptName") || "";
       }
@@ -95,6 +96,10 @@ const _sfc_main = {
         this.callService();
         return;
       }
+      if (item.title === "会员码") {
+        common_vendor.index.navigateTo({ url: "/pages/mine/memberCode/index" });
+        return;
+      }
       if (item.title === "公司认证") {
         common_vendor.index.navigateTo({ url: "/pages/mine/company-auth" });
         return;
@@ -107,13 +112,30 @@ const _sfc_main = {
         common_vendor.index.navigateTo({ url: "/pages/coupon/recharge" });
         return;
       }
+      if (item.title === "积分商城") {
+        common_vendor.index.navigateTo({
+          url: "/pages/integralShop/index"
+        });
+        return;
+      }
+      if (item.title === "会员日") {
+        common_vendor.index.navigateTo({ url: "/pages/mine/memberDay/index" });
+        return;
+      }
       if (item.title === "退出登录") {
         this.logout();
         return;
       }
       this.onFeatureTap(item.title);
     },
+    // 右上角会员码按钮专用方法
     onFeatureTap(title) {
+      if (title === "会员码") {
+        common_vendor.index.navigateTo({
+          url: "/pages/mine/memberCode/index"
+        });
+        return;
+      }
       common_vendor.index.showToast({ title: `${title}功能开发中`, icon: "none" });
     },
     async callService() {
@@ -161,7 +183,7 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $options.avatarSrc,
-    b: common_vendor.o(($event) => $data.showAvatarPicker = true, "da"),
+    b: common_vendor.o(($event) => $data.showAvatarPicker = true, "99"),
     c: common_vendor.t($data.nickname || "未登录用户"),
     d: $data.companyVerified
   }, $data.companyVerified ? {} : {}, {
@@ -170,7 +192,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.companyVerified && $data.companyDeptName ? {
     g: common_vendor.t($data.companyDeptName)
   } : {}, {
-    h: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "5f"),
+    h: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "91"),
     i: common_vendor.t($data.balance),
     j: common_vendor.t($data.pointCount),
     k: common_vendor.t($data.couponCount),
@@ -199,13 +221,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     o: $data.showAvatarPicker
   }, $data.showAvatarPicker ? {
     p: $data.avatarKey === "1" ? 1 : "",
-    q: common_vendor.o(($event) => $options.selectAvatar("1"), "f8"),
+    q: common_vendor.o(($event) => $options.selectAvatar("1"), "d1"),
     r: $data.avatarKey === "2" ? 1 : "",
-    s: common_vendor.o(($event) => $options.selectAvatar("2"), "b5"),
-    t: common_vendor.o(($event) => $data.showAvatarPicker = false, "88"),
+    s: common_vendor.o(($event) => $options.selectAvatar("2"), "40"),
+    t: common_vendor.o(($event) => $data.showAvatarPicker = false, "71"),
     v: common_vendor.o(() => {
-    }, "92"),
-    w: common_vendor.o(($event) => $data.showAvatarPicker = false, "aa")
+    }, "b4"),
+    w: common_vendor.o(($event) => $data.showAvatarPicker = false, "92")
   } : {}, {
     x: $data.showServicePicker
   }, $data.showServicePicker ? {
@@ -217,10 +239,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.makeCall(item.phone), index)
       };
     }),
-    z: common_vendor.o(($event) => $data.showServicePicker = false, "9f"),
+    z: common_vendor.o(($event) => $data.showServicePicker = false, "12"),
     A: common_vendor.o(() => {
-    }, "a2"),
-    B: common_vendor.o(($event) => $data.showServicePicker = false, "49")
+    }, "3e"),
+    B: common_vendor.o(($event) => $data.showServicePicker = false, "8f")
   } : {}, {
     C: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {

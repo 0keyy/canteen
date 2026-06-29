@@ -159,6 +159,12 @@ const _sfc_main = {
       common_vendor.index.showToast({ title: "搜索功能开发中", icon: "none" });
     },
     onShortcutTap(item) {
+      if ((item == null ? void 0 : item.name) === "积分商城") {
+        common_vendor.index.navigateTo({
+          url: "/pages/integralShop/index"
+        });
+        return;
+      }
       if ((item == null ? void 0 : item.name) === "优惠券包") {
         common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
         return;

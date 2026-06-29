@@ -4,7 +4,7 @@
     <view class="recharge-page__header">
       <view class="recharge-page__balance-card">
         <view class="recharge-page__balance-icon">
-          <image src="/static/tabbar/钱.png" mode="" class="recharge-page__balance-image"></image>
+          <image src="/static/tabbar/充值金额 1.png" mode="" class="recharge-page__balance-image"></image>
         </view>
         <text class="recharge-page__balance-label">我的余额</text>
         <text class="recharge-page__balance-value">¥{{ formatBalance }}</text>
@@ -151,7 +151,6 @@ export default {
     width: 120rpx;
     height: 120rpx;
     border-radius: 50%;
-    background: #FFF0F0;
     display: flex;
     align-items: center;
     justify-content: center;

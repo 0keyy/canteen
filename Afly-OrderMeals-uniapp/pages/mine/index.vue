@@ -19,7 +19,8 @@
             <text v-if="companyVerified && companyDeptName" class="profile-page__company">{{ companyDeptName }}</text>
           </view>
           <view class="profile-page__qr-btn" @tap="onFeatureTap('会员码')">
-            <view class="profile-page__qr-icon"></view>
+            <!-- 替换成自己的二维码图标，路径换成你的图片地址 -->
+            <image class="profile-page__qr-img" src="/static/tabbar/二维码图标.png" mode="aspectFit"></image>
           </view>
         </view>
 
@@ -189,7 +190,6 @@ const SECONDARY_ACTIONS = [
   { title: '公司认证', icon: 'check', iconImg: '/static/tabbar/公司认证.png' },
   { title: '充值中心', icon: 'wallet', iconImg: '/static/tabbar/充值 1.png' },
   { title: '积分商城', icon: 'coins', iconImg: '/static/tabbar/积分商城.png' },
-  { title: '集点有礼', icon: 'star', iconImg: '/static/tabbar/签到 1.png' },
   { title: '优惠券包', icon: 'ticket', iconImg: '/static/tabbar/卡券 1.png' },
   { title: '会员日', icon: 'crown', iconImg: '/static/tabbar/名词 1.png' },
   { title: '退出登录', icon: 'logout', iconImg: '/static/tabbar/退出 1.png' }
@@ -241,17 +241,22 @@ export default {
           this.mobile = profile.mobile || this.mobile
           this.companyVerified = !!profile.companyVerified
           this.companyDeptName = profile.companyDeptName || ''
+          // 核心：后端返回最新余额直接赋值给页面展示变量
           this.balance = profile.balance != null ? profile.balance : 0
-          this.pointCount = profile.point ?? 0 // 接口赋值积分
+          this.pointCount = profile.point ?? 0
+          // 同步存入本地缓存备用
+          uni.setStorageSync('balance', this.balance)
           uni.setStorageSync('companyVerified', this.companyVerified)
           uni.setStorageSync('companyDeptName', this.companyDeptName)
         }
       } catch (e) {
+        // 接口失败就读缓存兜底
+        this.balance = uni.getStorageSync('balance') || 0
         this.companyVerified = !!uni.getStorageSync('companyVerified')
         this.companyDeptName = uni.getStorageSync('companyDeptName') || ''
       }
-
-      // 加载可用优惠券数量
+    
+      // 加载优惠券数量
       try {
         const myCoupons = await couponApi.myCoupons(1) || []
         this.couponCount = myCoupons.length
@@ -272,6 +277,11 @@ export default {
         this.callService()
         return
       }
+      // 会员码图标跳转
+      if (item.title === '会员码') {
+        uni.navigateTo({ url: '/pages/mine/memberCode/index' })
+        return
+      }
       if (item.title === '公司认证') {
         uni.navigateTo({ url: '/pages/mine/company-auth' })
         return
@@ -284,13 +294,34 @@ export default {
         uni.navigateTo({ url: '/pages/coupon/recharge' })
         return
       }
+      // ========== 积分商城跳转（修改这里） ==========
+      if (item.title === '积分商城') {
+        uni.navigateTo({
+          url: '/pages/integralShop/index'
+        })
+        return
+      }
+      // ==========================================
+      // 会员日图标跳转
+      if (item.title === '会员日') {
+        uni.navigateTo({ url: '/pages/mine/memberDay/index' })
+        return
+      }
       if (item.title === '退出登录') {
         this.logout()
         return
       }
       this.onFeatureTap(item.title)
     },
+    // 右上角会员码按钮专用方法
     onFeatureTap(title) {
+      // 参数直接就是文字，不需要 item.title
+      if (title === '会员码') {
+        uni.navigateTo({
+          url: '/pages/mine/memberCode/index'
+        })
+        return
+      }
       uni.showToast({ title: `${title}功能开发中`, icon: 'none' })
     },
     async callService() {
@@ -338,7 +369,7 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: $bg-gray;
+  background: #fff9f3;
 
   &__scroll {
     flex: 1;
@@ -347,7 +378,7 @@ export default {
 
   &__hero {
       padding: 0 32rpx 32rpx;
-      background: linear-gradient(135deg, rgba(177, 10, 15, 0.15) 0%, rgba(255, 139, 26, 0.1) 40%, $bg-page 100%);
+      background: linear-gradient(135deg, rgba(177, 10, 15, 0.15) 0%, rgba(255, 139, 26, 0.1) 40%, #fff9f3 100%);
   }
 
   &__user-row {
@@ -365,8 +396,8 @@ export default {
     width: 112rpx;
     height: 112rpx;
     border-radius: 50%;
-    border: 4rpx solid $brand-primary;
-    box-shadow: $shadow-sm;
+    border: 4rpx solid #C41E3A;
+    box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08);
     display: block;
   }
 
@@ -377,16 +408,16 @@ export default {
     width: 36rpx;
     height: 36rpx;
     border-radius: 50%;
-    background: $brand-primary;
+    background: #C41E3A;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2rpx solid $bg-surface;
+    border: 2rpx solid #ffffff;
   }
 
   &__avatar-edit-text {
     font-size: 18rpx;
-    color: $text-white;
+    color: #ffffff;
     font-weight: 600;
     line-height: 1;
   }
@@ -406,8 +437,8 @@ export default {
 
   &__avatar-picker {
     width: 560rpx;
-    background: $bg-surface;
-    border-radius: $radius-lg;
+    background: #ffffff;
+    border-radius: 24rpx;
     padding: 40rpx 32rpx;
     display: flex;
     flex-direction: column;
@@ -417,7 +448,7 @@ export default {
   &__avatar-picker-title {
     font-size: 32rpx;
     font-weight: 900;
-    color: $text-primary;
+    color: #333333;
     margin-bottom: 32rpx;
   }
 
@@ -433,10 +464,10 @@ export default {
     border-radius: 50%;
     overflow: hidden;
     border: 4rpx solid transparent;
-    transition: border-color $transition-fast;
+    transition: border-color 0.24s;
 
     &--active {
-      border-color: $brand-primary;
+      border-color: #C41E3A;
     }
   }
 
@@ -448,7 +479,7 @@ export default {
 
   &__avatar-picker-close {
     font-size: 28rpx;
-    color: $text-secondary;
+    color: #999999;
     padding: 12rpx 48rpx;
   }
 
@@ -581,7 +612,7 @@ export default {
   &__nickname {
     font-size: 32rpx;
     font-weight: 900;
-    color: $text-primary;
+    color: #333333;
   }
 
   &__level-tag {
@@ -589,7 +620,7 @@ export default {
     border-radius: 999rpx;
     background: rgba(177, 10, 15, 0.1);
     font-size: 20rpx;
-    color: $brand-primary;
+    color: #C41E3A;
 
     &--verified {
       background: rgba(34, 139, 34, 0.12);
@@ -601,53 +632,29 @@ export default {
     display: block;
     margin-top: 4rpx;
     font-size: 22rpx;
-    color: $text-secondary;
+    color: #999999;
   }
 
   &__mobile {
     display: block;
     margin-top: 6rpx;
     font-size: 24rpx;
-    color: $text-secondary;
+    color: #999999;
   }
 
   &__qr-btn {
     width: 80rpx;
     height: 80rpx;
-    border-radius: $radius-card;
-    background: $bg-surface;
-    box-shadow: $shadow-sm;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
   }
-
-  &__qr-icon {
-    width: 40rpx;
-    height: 40rpx;
-    border: 3rpx solid $text-primary;
-    border-radius: 6rpx;
-    position: relative;
-
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      width: 8rpx;
-      height: 8rpx;
-      background: $text-primary;
-    }
-
-    &::before {
-      top: 6rpx;
-      left: 6rpx;
-    }
-
-    &::after {
-      bottom: 6rpx;
-      right: 6rpx;
-    }
+  
+  &__qr-img {
+    width: 44rpx;
+    height: 44rpx;
+    display: block;
   }
 
   &__stats {
@@ -669,7 +676,7 @@ export default {
       display: block;
       font-size: 36rpx;
       font-weight: 900;
-      color: $text-primary;
+      color: #333333;
     }
   
     &__stat-label {
@@ -677,14 +684,14 @@ export default {
       margin-top: 4rpx;
       font-size: 24rpx;
       font-weight: 600;
-      color: $text-secondary;
+      color: #999999;
     }
 
   &__vip-card {
     margin-top: 35rpx;
-    margin-bottom: 10rpx; /* 新增这一行，控制下方和订单卡片距离 */
+    margin-bottom: 10rpx;
     padding: 24rpx;
-    border-radius: $radius-card;
+    border-radius: 24rpx;
     background: linear-gradient(135deg, #d9c8b8 0%, #e9ddcf 100%);
     box-shadow: 0 4rpx 14rpx rgba(160, 130, 100, 0.15);
   }
@@ -742,10 +749,10 @@ export default {
   }
 
   &__card {
-    background: $bg-surface;
-    border-radius: $radius-card;
+    background: #ffffff;
+    border-radius: 24rpx;
     padding: 24rpx;
-    box-shadow: $shadow-sm;
+    box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08);
     margin-bottom: 30rpx;
 
     &--grid {
@@ -759,7 +766,7 @@ export default {
     display: block;
     font-size: 32rpx;
     font-weight: 900;
-    color: $text-primary;
+    color: #333333;
     margin-bottom: 24rpx;
   }
 
@@ -774,7 +781,7 @@ export default {
     flex-direction: column;
     align-items: center;
     gap: 12rpx;
-    transition: transform $transition-fast;
+    transition: transform 0.24s;
 
     &:active {
       transform: scale(0.95);
@@ -784,7 +791,7 @@ export default {
   &__grid-icon {
     width: 80rpx;
     height: 80rpx;
-    border-radius: $radius-card;
+    border-radius: 24rpx;
     background: rgba(177, 10, 15, 0.08);
     display: flex;
     align-items: center;
@@ -798,7 +805,7 @@ export default {
   &__grid-label {
     font-size: 22rpx;
     font-weight: 600;
-    color: $text-primary;
+    color: #333333;
     text-align: center;
   }
 
@@ -808,7 +815,7 @@ export default {
     position: relative;
 
     &--orders {
-      border: 3rpx solid $brand-primary;
+      border: 3rpx solid #C41E3A;
       border-radius: 4rpx;
 
       &::before {
@@ -818,19 +825,19 @@ export default {
         left: 6rpx;
         right: 6rpx;
         height: 3rpx;
-        background: $brand-primary;
-        box-shadow: 0 8rpx 0 $brand-primary;
+        background: #C41E3A;
+        box-shadow: 0 8rpx 0 #C41E3A;
       }
     }
 
     &--address {
-      border: 3rpx solid $brand-primary;
+      border: 3rpx solid #C41E3A;
       border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg);
     }
 
     &--service {
-      border: 3rpx solid $brand-primary;
+      border: 3rpx solid #C41E3A;
       border-radius: 50%;
 
       &::before {
@@ -841,19 +848,19 @@ export default {
         transform: translateX(-50%);
         width: 16rpx;
         height: 10rpx;
-        border: 3rpx solid $brand-primary;
+        border: 3rpx solid #C41E3A;
         border-top: none;
         border-radius: 0 0 12rpx 12rpx;
       }
     }
 
     &--code {
-      border: 3rpx solid $brand-primary;
+      border: 3rpx solid #C41E3A;
       border-radius: 4rpx;
     }
 
     &--wallet {
-      border: 3rpx solid $brand-primary;
+      border: 3rpx solid #C41E3A;
       border-radius: 8rpx;
     }
 
@@ -863,7 +870,7 @@ export default {
     &--ticket,
     &--crown,
     &--logout {
-      border: 3rpx solid $brand-primary;
+      border: 3rpx solid #C41E3A;
       border-radius: 50%;
     }
   }
@@ -883,18 +890,18 @@ export default {
 
   &__footer-text {
     font-size: 24rpx;
-    color: $text-secondary;
+    color: #999999;
     line-height: 1.6;
     text-align: center;
   }
 
   &__footer-sub {
     font-size: 24rpx;
-    color: $text-secondary;
+    color: #999999;
   }
 
   &__bottom-space {
-    height: $tabbar-height;
+    height: 120rpx;
   }
 }
 </style>

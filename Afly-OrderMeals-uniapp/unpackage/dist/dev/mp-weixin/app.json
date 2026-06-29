@@ -15,7 +15,10 @@
     "pages/coupon/wallet",
     "pages/coupon/recharge",
     "pages/coupon/verify-code",
-    "pages/points/index"
+    "pages/points/index",
+    "pages/integralShop/index",
+    "pages/integralDraw/index",
+    "pages/mine/memberCode/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",

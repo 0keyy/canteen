@@ -115,7 +115,25 @@
       "style": {
         "navigationStyle": "custom"
       }
-    }
+    },
+    {
+      "path": "pages/integralShop/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+	{
+	  "path": "pages/integralDraw/index",
+	  "style": {
+	    "navigationStyle": "custom"
+	  }
+	},
+	{
+	  "path": "pages/mine/memberCode/index",
+	  "style": {
+	    "navigationBarTitleText": "会员码"
+	  }
+	}
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",

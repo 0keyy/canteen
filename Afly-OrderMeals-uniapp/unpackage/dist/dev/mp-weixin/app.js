@@ -20,6 +20,9 @@ if (!Math) {
   "./pages/coupon/recharge.js";
   "./pages/coupon/verify-code.js";
   "./pages/points/index.js";
+  "./pages/integralShop/index.js";
+  "./pages/integralDraw/index.js";
+  "./pages/mine/memberCode/index.js";
 }
 async function preloadTabbar() {
   try {

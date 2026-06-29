@@ -309,6 +309,13 @@ export default {
       uni.showToast({ title: '搜索功能开发中', icon: 'none' })
     },
     onShortcutTap(item) {
+      // 新增：积分商城跳转逻辑，放在最前面
+      if (item?.name === '积分商城') {
+        uni.navigateTo({
+          url: '/pages/integralShop/index'
+        })
+        return
+      }
       if (item?.name === '优惠券包') {
         uni.navigateTo({ url: '/pages/coupon/wallet' })
         return

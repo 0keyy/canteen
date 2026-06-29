@@ -46,4 +46,5 @@ function post(url, data, params) {
 }
 exports.get = get;
 exports.post = post;
+exports.request = request;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/utils/request.js.map
