@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
 const utils_navbar = require("../../utils/navbar.js");
+const PageLoading = () => "../../components/page-loading/page-loading.js";
 const PRIMARY_ACTIONS = [
   { title: "我的订单", icon: "orders" },
   { title: "地址管理", icon: "address" },
@@ -19,6 +20,9 @@ const SECONDARY_ACTIONS = [
 ];
 const _sfc_main = {
   mixins: [mixins_tabbarPage.tabbarPageMixin],
+  components: {
+    PageLoading
+  },
   data() {
     return {
       navMetrics: utils_navbar.getNavMetrics(),
@@ -29,13 +33,14 @@ const _sfc_main = {
       balance: 0,
       couponCount: 0,
       pointCount: 0,
-      // 新增积分变量
       primaryActions: PRIMARY_ACTIONS,
       secondaryActions: SECONDARY_ACTIONS,
       avatarKey: "",
       showAvatarPicker: false,
       showServicePicker: false,
-      servicePhones: [{ phone: "400-800-1234", name: "客服热线" }]
+      servicePhones: [{ phone: "400-800-1234", name: "客服热线" }],
+      pageLoading: false,
+      pageLoadingTip: "加载中..."
     };
   },
   computed: {
@@ -85,11 +90,11 @@ const _sfc_main = {
     },
     onActionTap(item) {
       if (item.title === "我的订单") {
-        common_vendor.index.switchTab({ url: "/pages/order/list" });
+        this.goWithLoading("/pages/order/list", "switchTab");
         return;
       }
       if (item.title === "地址管理") {
-        common_vendor.index.navigateTo({ url: "/pages/address/list" });
+        this.goWithLoading("/pages/address/list");
         return;
       }
       if (item.title === "联系客服") {
@@ -97,29 +102,27 @@ const _sfc_main = {
         return;
       }
       if (item.title === "会员码") {
-        common_vendor.index.navigateTo({ url: "/pages/mine/memberCode/index" });
+        this.goWithLoading("/pages/mine/memberCode/index");
         return;
       }
       if (item.title === "公司认证") {
-        common_vendor.index.navigateTo({ url: "/pages/mine/company-auth" });
+        this.goWithLoading("/pages/mine/company-auth");
         return;
       }
       if (item.title === "优惠券包") {
-        common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
+        this.goWithLoading("/pages/coupon/wallet");
         return;
       }
       if (item.title === "充值中心") {
-        common_vendor.index.navigateTo({ url: "/pages/coupon/recharge" });
+        this.goWithLoading("/pages/coupon/recharge");
         return;
       }
       if (item.title === "积分商城") {
-        common_vendor.index.navigateTo({
-          url: "/pages/integralShop/index"
-        });
+        this.goWithLoading("/pages/integralShop/index");
         return;
       }
       if (item.title === "会员日") {
-        common_vendor.index.navigateTo({ url: "/pages/mine/memberDay/index" });
+        this.goWithLoading("/pages/mine/memberDay/index");
         return;
       }
       if (item.title === "退出登录") {
@@ -128,15 +131,30 @@ const _sfc_main = {
       }
       this.onFeatureTap(item.title);
     },
-    // 右上角会员码按钮专用方法
     onFeatureTap(title) {
       if (title === "会员码") {
-        common_vendor.index.navigateTo({
-          url: "/pages/mine/memberCode/index"
-        });
+        this.goWithLoading("/pages/mine/memberCode/index");
         return;
       }
       common_vendor.index.showToast({ title: `${title}功能开发中`, icon: "none" });
+    },
+    goWithLoading(url, type = "navigateTo", tip = "加载中...") {
+      this.pageLoadingTip = tip;
+      this.pageLoading = true;
+      setTimeout(() => {
+        if (type === "switchTab") {
+          common_vendor.index.switchTab({ url });
+        } else if (type === "reLaunch") {
+          common_vendor.index.reLaunch({ url });
+        } else if (type === "redirectTo") {
+          common_vendor.index.redirectTo({ url });
+        } else {
+          common_vendor.index.navigateTo({ url });
+        }
+        setTimeout(() => {
+          this.pageLoading = false;
+        }, 500);
+      }, 100);
     },
     async callService() {
       try {
@@ -176,14 +194,22 @@ const _sfc_main = {
       } catch (e) {
       }
       common_vendor.index.clearStorageSync();
-      common_vendor.index.reLaunch({ url: "/pages/login/index" });
+      this.goWithLoading("/pages/login/index", "reLaunch");
     }
   }
 };
+if (!Array) {
+  const _easycom_page_loading2 = common_vendor.resolveComponent("page-loading");
+  _easycom_page_loading2();
+}
+const _easycom_page_loading = () => "../../components/page-loading/page-loading.js";
+if (!Math) {
+  _easycom_page_loading();
+}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $options.avatarSrc,
-    b: common_vendor.o(($event) => $data.showAvatarPicker = true, "99"),
+    b: common_vendor.o(($event) => $data.showAvatarPicker = true, "da"),
     c: common_vendor.t($data.nickname || "未登录用户"),
     d: $data.companyVerified
   }, $data.companyVerified ? {} : {}, {
@@ -192,7 +218,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.companyVerified && $data.companyDeptName ? {
     g: common_vendor.t($data.companyDeptName)
   } : {}, {
-    h: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "91"),
+    h: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "5f"),
     i: common_vendor.t($data.balance),
     j: common_vendor.t($data.pointCount),
     k: common_vendor.t($data.couponCount),
@@ -221,13 +247,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     o: $data.showAvatarPicker
   }, $data.showAvatarPicker ? {
     p: $data.avatarKey === "1" ? 1 : "",
-    q: common_vendor.o(($event) => $options.selectAvatar("1"), "d1"),
+    q: common_vendor.o(($event) => $options.selectAvatar("1"), "3c"),
     r: $data.avatarKey === "2" ? 1 : "",
-    s: common_vendor.o(($event) => $options.selectAvatar("2"), "40"),
-    t: common_vendor.o(($event) => $data.showAvatarPicker = false, "71"),
+    s: common_vendor.o(($event) => $options.selectAvatar("2"), "e0"),
+    t: common_vendor.o(($event) => $data.showAvatarPicker = false, "8d"),
     v: common_vendor.o(() => {
-    }, "b4"),
-    w: common_vendor.o(($event) => $data.showAvatarPicker = false, "92")
+    }, "ba"),
+    w: common_vendor.o(($event) => $data.showAvatarPicker = false, "83")
   } : {}, {
     x: $data.showServicePicker
   }, $data.showServicePicker ? {
@@ -239,10 +265,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.makeCall(item.phone), index)
       };
     }),
-    z: common_vendor.o(($event) => $data.showServicePicker = false, "12"),
+    z: common_vendor.o(($event) => $data.showServicePicker = false, "05"),
     A: common_vendor.o(() => {
-    }, "3e"),
-    B: common_vendor.o(($event) => $data.showServicePicker = false, "8f")
+    }, "53"),
+    B: common_vendor.o(($event) => $data.showServicePicker = false, "59")
   } : {}, {
     C: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
@@ -253,6 +279,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: _ctx.tabbarSelected === index ? 1 : "",
         f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
       };
+    }),
+    D: common_vendor.p({
+      visible: $data.pageLoading,
+      tip: $data.pageLoadingTip
     })
   });
 }

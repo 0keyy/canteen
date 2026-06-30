@@ -77,3 +77,7 @@ export const walletApi = {
 export const serviceApi = {
   hotline: () => get('/front/service/hotline')
 }
+
+export const memberApi = {
+  code: () => get('/front/member/code')
+}

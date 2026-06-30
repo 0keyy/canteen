@@ -40,11 +40,13 @@
         <text class="recharge-page__record-text">查看明细</text>
       </view>
     </view>
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 import { walletApi, payApi, authApi } from '../../api/index'
+import PageLoading from '../../components/page-loading/page-loading.vue'
 
 // #ifdef MP-WEIXIN
 import { wxPay } from '../../utils/pay/weixin'
@@ -55,11 +57,14 @@ import { aliPay } from '../../utils/pay/alipay'
 // #endif
 
 export default {
+  components: { PageLoading },
   data() {
     return {
       balance: 0,
       selectedAmount: 10,
-      amountOptions: [10, 20, 50, 100, 200, 500]
+      amountOptions: [10, 20, 50, 100, 200, 500],
+      pageLoading: false,
+      pageLoadingTip: '加载中...'
     }
   },
   computed: {
@@ -123,6 +128,18 @@ export default {
     },
     goRecord() {
       uni.showToast({ title: '明细功能开发中', icon: 'none' })
+    },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') { uni.switchTab({ url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url }) }
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
     }
   }
 }

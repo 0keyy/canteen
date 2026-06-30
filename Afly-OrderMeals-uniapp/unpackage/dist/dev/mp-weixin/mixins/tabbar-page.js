@@ -3,6 +3,7 @@ const common_vendor = require("../common/vendor.js");
 const api_index = require("../api/index.js");
 const utils_image = require("../utils/image.js");
 const utils_tabbar = require("../utils/tabbar.js");
+const utils_globalLoading = require("../utils/global-loading.js");
 const tabbarPageMixin = {
   data() {
     return {
@@ -67,12 +68,16 @@ const tabbarPageMixin = {
         return;
       if (this.tabbarSelected === index)
         return;
+      utils_globalLoading.showGlobalLoading();
       common_vendor.index.switchTab({
         url: `/${path}`,
         fail: () => {
           common_vendor.index.reLaunch({ url: `/${path}` });
         }
       });
+      setTimeout(() => {
+        utils_globalLoading.hideGlobalLoading();
+      }, 600);
     }
   }
 };

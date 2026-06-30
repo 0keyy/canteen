@@ -1,6 +1,7 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
+    "page-loading": "../../components/page-loading/page-loading",
     "menu-category-sidebar": "../../components/menu-category-sidebar/menu-category-sidebar"
   }
 }

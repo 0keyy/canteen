@@ -30,17 +30,22 @@
       <button class="login-page__btn" :loading="loading" @click="handleSmsLogin">登录</button>
     </view>
     <!-- #endif -->
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 import { authApi } from '../../api/index'
 import { saveLoginResult } from '../../utils/auth/index'
+import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
+  components: { PageLoading },
   data() {
     return {
       loading: false,
+      pageLoading: false,
+      pageLoadingTip: '加载中...',
       mobile: '',
       smsCode: '',
       countdown: 0,
@@ -49,7 +54,7 @@ export default {
   },
   methods: {
     goHome() {
-      uni.switchTab({ url: '/pages/index/index' })
+      this.goWithLoading('/pages/index/index', 'switchTab')
     },
     async handleWxLogin() {
       this.loading = true
@@ -120,6 +125,18 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') { uni.switchTab({ url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url }) }
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
     }
   },
   onUnload() {

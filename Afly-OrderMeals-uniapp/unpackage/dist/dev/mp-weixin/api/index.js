@@ -65,11 +65,15 @@ const walletApi = {
 const serviceApi = {
   hotline: () => utils_request.get("/front/service/hotline")
 };
+const memberApi = {
+  code: () => utils_request.get("/front/member/code")
+};
 exports.addressApi = addressApi;
 exports.authApi = authApi;
 exports.companyApi = companyApi;
 exports.couponApi = couponApi;
 exports.decorateApi = decorateApi;
+exports.memberApi = memberApi;
 exports.orderApi = orderApi;
 exports.payApi = payApi;
 exports.serviceApi = serviceApi;

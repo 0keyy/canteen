@@ -101,13 +101,16 @@
       </view>
     </view>
 
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 import { authApi } from '../../api/index'
+import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
+  components: { PageLoading },
   data: function() {
     return {
       navPaddingStyle: {},
@@ -128,7 +131,9 @@ export default {
       showAvatarModal: false,
       tempNickname: '',
       birthdayPickerVisible: false,
-      pickerDate: '2000-01-01'
+      pickerDate: '2000-01-01',
+      pageLoading: false,
+      pageLoadingTip: '加载中...'
     }
   },
   computed: {
@@ -153,11 +158,19 @@ export default {
   },
   methods: {
     goBack: function() {
-      uni.navigateBack({
-        fail: function() {
-          uni.switchTab({ url: '/pages/mine/index' })
-        }
-      })
+      const self = this
+      this.pageLoadingTip = '加载中...'
+      this.pageLoading = true
+      setTimeout(() => {
+        uni.navigateBack({
+          fail: function() {
+            uni.switchTab({ url: '/pages/mine/index' })
+          },
+          complete: function() {
+            setTimeout(() => { self.pageLoading = false }, 500)
+          }
+        })
+      }, 100)
     },
     loadProfile: function() {
       const self = this
@@ -216,13 +229,28 @@ export default {
         uni.setStorageSync('nickname', self.form.nickname)
         uni.showToast({ title: '保存成功', icon: 'success' })
         setTimeout(function() {
-          uni.navigateBack()
+          self.goWithLoading('', 'navigateBack')
         }, 1500)
       }).catch(function(e) {
         uni.showToast({ title: (e && e.message) || '保存失败', icon: 'none' })
       }).finally(function() {
         self.saving = false
       })
+    },
+    goWithLoading: function(url, type, tip) {
+      if (type === undefined) type = 'navigateTo'
+      if (tip === undefined) tip = '加载中...'
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      const self = this
+      setTimeout(function() {
+        if (type === 'switchTab') { uni.switchTab({ url: url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url: url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url: url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url: url }) }
+        setTimeout(function() { self.pageLoading = false }, 500)
+      }, 100)
     }
   }
 }

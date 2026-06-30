@@ -4,11 +4,11 @@
     <view class="member-header">
       <view class="user-info">
         <view class="avatar-box">
-          <image class="avatar-img" src="/static/1.png" mode="aspectFill" />
+          <image class="avatar-img" :src="avatarSrc" mode="aspectFill" />
         </view>
         <view class="user-text">
-          <text class="user-name">用户123</text>
-          <text class="user-desc">普通会员</text>
+          <text class="user-name">{{ nickname || '加载中...' }}</text>
+          <text class="user-desc">{{ level || '会员' }}</text>
         </view>
       </view>
 	  <view class="member-logo">
@@ -21,14 +21,15 @@
       <!-- 条形码 -->
       <view class="barcode-section">
         <!-- <view class="barcode"></view> -->
-        <text class="card-no">会员卡号：202605290929405125</text>
+        <text class="card-no">会员卡号：{{ memberId || '--' }}</text>
       </view>
 
       <!-- 二维码区域 -->
       <view class="qrcode-section">
         <view class="qrcode-box">
           <!-- 绑定会员唯一ID，动态内容 -->
-          <u-qrcode :value="qrCodeContent" size="320"></u-qrcode>
+          <u-qrcode v-if="qrCodeContent" :value="qrCodeContent" size="320"></u-qrcode>
+          <view v-else class="qrcode-placeholder">加载中...</view>
         </view>
         <view class="refresh-tip">
           <image src="/static/tabbar/刷新.png" mode="aspectFit" class="refresh-icon"></image>
@@ -38,7 +39,7 @@
 
       <!-- 余额 -->
       <view class="balance-section">
-        <text class="balance-value">0.00</text>
+        <text class="balance-value">{{ balance || '0.00' }}</text>
         <text class="balance-label">余额</text>
       </view>
     </view>
@@ -47,41 +48,80 @@
     <view class="footer-tip">
       <text class="tip-text">使用会员码，可在门店享受会员优惠与积分抵扣</text>
     </view>
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
+import { memberApi } from '../../../api/index'
+import PageLoading from '../../../components/page-loading/page-loading.vue'
 export default {
+  components: { PageLoading },
   data() {
     return {
-      userId: "202605290929405125", // 当前会员唯一卡号/ID
-      qrCodeContent: "", // 二维码携带的核销内容
-      timer: null // 定时器标记
+      pageLoading: false,
+      pageLoadingTip: '加载中...',
+      memberId: "",
+      nickname: "",
+      level: "",
+      balance: "",
+      avatarKey: "1",
+      qrCodeContent: "",
+      timer: null
+    }
+  },
+  computed: {
+    avatarSrc() {
+      return `/static/${this.avatarKey || '1'}.png`
     }
   },
   onLoad() {
-    // 首次生成二维码
-    this.refreshQrCode()
-    // 开启30秒循环刷新
+    this.avatarKey = uni.getStorageSync('avatarKey') || '1'
+    this.loadMemberCode()
     this.timer = setInterval(() => {
       this.refreshQrCode()
     }, 30000)
   },
   onUnload() {
-    // 页面销毁清除定时器，防止内存泄漏
     if (this.timer) {
       clearInterval(this.timer)
     }
   },
   methods: {
-    // 刷新二维码：拼接唯一标识+时间戳，保证30秒内容变化
+    async loadMemberCode() {
+      try {
+        const res = await memberApi.code()
+        if (res && res.code === 200 && res.data) {
+          const data = res.data
+          this.memberId = data.memberId || ''
+          this.nickname = data.nickname || '会员'
+          this.level = data.level || '普通会员'
+          this.balance = data.balance != null ? data.balance : '0.00'
+        }
+      } catch (e) {
+        console.log('会员码接口暂未开发', e)
+      }
+      this.refreshQrCode()
+    },
     refreshQrCode() {
+      if (!this.memberId) return
       const timeStamp = Date.now()
-      // 二维码内容格式：后端核销接口/会员ID+时间戳
-      this.qrCodeContent = `https://你的后端核销接口.com/verify?uid=${this.userId}&ts=${timeStamp}`
+      this.qrCodeContent = `https://你的后端核销接口.com/verify?uid=${this.memberId}&ts=${timeStamp}`
     },
     goBack() {
-      uni.navigateBack()
+      this.goWithLoading('', 'navigateBack')
+    },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') { uni.switchTab({ url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url }) }
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
     }
   }
 }
@@ -211,6 +251,10 @@ export default {
   align-items: center;
   justify-content: center;
   background: #fff;
+}
+.qrcode-placeholder {
+  font-size: 24rpx;
+  color: #999;
 }
 .refresh-tip {
   margin-top: 20rpx;

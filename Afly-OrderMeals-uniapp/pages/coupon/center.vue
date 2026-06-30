@@ -62,17 +62,22 @@
         </view>
       </view>
     </view>
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 import { couponApi } from '../../api/index'
+import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
+  components: { PageLoading },
   data() {
     return {
       loading: false,
-      coupons: []
+      coupons: [],
+      pageLoading: false,
+      pageLoadingTip: '加载中...'
     }
   },
   onShow() {
@@ -110,6 +115,18 @@ export default {
       } catch (e) {
         uni.showToast({ title: e || '领取失败', icon: 'none' })
       }
+    },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') { uni.switchTab({ url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url }) }
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
     }
   }
 }

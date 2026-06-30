@@ -3,6 +3,7 @@ Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
 const api_index = require("./api/index.js");
 const utils_tabbar = require("./utils/tabbar.js");
+const utils_router = require("./utils/router.js");
 if (!Math) {
   "./pages/login/index.js";
   "./pages/index/index.js";
@@ -49,6 +50,7 @@ const _sfc_main = {
 };
 function createApp() {
   const app = common_vendor.createSSRApp(_sfc_main);
+  app.config.globalProperties.$router = utils_router.router;
   return { app };
 }
 createApp().app.mount("#app");

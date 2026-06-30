@@ -5,8 +5,12 @@ const utils_config = require("../../utils/config.js");
 const utils_image = require("../../utils/image.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
 const utils_navbar = require("../../utils/navbar.js");
+const PageLoading = () => "../../components/page-loading/page-loading.js";
 const _sfc_main = {
   mixins: [mixins_tabbarPage.tabbarPageMixin],
+  components: {
+    PageLoading
+  },
   data() {
     return {
       navMetrics: utils_navbar.getNavMetrics(),
@@ -20,7 +24,9 @@ const _sfc_main = {
         { name: "积分商城", desc: "神秘好物等你来", iconClass: "home__icon--points" },
         { name: "领券中心", desc: "限时领取优惠", iconClass: "home__icon--coupon" },
         { name: "优惠券包", desc: "享多重优惠", iconClass: "home__icon--wallet" }
-      ]
+      ],
+      pageLoading: false,
+      pageLoadingTip: "加载中..."
     };
   },
   computed: {
@@ -143,14 +149,14 @@ const _sfc_main = {
       }
       common_vendor.index.setStorageSync("diningMode", mode);
       if (mode === 3) {
-        common_vendor.index.navigateTo({ url: "/pages/address/list?select=1" });
+        this.goWithLoading("/pages/address/list?select=1");
         return;
       }
-      common_vendor.index.switchTab({ url: "/pages/menu/index" });
+      this.goWithLoading("/pages/menu/index", "switchTab");
     },
     goMenu() {
       common_vendor.index.setStorageSync("diningMode", 1);
-      common_vendor.index.switchTab({ url: "/pages/menu/index" });
+      this.goWithLoading("/pages/menu/index", "switchTab");
     },
     selectSpec() {
       this.goMenu();
@@ -160,26 +166,50 @@ const _sfc_main = {
     },
     onShortcutTap(item) {
       if ((item == null ? void 0 : item.name) === "积分商城") {
-        common_vendor.index.navigateTo({
-          url: "/pages/integralShop/index"
-        });
+        this.goWithLoading("/pages/integralShop/index");
         return;
       }
       if ((item == null ? void 0 : item.name) === "优惠券包") {
-        common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
+        this.goWithLoading("/pages/coupon/wallet");
         return;
       }
       if ((item == null ? void 0 : item.name) === "领券中心") {
-        common_vendor.index.navigateTo({ url: "/pages/coupon/center" });
+        this.goWithLoading("/pages/coupon/center");
         return;
       }
       common_vendor.index.showToast({ title: "功能开发中", icon: "none" });
     },
     goCouponCenter() {
-      common_vendor.index.navigateTo({ url: "/pages/coupon/center" });
+      this.goWithLoading("/pages/coupon/center");
+    },
+    goWithLoading(url, type = "navigateTo", tip = "加载中...") {
+      this.pageLoadingTip = tip;
+      this.pageLoading = true;
+      setTimeout(() => {
+        if (type === "switchTab") {
+          common_vendor.index.switchTab({ url });
+        } else if (type === "reLaunch") {
+          common_vendor.index.reLaunch({ url });
+        } else if (type === "redirectTo") {
+          common_vendor.index.redirectTo({ url });
+        } else {
+          common_vendor.index.navigateTo({ url });
+        }
+        setTimeout(() => {
+          this.pageLoading = false;
+        }, 500);
+      }, 100);
     }
   }
 };
+if (!Array) {
+  const _easycom_page_loading2 = common_vendor.resolveComponent("page-loading");
+  _easycom_page_loading2();
+}
+const _easycom_page_loading = () => "../../components/page-loading/page-loading.js";
+if (!Math) {
+  _easycom_page_loading();
+}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: common_vendor.o((...args) => $options.goSearch && $options.goSearch(...args), "81"),
@@ -238,6 +268,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: _ctx.tabbarSelected === index ? 1 : "",
         f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
       };
+    }),
+    p: common_vendor.p({
+      visible: $data.pageLoading,
+      tip: $data.pageLoadingTip
     })
   });
 }

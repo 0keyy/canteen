@@ -150,6 +150,7 @@
       </view>
     </view>
   </view>
+  <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
 </template>
 
 <script>
@@ -158,9 +159,13 @@ import { DEFAULT_SHOP_ID } from '../../utils/config'
 import { resolveImageUrl } from '../../utils/image'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getMenuButtonMarginRight, getNavMetrics } from '../../utils/navbar'
+import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
   mixins: [tabbarPageMixin],
+  components: {
+    PageLoading
+  },
   data() {
     return {
       navMetrics: getNavMetrics(),
@@ -174,7 +179,9 @@ export default {
         { name: '积分商城', desc: '神秘好物等你来', iconClass: 'home__icon--points' },
         { name: '领券中心', desc: '限时领取优惠', iconClass: 'home__icon--coupon' },
         { name: '优惠券包', desc: '享多重优惠', iconClass: 'home__icon--wallet' }
-      ]
+      ],
+      pageLoading: false,
+      pageLoadingTip: '加载中...'
     }
   },
   computed: {
@@ -293,14 +300,14 @@ export default {
       }
       uni.setStorageSync('diningMode', mode)
       if (mode === 3) {
-        uni.navigateTo({ url: '/pages/address/list?select=1' })
+        this.goWithLoading('/pages/address/list?select=1')
         return
       }
-      uni.switchTab({ url: '/pages/menu/index' })
+      this.goWithLoading('/pages/menu/index', 'switchTab')
     },
     goMenu() {
       uni.setStorageSync('diningMode', 1)
-      uni.switchTab({ url: '/pages/menu/index' })
+      this.goWithLoading('/pages/menu/index', 'switchTab')
     },
     selectSpec() {
       this.goMenu()
@@ -309,25 +316,40 @@ export default {
       uni.showToast({ title: '搜索功能开发中', icon: 'none' })
     },
     onShortcutTap(item) {
-      // 新增：积分商城跳转逻辑，放在最前面
       if (item?.name === '积分商城') {
-        uni.navigateTo({
-          url: '/pages/integralShop/index'
-        })
+        this.goWithLoading('/pages/integralShop/index')
         return
       }
       if (item?.name === '优惠券包') {
-        uni.navigateTo({ url: '/pages/coupon/wallet' })
+        this.goWithLoading('/pages/coupon/wallet')
         return
       }
       if (item?.name === '领券中心') {
-        uni.navigateTo({ url: '/pages/coupon/center' })
+        this.goWithLoading('/pages/coupon/center')
         return
       }
       uni.showToast({ title: '功能开发中', icon: 'none' })
     },
     goCouponCenter() {
-      uni.navigateTo({ url: '/pages/coupon/center' })
+      this.goWithLoading('/pages/coupon/center')
+    },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') {
+          uni.switchTab({ url })
+        } else if (type === 'reLaunch') {
+          uni.reLaunch({ url })
+        } else if (type === 'redirectTo') {
+          uni.redirectTo({ url })
+        } else {
+          uni.navigateTo({ url })
+        }
+        setTimeout(() => {
+          this.pageLoading = false
+        }, 500)
+      }, 100)
     }
   }
 }

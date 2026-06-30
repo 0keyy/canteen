@@ -29,17 +29,22 @@
     <view class="address-page__footer safe-area-bottom">
       <button class="address-page__add-btn" @click="edit()">新增地址</button>
     </view>
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 import { addressApi } from '../../api/index'
+import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
+  components: { PageLoading },
   data() {
     return {
       list: [],
-      selectMode: false
+      selectMode: false,
+      pageLoading: false,
+      pageLoadingTip: '加载中...'
     }
   },
   onLoad(options) {
@@ -56,15 +61,27 @@ export default {
       if (!this.selectMode) return
       uni.setStorageSync('diningMode', 3)
       uni.setStorageSync('addressId', item.id)
-      uni.switchTab({ url: '/pages/menu/index' })
+      this.goWithLoading('/pages/menu/index', 'switchTab')
     },
     edit(item) {
       const id = item?.id || ''
-      uni.navigateTo({ url: `/pages/address/edit?id=${id}` })
+      this.goWithLoading(`/pages/address/edit?id=${id}`)
     },
     async remove(id) {
       await addressApi.delete(id)
       this.loadList()
+    },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') { uni.switchTab({ url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url }) }
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
     }
   }
 }

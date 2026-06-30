@@ -114,6 +114,8 @@
         <view class="detail-page__pay-picker-close" @tap="showPayPicker = false">取消</view>
       </view>
     </view>
+
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
@@ -121,16 +123,19 @@
 import { orderApi } from '../../api/index'
 import { payOrder, DEFAULT_PAY_CHANNEL } from '../../utils/pay/index'
 import PayMethodPicker from '../../components/pay-method-picker/pay-method-picker.vue'
+import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
-  components: { PayMethodPicker },
+  components: { PayMethodPicker, PageLoading },
   data() {
     return {
       orderId: 0,
       order: null,
       payChannel: DEFAULT_PAY_CHANNEL,
       showPayPicker: false,
-      payMethodList: []
+      payMethodList: [],
+      pageLoading: false,
+      pageLoadingTip: '加载中...'
     }
   },
   computed: {
@@ -197,7 +202,19 @@ export default {
       this.payMethodList = list || []
     },
     goBack() {
-      uni.navigateBack()
+      this.goWithLoading('', 'navigateBack')
+    },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') { uni.switchTab({ url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url }) }
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
     }
   }
 }

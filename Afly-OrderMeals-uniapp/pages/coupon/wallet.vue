@@ -74,13 +74,16 @@
         </view>
       </view>
     </scroll-view>
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 import { couponApi } from '../../api/index'
+import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
+  components: { PageLoading },
   data() {
     return {
       tabs: [
@@ -90,7 +93,9 @@ export default {
       ],
       activeTab: 1,
       loading: false,
-      coupons: []
+      coupons: [],
+      pageLoading: false,
+      pageLoadingTip: '加载中...'
     }
   },
   onShow() {
@@ -123,7 +128,19 @@ export default {
       }
     },
     goVerifyCode(coupon) {
-      uni.navigateTo({ url: `/pages/coupon/verify-code?id=${coupon.id}` })
+      this.goWithLoading(`/pages/coupon/verify-code?id=${coupon.id}`)
+    },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') { uni.switchTab({ url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url }) }
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
     }
   }
 }

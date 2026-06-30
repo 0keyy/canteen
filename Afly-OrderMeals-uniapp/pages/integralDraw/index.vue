@@ -45,15 +45,20 @@
         </view>
       </view>
     </view>
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
+import PageLoading from '../../components/page-loading/page-loading.vue'
 // 对接后端积分接口
 import { getDrawPrizeList, startDrawApi } from '@/api/integral'
 export default {
+  components: { PageLoading },
   data() {
     return {
+      pageLoading: false,
+      pageLoadingTip: '加载中...',
       // 后端返回奖品数组
       prizeList: [],
       // 兜底本地默认文字奖品（接口异常时显示）
@@ -99,7 +104,7 @@ export default {
     },
     // 返回上一页（积分商城）
     goBack() {
-      uni.navigateBack()
+      this.goWithLoading('', 'navigateBack')
     },
     // 开启九宫格循环高亮滚动动画
     startScroll() {
@@ -159,6 +164,18 @@ export default {
         this.isRunning = false
         uni.showToast({ title: '网络异常', icon: 'none' })
       }
+    },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') { uni.switchTab({ url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url }) }
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
     }
   }
 }

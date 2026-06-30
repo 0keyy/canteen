@@ -55,14 +55,17 @@
 
       <view class="page-bottom-space"></view>
     </scroll-view>
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 // 引入用户信息接口、积分商品接口
+import PageLoading from '../../components/page-loading/page-loading.vue'
 import { authApi } from '../../api/index'
 import { getIntegralGoodsList } from '../../api/integral'
 export default {
+  components: { PageLoading },
   data() {
     return {
       userScore: 0,
@@ -97,7 +100,9 @@ export default {
           sold: 0
         }
       ],
-      goodsList: []
+      goodsList: [],
+      pageLoading: false,
+      pageLoadingTip: '加载中...'
     }
   },
   onLoad() {
@@ -113,13 +118,11 @@ export default {
   methods: {
     // 返回上一页
     goBack() {
-      uni.navigateBack()
+      this.goWithLoading('', 'navigateBack')
     },
     // 跳转积分抽奖页
     goDrawPage() {
-      uni.navigateTo({
-        url: '/pages/integralDraw/index'
-      })
+      this.goWithLoading('/pages/integralDraw/index', 'navigateTo')
     },
     // 获取用户当前积分（从用户信息接口拿）
     async getUserScore() {
@@ -150,6 +153,18 @@ export default {
     goGoodsDetail(item) {
       uni.showToast({ title: '商品详情开发中', icon: 'none' })
     },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') { uni.switchTab({ url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url }) }
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
+    }
   }
 }
 </script>

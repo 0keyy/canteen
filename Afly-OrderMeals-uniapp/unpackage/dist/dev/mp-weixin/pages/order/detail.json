@@ -3,6 +3,7 @@
   "navigationBarBackgroundColor": "#FFFCF8",
   "navigationBarTextStyle": "black",
   "usingComponents": {
-    "pay-method-picker": "../../components/pay-method-picker/pay-method-picker"
+    "pay-method-picker": "../../components/pay-method-picker/pay-method-picker",
+    "page-loading": "../../components/page-loading/page-loading"
   }
 }

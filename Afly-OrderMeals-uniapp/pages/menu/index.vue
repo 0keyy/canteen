@@ -135,6 +135,7 @@
         </text>
       </view>
     </view>
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
@@ -144,9 +145,11 @@ import { DEFAULT_SHOP_ID } from '../../utils/config'
 import { resolveImageUrl } from '../../utils/image'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getMenuButtonMarginRight, getNavMetrics } from '../../utils/navbar'
+import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
   mixins: [tabbarPageMixin],
+  components: { PageLoading },
   data() {
     return {
       navMetrics: getNavMetrics(),
@@ -162,7 +165,9 @@ export default {
       cartReady: false,
       cartBusy: false,
       cartInitPromise: null,
-      banners: []
+      banners: [],
+      pageLoading: false,
+      pageLoadingTip: '加载中...'
     }
   },
   computed: {
@@ -249,7 +254,7 @@ export default {
       uni.setStorageSync('diningMode', mode)
       this.diningMode = mode
       if (mode === 3) {
-        uni.navigateTo({ url: '/pages/address/list?select=1' })
+        this.goWithLoading('/pages/address/list?select=1', 'navigateTo')
         return
       }
       await this.bootstrap()
@@ -500,10 +505,39 @@ export default {
           return
         }
         uni.setStorageSync('orderId', this.orderId)
-        uni.navigateTo({ url: '/pages/cart/confirm' })
+        this.goWithLoading('/pages/cart/confirm', 'navigateTo')
       } catch (e) {
         uni.showToast({ title: e.message || e || '购物车未就绪', icon: 'none' })
       }
+    },
+    switchTabbar(item, index) {
+      const path = (item?.link?.path || item?.link?.url || item?.pagePath || '').replace(/^\//, '')
+      if (!path) return
+      if (this.tabbarSelected === index) return
+      const url = `/${path}`
+      this.pageLoadingTip = '加载中...'
+      this.pageLoading = true
+      setTimeout(() => {
+        uni.switchTab({
+          url,
+          fail: () => {
+            uni.reLaunch({ url })
+          }
+        })
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
+    },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') { uni.switchTab({ url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url }) }
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
     }
   }
 }

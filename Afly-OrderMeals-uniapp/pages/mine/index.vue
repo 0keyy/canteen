@@ -172,12 +172,14 @@
       </view>
     </view>
   </view>
+  <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
 </template>
 
 <script>
 import { authApi, couponApi, serviceApi } from '../../api/index'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getNavMetrics } from '../../utils/navbar'
+import PageLoading from '../../components/page-loading/page-loading.vue'
 
 const PRIMARY_ACTIONS = [
   { title: '我的订单', icon: 'orders' },
@@ -197,6 +199,9 @@ const SECONDARY_ACTIONS = [
 
 export default {
   mixins: [tabbarPageMixin],
+  components: {
+    PageLoading
+  },
   data() {
     return {
       navMetrics: getNavMetrics(),
@@ -206,13 +211,15 @@ export default {
       companyDeptName: '',
       balance: 0,
       couponCount: 0,
-      pointCount: 0, // 新增积分变量
+      pointCount: 0,
       primaryActions: PRIMARY_ACTIONS,
       secondaryActions: SECONDARY_ACTIONS,
       avatarKey: '',
       showAvatarPicker: false,
       showServicePicker: false,
-      servicePhones: [{ phone: '400-800-1234', name: '客服热线' }]
+      servicePhones: [{ phone: '400-800-1234', name: '客服热线' }],
+      pageLoading: false,
+      pageLoadingTip: '加载中...'
     }
   },
   computed: {
@@ -266,45 +273,39 @@ export default {
     },
     onActionTap(item) {
       if (item.title === '我的订单') {
-        uni.switchTab({ url: '/pages/order/list' })
+        this.goWithLoading('/pages/order/list', 'switchTab')
         return
       }
       if (item.title === '地址管理') {
-        uni.navigateTo({ url: '/pages/address/list' })
+        this.goWithLoading('/pages/address/list')
         return
       }
       if (item.title === '联系客服') {
         this.callService()
         return
       }
-      // 会员码图标跳转
       if (item.title === '会员码') {
-        uni.navigateTo({ url: '/pages/mine/memberCode/index' })
+        this.goWithLoading('/pages/mine/memberCode/index')
         return
       }
       if (item.title === '公司认证') {
-        uni.navigateTo({ url: '/pages/mine/company-auth' })
+        this.goWithLoading('/pages/mine/company-auth')
         return
       }
       if (item.title === '优惠券包') {
-        uni.navigateTo({ url: '/pages/coupon/wallet' })
+        this.goWithLoading('/pages/coupon/wallet')
         return
       }
       if (item.title === '充值中心') {
-        uni.navigateTo({ url: '/pages/coupon/recharge' })
+        this.goWithLoading('/pages/coupon/recharge')
         return
       }
-      // ========== 积分商城跳转（修改这里） ==========
       if (item.title === '积分商城') {
-        uni.navigateTo({
-          url: '/pages/integralShop/index'
-        })
+        this.goWithLoading('/pages/integralShop/index')
         return
       }
-      // ==========================================
-      // 会员日图标跳转
       if (item.title === '会员日') {
-        uni.navigateTo({ url: '/pages/mine/memberDay/index' })
+        this.goWithLoading('/pages/mine/memberDay/index')
         return
       }
       if (item.title === '退出登录') {
@@ -313,16 +314,30 @@ export default {
       }
       this.onFeatureTap(item.title)
     },
-    // 右上角会员码按钮专用方法
     onFeatureTap(title) {
-      // 参数直接就是文字，不需要 item.title
       if (title === '会员码') {
-        uni.navigateTo({
-          url: '/pages/mine/memberCode/index'
-        })
+        this.goWithLoading('/pages/mine/memberCode/index')
         return
       }
       uni.showToast({ title: `${title}功能开发中`, icon: 'none' })
+    },
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') {
+          uni.switchTab({ url })
+        } else if (type === 'reLaunch') {
+          uni.reLaunch({ url })
+        } else if (type === 'redirectTo') {
+          uni.redirectTo({ url })
+        } else {
+          uni.navigateTo({ url })
+        }
+        setTimeout(() => {
+          this.pageLoading = false
+        }, 500)
+      }, 100)
     },
     async callService() {
       try {
@@ -358,7 +373,7 @@ export default {
         await authApi.logout()
       } catch (e) {}
       uni.clearStorageSync()
-      uni.reLaunch({ url: '/pages/login/index' })
+      this.goWithLoading('/pages/login/index', 'reLaunch')
     }
   }
 }

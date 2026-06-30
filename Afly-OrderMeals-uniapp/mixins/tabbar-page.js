@@ -9,6 +9,7 @@ import {
   readTabbarCache,
   writeTabbarCache
 } from '../utils/tabbar'
+import { showGlobalLoading, hideGlobalLoading } from '../utils/global-loading'
 
 export default {
   data() {
@@ -69,12 +70,18 @@ export default {
       const path = normalizeTabPath(item?.link?.path || item?.link?.url || item?.pagePath)
       if (!path) return
       if (this.tabbarSelected === index) return
+      // 使用全局 loading，新页面的 PageLoading 会监听到并显示
+      showGlobalLoading()
       uni.switchTab({
         url: `/${path}`,
         fail: () => {
           uni.reLaunch({ url: `/${path}` })
         }
       })
+      // 600ms 后关闭全局 loading
+      setTimeout(() => {
+        hideGlobalLoading()
+      }, 600)
     }
   }
 }

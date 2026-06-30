@@ -4,8 +4,9 @@ const api_index = require("../../api/index.js");
 const utils_pay_index = require("../../utils/pay/index.js");
 const utils_pay_channels = require("../../utils/pay/channels.js");
 const PayMethodPicker = () => "../../components/pay-method-picker/pay-method-picker.js";
+const PageLoading = () => "../../components/page-loading/page-loading.js";
 const _sfc_main = {
-  components: { PayMethodPicker },
+  components: { PayMethodPicker, PageLoading },
   data() {
     return {
       orderId: 0,
@@ -18,7 +19,9 @@ const _sfc_main = {
       selectedCouponId: 0,
       couponDiscount: 0,
       showPayPicker: false,
-      payMethodList: []
+      payMethodList: [],
+      pageLoading: false,
+      pageLoadingTip: "加载中..."
     };
   },
   computed: {
@@ -58,10 +61,10 @@ const _sfc_main = {
   },
   methods: {
     goBack() {
-      common_vendor.index.navigateBack();
+      this.goWithLoading("", "navigateBack");
     },
     goAddress() {
-      common_vendor.index.navigateTo({ url: "/pages/address/list?select=1" });
+      this.goWithLoading("/pages/address/list?select=1", "navigateTo");
     },
     calcDishesAmount(dishes) {
       if (!Array.isArray(dishes) || dishes.length === 0)
@@ -127,34 +130,56 @@ const _sfc_main = {
         await utils_pay_index.payOrder(this.orderId, this.payChannel, "mp");
         common_vendor.index.showToast({ title: "支付成功", icon: "success" });
         setTimeout(() => {
-          common_vendor.index.redirectTo({ url: `/pages/order/detail?orderId=${this.orderId}` });
+          this.goWithLoading(`/pages/order/detail?orderId=${this.orderId}`, "redirectTo");
         }, 500);
       } catch (e) {
         common_vendor.index.showToast({ title: e.message || e, icon: "none" });
       } finally {
         this.loading = false;
       }
+    },
+    goWithLoading(url, type = "navigateTo", tip = "加载中...") {
+      this.pageLoadingTip = tip;
+      this.pageLoading = true;
+      setTimeout(() => {
+        if (type === "switchTab") {
+          common_vendor.index.switchTab({ url });
+        } else if (type === "reLaunch") {
+          common_vendor.index.reLaunch({ url });
+        } else if (type === "redirectTo") {
+          common_vendor.index.redirectTo({ url });
+        } else if (type === "navigateBack") {
+          common_vendor.index.navigateBack();
+        } else {
+          common_vendor.index.navigateTo({ url });
+        }
+        setTimeout(() => {
+          this.pageLoading = false;
+        }, 500);
+      }, 100);
     }
   }
 };
 if (!Array) {
   const _easycom_pay_method_picker2 = common_vendor.resolveComponent("pay-method-picker");
-  _easycom_pay_method_picker2();
+  const _easycom_page_loading2 = common_vendor.resolveComponent("page-loading");
+  (_easycom_pay_method_picker2 + _easycom_page_loading2)();
 }
 const _easycom_pay_method_picker = () => "../../components/pay-method-picker/pay-method-picker.js";
+const _easycom_page_loading = () => "../../components/page-loading/page-loading.js";
 if (!Math) {
-  _easycom_pay_method_picker();
+  (_easycom_pay_method_picker + _easycom_page_loading)();
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $data.order
   }, $data.order ? common_vendor.e({
-    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "fb"),
+    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "26"),
     c: $options.addressInfo
   }, $options.addressInfo ? {
     d: common_vendor.t($options.addressInfo)
   } : {}, {
-    e: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args), "40"),
+    e: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args), "79"),
     f: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
       return {
         a: dish.image || "/static/placeholder.png",
@@ -170,26 +195,31 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   } : {}, {
     j: common_vendor.t($options.finalAmount),
     k: common_vendor.t($options.payChannelText),
-    l: common_vendor.o(($event) => $data.showPayPicker = true, "f1"),
+    l: common_vendor.o(($event) => $data.showPayPicker = true, "8b"),
     m: $data.remark,
-    n: common_vendor.o(($event) => $data.remark = $event.detail.value, "76"),
+    n: common_vendor.o(($event) => $data.remark = $event.detail.value, "9a"),
     o: common_vendor.t($options.finalAmount),
     p: common_vendor.t($data.loading ? "提交中..." : "去支付"),
-    q: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "4b"),
+    q: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "99"),
     r: $data.showPayPicker
   }, $data.showPayPicker ? {
-    s: common_vendor.o($options.onPayMethodChange, "d1"),
-    t: common_vendor.o($options.onPayMethodsLoaded, "d8"),
-    v: common_vendor.o(($event) => $data.payChannel = $event, "f6"),
+    s: common_vendor.o($options.onPayMethodChange, "47"),
+    t: common_vendor.o($options.onPayMethodsLoaded, "30"),
+    v: common_vendor.o(($event) => $data.payChannel = $event, "0c"),
     w: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    x: common_vendor.o(($event) => $data.showPayPicker = false, "51"),
+    x: common_vendor.o(($event) => $data.showPayPicker = false, "92"),
     y: common_vendor.o(() => {
-    }, "a3"),
-    z: common_vendor.o(($event) => $data.showPayPicker = false, "56")
-  } : {}) : {});
+    }, "13"),
+    z: common_vendor.o(($event) => $data.showPayPicker = false, "51")
+  } : {}, {
+    A: common_vendor.p({
+      visible: $data.pageLoading,
+      tip: $data.pageLoadingTip
+    })
+  }) : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-aaa7ef6e"]]);
 wx.createPage(MiniProgramPage);

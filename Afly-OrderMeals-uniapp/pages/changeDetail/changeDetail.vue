@@ -17,19 +17,38 @@
       </view>
       <view class="empty" v-if="detailList.length === 0">暂无收支明细记录</view>
     </scroll-view>
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
+import PageLoading from '../../components/page-loading/page-loading.vue'
 export default {
+  components: { PageLoading },
   data() {
     return {
-      detailList: []
+      detailList: [],
+      pageLoading: false,
+      pageLoadingTip: '加载中...'
     }
   },
   onLoad() {
     // 读取充值存入的本地记录
     this.detailList = uni.getStorageSync('detailList') || []
+  },
+  methods: {
+    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
+      this.pageLoadingTip = tip
+      this.pageLoading = true
+      setTimeout(() => {
+        if (type === 'switchTab') { uni.switchTab({ url }) }
+        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
+        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
+        else if (type === 'navigateBack') { uni.navigateBack() }
+        else { uni.navigateTo({ url }) }
+        setTimeout(() => { this.pageLoading = false }, 500)
+      }, 100)
+    }
   }
 }
 </script>

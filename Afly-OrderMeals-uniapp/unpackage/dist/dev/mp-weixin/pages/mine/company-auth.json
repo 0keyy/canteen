@@ -3,6 +3,7 @@
   "navigationBarBackgroundColor": "#FFFCF8",
   "navigationBarTextStyle": "black",
   "usingComponents": {
-    "dept-tree-picker": "../../components/dept-tree-picker/dept-tree-picker"
+    "dept-tree-picker": "../../components/dept-tree-picker/dept-tree-picker",
+    "page-loading": "../../components/page-loading/page-loading"
   }
 }
