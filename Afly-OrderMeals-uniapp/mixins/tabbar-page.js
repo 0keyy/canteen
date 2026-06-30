@@ -78,10 +78,10 @@ export default {
           uni.reLaunch({ url: `/${path}` })
         }
       })
-      // 600ms 后关闭全局 loading
+      // 300ms 后关闭全局 loading
       setTimeout(() => {
         hideGlobalLoading()
-      }, 600)
+      }, 300)
     }
   }
 }

@@ -17,7 +17,7 @@
 </template>
 
 <script>
-const MIN_DURATION = 600
+const MIN_DURATION = 300
 
 export default {
   name: 'PageLoading',
@@ -96,11 +96,11 @@ export default {
       }
     },
     doHide() {
-      this.progress = 100
+      this.progress = 80
       this.stopProgress()
       setTimeout(() => {
         this.innerVisible = false
-      }, 150)
+      }, 100)
     },
     startProgress() {
       if (this.timer) clearInterval(this.timer)
@@ -109,7 +109,7 @@ export default {
           const step = Math.random() * 8 + 2
           this.progress = Math.min(this.progress + step, 85)
         }
-      }, 200)
+      }, 150)
     },
     stopProgress() {
       if (this.timer) {

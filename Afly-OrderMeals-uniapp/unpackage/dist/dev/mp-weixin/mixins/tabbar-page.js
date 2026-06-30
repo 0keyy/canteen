@@ -77,7 +77,7 @@ const tabbarPageMixin = {
       });
       setTimeout(() => {
         utils_globalLoading.hideGlobalLoading();
-      }, 600);
+      }, 300);
     }
   }
 };

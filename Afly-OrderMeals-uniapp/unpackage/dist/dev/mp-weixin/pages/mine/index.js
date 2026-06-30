@@ -122,7 +122,7 @@ const _sfc_main = {
         return;
       }
       if (item.title === "会员日") {
-        this.goWithLoading("/pages/mine/memberDay/index");
+        common_vendor.index.navigateTo({ url: "/pages/mine/memberDay/index" });
         return;
       }
       if (item.title === "退出登录") {

@@ -305,7 +305,7 @@ export default {
         return
       }
       if (item.title === '会员日') {
-        this.goWithLoading('/pages/mine/memberDay/index')
+        uni.navigateTo({ url: '/pages/mine/memberDay/index' })
         return
       }
       if (item.title === '退出登录') {
