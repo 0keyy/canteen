@@ -76,7 +76,6 @@
         </text>
       </view>
     </view>
-    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
@@ -84,17 +83,13 @@
 import { orderApi } from '../../api/index'
 import { DEFAULT_SHOP_ID } from '../../utils/config'
 import tabbarPageMixin from '../../mixins/tabbar-page'
-import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
-  components: { PageLoading },
   mixins: [tabbarPageMixin],
   data() {
     return {
       list: [],
-      pendingTotal: 0,
-      pageLoading: false,
-      pageLoadingTip: '加载中...'
+      pendingTotal: 0
     }
   },
   onShow() {
@@ -141,25 +136,13 @@ export default {
       }
     },
     goDetail(orderId) {
-      this.goWithLoading(`/pages/order/detail?orderId=${orderId}`, 'navigateTo')
+      uni.navigateTo({ url: `/pages/order/detail?orderId=${orderId}` })
     },
     goMenu() {
-      this.goWithLoading('/pages/menu/index', 'switchTab')
+      uni.switchTab({ url: '/pages/menu/index' })
     },
     reorder() {
-      this.goWithLoading('/pages/menu/index', 'switchTab')
-    },
-    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
-      this.pageLoadingTip = tip
-      this.pageLoading = true
-      setTimeout(() => {
-        if (type === 'switchTab') { uni.switchTab({ url }) }
-        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
-        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
-        else if (type === 'navigateBack') { uni.navigateBack() }
-        else { uni.navigateTo({ url }) }
-        setTimeout(() => { this.pageLoading = false }, 500)
-      }, 100)
+      uni.switchTab({ url: '/pages/menu/index' })
     }
   }
 }

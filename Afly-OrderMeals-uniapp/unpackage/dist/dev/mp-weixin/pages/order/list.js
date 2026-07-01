@@ -3,16 +3,12 @@ const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const utils_config = require("../../utils/config.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
-const PageLoading = () => "../../components/page-loading/page-loading.js";
 const _sfc_main = {
-  components: { PageLoading },
   mixins: [mixins_tabbarPage.tabbarPageMixin],
   data() {
     return {
       list: [],
-      pendingTotal: 0,
-      pageLoading: false,
-      pageLoadingTip: "加载中..."
+      pendingTotal: 0
     };
   },
   onShow() {
@@ -64,44 +60,16 @@ const _sfc_main = {
       }
     },
     goDetail(orderId) {
-      this.goWithLoading(`/pages/order/detail?orderId=${orderId}`, "navigateTo");
+      common_vendor.index.navigateTo({ url: `/pages/order/detail?orderId=${orderId}` });
     },
     goMenu() {
-      this.goWithLoading("/pages/menu/index", "switchTab");
+      common_vendor.index.switchTab({ url: "/pages/menu/index" });
     },
     reorder() {
-      this.goWithLoading("/pages/menu/index", "switchTab");
-    },
-    goWithLoading(url, type = "navigateTo", tip = "加载中...") {
-      this.pageLoadingTip = tip;
-      this.pageLoading = true;
-      setTimeout(() => {
-        if (type === "switchTab") {
-          common_vendor.index.switchTab({ url });
-        } else if (type === "reLaunch") {
-          common_vendor.index.reLaunch({ url });
-        } else if (type === "redirectTo") {
-          common_vendor.index.redirectTo({ url });
-        } else if (type === "navigateBack") {
-          common_vendor.index.navigateBack();
-        } else {
-          common_vendor.index.navigateTo({ url });
-        }
-        setTimeout(() => {
-          this.pageLoading = false;
-        }, 500);
-      }, 100);
+      common_vendor.index.switchTab({ url: "/pages/menu/index" });
     }
   }
 };
-if (!Array) {
-  const _easycom_page_loading2 = common_vendor.resolveComponent("page-loading");
-  _easycom_page_loading2();
-}
-const _easycom_page_loading = () => "../../components/page-loading/page-loading.js";
-if (!Math) {
-  _easycom_page_loading();
-}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $data.pendingTotal > 0
@@ -135,10 +103,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: _ctx.tabbarSelected === index ? 1 : "",
         f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
       };
-    }),
-    g: common_vendor.p({
-      visible: $data.pageLoading,
-      tip: $data.pageLoadingTip
     })
   });
 }

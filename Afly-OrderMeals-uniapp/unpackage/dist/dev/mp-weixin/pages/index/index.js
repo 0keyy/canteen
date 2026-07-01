@@ -8,9 +8,7 @@ const utils_navbar = require("../../utils/navbar.js");
 const PageLoading = () => "../../components/page-loading/page-loading.js";
 const _sfc_main = {
   mixins: [mixins_tabbarPage.tabbarPageMixin],
-  components: {
-    PageLoading
-  },
+  components: { PageLoading },
   data() {
     return {
       navMetrics: utils_navbar.getNavMetrics(),
@@ -20,13 +18,13 @@ const _sfc_main = {
       banners: [],
       recommendDishes: [],
       recommendLoading: false,
+      pageLoading: false,
+      pageLoadingTip: "",
       shortcuts: [
         { name: "积分商城", desc: "神秘好物等你来", iconClass: "home__icon--points" },
         { name: "领券中心", desc: "限时领取优惠", iconClass: "home__icon--coupon" },
         { name: "优惠券包", desc: "享多重优惠", iconClass: "home__icon--wallet" }
-      ],
-      pageLoading: false,
-      pageLoadingTip: "加载中..."
+      ]
     };
   },
   computed: {
@@ -65,9 +63,15 @@ const _sfc_main = {
       this.menuButtonRight = utils_navbar.getMenuButtonMarginRight(96);
     },
     async loadPageContent() {
-      await this.loadShop();
-      await this.loadDecoration();
-      this.loadRecommend();
+      this.pageLoading = true;
+      this.pageLoadingTip = "加载中...";
+      try {
+        await this.loadShop();
+        await this.loadDecoration();
+        await this.loadRecommend();
+      } finally {
+        this.pageLoading = false;
+      }
     },
     parsePageWidgets(pageData) {
       if (!pageData)
@@ -149,14 +153,14 @@ const _sfc_main = {
       }
       common_vendor.index.setStorageSync("diningMode", mode);
       if (mode === 3) {
-        this.goWithLoading("/pages/address/list?select=1");
+        common_vendor.index.navigateTo({ url: "/pages/address/list?select=1" });
         return;
       }
-      this.goWithLoading("/pages/menu/index", "switchTab");
+      common_vendor.index.switchTab({ url: "/pages/menu/index" });
     },
     goMenu() {
       common_vendor.index.setStorageSync("diningMode", 1);
-      this.goWithLoading("/pages/menu/index", "switchTab");
+      common_vendor.index.switchTab({ url: "/pages/menu/index" });
     },
     selectSpec() {
       this.goMenu();
@@ -166,39 +170,21 @@ const _sfc_main = {
     },
     onShortcutTap(item) {
       if ((item == null ? void 0 : item.name) === "积分商城") {
-        this.goWithLoading("/pages/integralShop/index");
+        common_vendor.index.navigateTo({ url: "/pages/integralShop/index" });
         return;
       }
       if ((item == null ? void 0 : item.name) === "优惠券包") {
-        this.goWithLoading("/pages/coupon/wallet");
+        common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
         return;
       }
       if ((item == null ? void 0 : item.name) === "领券中心") {
-        this.goWithLoading("/pages/coupon/center");
+        common_vendor.index.navigateTo({ url: "/pages/coupon/center" });
         return;
       }
       common_vendor.index.showToast({ title: "功能开发中", icon: "none" });
     },
     goCouponCenter() {
-      this.goWithLoading("/pages/coupon/center");
-    },
-    goWithLoading(url, type = "navigateTo", tip = "加载中...") {
-      this.pageLoadingTip = tip;
-      this.pageLoading = true;
-      setTimeout(() => {
-        if (type === "switchTab") {
-          common_vendor.index.switchTab({ url });
-        } else if (type === "reLaunch") {
-          common_vendor.index.reLaunch({ url });
-        } else if (type === "redirectTo") {
-          common_vendor.index.redirectTo({ url });
-        } else {
-          common_vendor.index.navigateTo({ url });
-        }
-        setTimeout(() => {
-          this.pageLoading = false;
-        }, 500);
-      }, 100);
+      common_vendor.index.navigateTo({ url: "/pages/coupon/center" });
     }
   }
 };
@@ -212,9 +198,7 @@ if (!Math) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.o((...args) => $options.goSearch && $options.goSearch(...args), "81"),
-    b: common_vendor.s($options.searchRowStyle),
-    c: common_vendor.f($options.displayBanners, (item, index, i0) => {
+    a: common_vendor.f($options.displayBanners, (item, index, i0) => {
       return common_vendor.e({
         a: item.image
       }, item.image ? {
@@ -223,13 +207,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         c: index
       });
     }),
-    d: $options.displayBanners.length > 1,
-    e: $options.displayBanners.length > 0,
-    f: common_vendor.o(($event) => $options.selectMode(1), "0c"),
-    g: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
-    h: common_vendor.o(($event) => $options.selectMode(3), "e2"),
-    i: common_vendor.s($options.heroPaddingStyle),
-    j: common_vendor.f($data.shortcuts, (item, k0, i0) => {
+    b: $options.displayBanners.length > 1,
+    c: $options.displayBanners.length > 0,
+    d: common_vendor.o(($event) => $options.selectMode(1), "be"),
+    e: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
+    f: common_vendor.o(($event) => $options.selectMode(3), "f5"),
+    g: common_vendor.s($options.heroPaddingStyle),
+    h: common_vendor.f($data.shortcuts, (item, k0, i0) => {
       return {
         a: common_vendor.n(item.iconClass),
         b: common_vendor.t(item.name),
@@ -238,10 +222,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: common_vendor.o(($event) => $options.onShortcutTap(item), item.name)
       };
     }),
-    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "8d"),
-    l: $options.homeRecommendDishes.length
+    i: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "94"),
+    j: $options.homeRecommendDishes.length
   }, $options.homeRecommendDishes.length ? {
-    m: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
+    k: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
       return common_vendor.e({
         a: dish.image,
         b: dish.badge
@@ -257,9 +241,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       });
     })
   } : {}, {
-    n: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
+    l: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
   }, !$data.recommendLoading && $options.homeRecommendDishes.length === 0 ? {} : {}, {
-    o: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    m: common_vendor.p({
+      visible: $data.pageLoading,
+      tip: $data.pageLoadingTip
+    }),
+    n: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),
@@ -268,10 +256,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: _ctx.tabbarSelected === index ? 1 : "",
         f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
       };
-    }),
-    p: common_vendor.p({
-      visible: $data.pageLoading,
-      tip: $data.pageLoadingTip
     })
   });
 }

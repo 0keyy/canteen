@@ -10,6 +10,7 @@
       "path": "pages/index/index",
       "style": {
         "navigationStyle": "custom",
+        "transparentTitle": "always",
         "enablePullDownRefresh": false
       }
     },
@@ -25,7 +26,8 @@
         "navigationStyle": "custom",
         "navigationBarTitleText": "确认订单",
         "navigationBarBackgroundColor": "#FFFCF8",
-        "navigationBarTextStyle": "black"
+        "navigationBarTextStyle": "black",
+        "animationType": "slide-in-right"
       }
     },
     {
@@ -33,7 +35,8 @@
       "style": {
         "navigationBarTitleText": "收货地址",
         "navigationBarBackgroundColor": "#FFFCF8",
-        "navigationBarTextStyle": "black"
+        "navigationBarTextStyle": "black",
+        "animationType": "slide-in-right"
       }
     },
     {
@@ -41,7 +44,8 @@
       "style": {
         "navigationBarTitleText": "编辑地址",
         "navigationBarBackgroundColor": "#FFFCF8",
-        "navigationBarTextStyle": "black"
+        "navigationBarTextStyle": "black",
+        "animationType": "slide-in-right"
       }
     },
     {
@@ -55,7 +59,8 @@
       "style": {
         "navigationBarTitleText": "订单详情",
         "navigationBarBackgroundColor": "#FFFCF8",
-        "navigationBarTextStyle": "black"
+        "navigationBarTextStyle": "black",
+        "animationType": "slide-in-right"
       }
     },
     {
@@ -69,13 +74,15 @@
       "style": {
         "navigationBarTitleText": "公司认证",
         "navigationBarBackgroundColor": "#FFFCF8",
-        "navigationBarTextStyle": "black"
+        "navigationBarTextStyle": "black",
+        "animationType": "slide-in-right"
       }
     },
     {
       "path": "pages/mine/profile",
       "style": {
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "animationType": "slide-in-right"
       }
     },
     {
@@ -83,7 +90,8 @@
       "style": {
         "navigationBarTitleText": "领券中心",
         "navigationBarBackgroundColor": "#FFFCF8",
-        "navigationBarTextStyle": "black"
+        "navigationBarTextStyle": "black",
+        "animationType": "slide-in-right"
       }
     },
     {
@@ -91,7 +99,8 @@
       "style": {
         "navigationBarTitleText": "我的券包",
         "navigationBarBackgroundColor": "#FFFCF8",
-        "navigationBarTextStyle": "black"
+        "navigationBarTextStyle": "black",
+        "animationType": "slide-in-right"
       }
     },
     {
@@ -99,7 +108,8 @@
       "style": {
         "navigationBarTitleText": "充值中心",
         "navigationBarBackgroundColor": "#FFFFFF",
-        "navigationBarTextStyle": "black"
+        "navigationBarTextStyle": "black",
+        "animationType": "slide-in-right"
       }
     },
     {
@@ -107,31 +117,36 @@
       "style": {
         "navigationBarTitleText": "核销码",
         "navigationBarBackgroundColor": "#FFFCF8",
-        "navigationBarTextStyle": "black"
+        "navigationBarTextStyle": "black",
+        "animationType": "slide-in-right"
       }
     },
     {
       "path": "pages/points/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "animationType": "slide-in-right"
       }
     },
     {
       "path": "pages/integralShop/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "animationType": "slide-in-right"
       }
     },
 	{
 	  "path": "pages/integralDraw/index",
 	  "style": {
-	    "navigationStyle": "custom"
+	    "navigationStyle": "custom",
+	    "animationType": "slide-in-right"
 	  }
 	},
 	{
 	  "path": "pages/mine/memberCode/index",
 	  "style": {
-	    "navigationBarTitleText": "会员码"
+	    "navigationBarTitleText": "会员码",
+	    "animationType": "slide-in-right"
 	  }
 	}
   ],

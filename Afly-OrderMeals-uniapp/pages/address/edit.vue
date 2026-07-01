@@ -114,16 +114,13 @@
       </view>
     </view>
 
-    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 import { addressApi } from '../../api/index'
-import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
-  components: { PageLoading },
   data() {
     return {
       form: {
@@ -136,9 +133,7 @@ export default {
         detail: '',
         isDefault: 0
       },
-      gender: '',
-      pageLoading: false,
-      pageLoadingTip: '加载中...'
+      gender: ''
     }
   },
   async onLoad(options) {
@@ -151,7 +146,7 @@ export default {
   },
   methods: {
     goBack() {
-      this.goWithLoading('', 'navigateBack')
+      uni.navigateBack()
     },
     extractGender() {
       if (this.form.contactName) {
@@ -181,19 +176,7 @@ export default {
       this.form.contactName = this.buildContactName()
       await addressApi.save(this.form)
       this.form.contactName = originalName
-      this.goWithLoading('', 'navigateBack')
-    },
-    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
-      this.pageLoadingTip = tip
-      this.pageLoading = true
-      setTimeout(() => {
-        if (type === 'switchTab') { uni.switchTab({ url }) }
-        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
-        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
-        else if (type === 'navigateBack') { uni.navigateBack() }
-        else { uni.navigateTo({ url }) }
-        setTimeout(() => { this.pageLoading = false }, 500)
-      }, 100)
+      uni.navigateBack()
     }
   }
 }

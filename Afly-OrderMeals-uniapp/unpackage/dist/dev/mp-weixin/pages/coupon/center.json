@@ -2,7 +2,6 @@
   "navigationBarTitleText": "领券中心",
   "navigationBarBackgroundColor": "#FFFCF8",
   "navigationBarTextStyle": "black",
-  "usingComponents": {
-    "page-loading": "../../components/page-loading/page-loading"
-  }
+  "animationType": "slide-in-right",
+  "usingComponents": {}
 }

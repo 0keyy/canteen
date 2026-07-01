@@ -1,9 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
-const PageLoading = () => "../../components/page-loading/page-loading.js";
 const _sfc_main = {
-  components: { PageLoading },
   data() {
     return {
       form: {
@@ -16,9 +14,7 @@ const _sfc_main = {
         detail: "",
         isDefault: 0
       },
-      gender: "",
-      pageLoading: false,
-      pageLoadingTip: "加载中..."
+      gender: ""
     };
   },
   async onLoad(options) {
@@ -30,7 +26,7 @@ const _sfc_main = {
   },
   methods: {
     goBack() {
-      this.goWithLoading("", "navigateBack");
+      common_vendor.index.navigateBack();
     },
     extractGender() {
       if (this.form.contactName) {
@@ -60,38 +56,10 @@ const _sfc_main = {
       this.form.contactName = this.buildContactName();
       await api_index.addressApi.save(this.form);
       this.form.contactName = originalName;
-      this.goWithLoading("", "navigateBack");
-    },
-    goWithLoading(url, type = "navigateTo", tip = "加载中...") {
-      this.pageLoadingTip = tip;
-      this.pageLoading = true;
-      setTimeout(() => {
-        if (type === "switchTab") {
-          common_vendor.index.switchTab({ url });
-        } else if (type === "reLaunch") {
-          common_vendor.index.reLaunch({ url });
-        } else if (type === "redirectTo") {
-          common_vendor.index.redirectTo({ url });
-        } else if (type === "navigateBack") {
-          common_vendor.index.navigateBack();
-        } else {
-          common_vendor.index.navigateTo({ url });
-        }
-        setTimeout(() => {
-          this.pageLoading = false;
-        }, 500);
-      }, 100);
+      common_vendor.index.navigateBack();
     }
   }
 };
-if (!Array) {
-  const _easycom_page_loading2 = common_vendor.resolveComponent("page-loading");
-  _easycom_page_loading2();
-}
-const _easycom_page_loading = () => "../../components/page-loading/page-loading.js";
-if (!Math) {
-  _easycom_page_loading();
-}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "ad"),
@@ -113,11 +81,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     q: common_vendor.o(($event) => $data.form.detail = $event.detail.value, "e0"),
     r: $data.form.isDefault === 1,
     s: common_vendor.o((...args) => $options.onDefaultChange && $options.onDefaultChange(...args), "0f"),
-    t: common_vendor.o((...args) => $options.save && $options.save(...args), "1a"),
-    v: common_vendor.p({
-      visible: $data.pageLoading,
-      tip: $data.pageLoadingTip
-    })
+    t: common_vendor.o((...args) => $options.save && $options.save(...args), "1a")
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-dcb1f0d8"]]);

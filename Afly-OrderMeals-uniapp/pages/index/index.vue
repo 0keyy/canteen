@@ -5,12 +5,12 @@
         <!-- 渐变顶栏：搜索 → 轮播 → 自提/外卖 -->
         <view class="home__hero">
           <view class="home__hero-inner" :style="heroPaddingStyle">
-            <view class="home__nav-row" :style="searchRowStyle">
+            <!-- <view class="home__nav-row" :style="searchRowStyle">
               <view class="home__search" @tap.stop="goSearch">
                 <view class="home__search-icon"></view>
                 <text class="home__search-text">点击搜索</text>
               </view>
-            </view>
+            </view> -->
 
             <view class="home__banner-section">
               <view class="home__banner-wrap">
@@ -126,6 +126,8 @@
       </view>
     </scroll-view>
 
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
+
     <view class="app-tab-bar">
       <view
         v-for="(item, index) in tabbarList"
@@ -150,7 +152,6 @@
       </view>
     </view>
   </view>
-  <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
 </template>
 
 <script>
@@ -163,9 +164,7 @@ import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
   mixins: [tabbarPageMixin],
-  components: {
-    PageLoading
-  },
+  components: { PageLoading },
   data() {
     return {
       navMetrics: getNavMetrics(),
@@ -175,13 +174,13 @@ export default {
       banners: [],
       recommendDishes: [],
       recommendLoading: false,
+      pageLoading: false,
+      pageLoadingTip: '',
       shortcuts: [
         { name: '积分商城', desc: '神秘好物等你来', iconClass: 'home__icon--points' },
         { name: '领券中心', desc: '限时领取优惠', iconClass: 'home__icon--coupon' },
         { name: '优惠券包', desc: '享多重优惠', iconClass: 'home__icon--wallet' }
-      ],
-      pageLoading: false,
-      pageLoadingTip: '加载中...'
+      ]
     }
   },
   computed: {
@@ -219,9 +218,15 @@ export default {
       this.menuButtonRight = getMenuButtonMarginRight(96)
     },
     async loadPageContent() {
-      await this.loadShop()
-      await this.loadDecoration()
-      this.loadRecommend()
+      this.pageLoading = true
+      this.pageLoadingTip = '加载中...'
+      try {
+        await this.loadShop()
+        await this.loadDecoration()
+        await this.loadRecommend()
+      } finally {
+        this.pageLoading = false
+      }
     },
     parsePageWidgets(pageData) {
       if (!pageData) return []
@@ -300,14 +305,14 @@ export default {
       }
       uni.setStorageSync('diningMode', mode)
       if (mode === 3) {
-        this.goWithLoading('/pages/address/list?select=1')
+        uni.navigateTo({ url: '/pages/address/list?select=1' })
         return
       }
-      this.goWithLoading('/pages/menu/index', 'switchTab')
+      uni.switchTab({ url: '/pages/menu/index' })
     },
     goMenu() {
       uni.setStorageSync('diningMode', 1)
-      this.goWithLoading('/pages/menu/index', 'switchTab')
+      uni.switchTab({ url: '/pages/menu/index' })
     },
     selectSpec() {
       this.goMenu()
@@ -317,39 +322,21 @@ export default {
     },
     onShortcutTap(item) {
       if (item?.name === '积分商城') {
-        this.goWithLoading('/pages/integralShop/index')
+        uni.navigateTo({ url: '/pages/integralShop/index' })
         return
       }
       if (item?.name === '优惠券包') {
-        this.goWithLoading('/pages/coupon/wallet')
+        uni.navigateTo({ url: '/pages/coupon/wallet' })
         return
       }
       if (item?.name === '领券中心') {
-        this.goWithLoading('/pages/coupon/center')
+        uni.navigateTo({ url: '/pages/coupon/center' })
         return
       }
       uni.showToast({ title: '功能开发中', icon: 'none' })
     },
     goCouponCenter() {
-      this.goWithLoading('/pages/coupon/center')
-    },
-    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
-      this.pageLoadingTip = tip
-      this.pageLoading = true
-      setTimeout(() => {
-        if (type === 'switchTab') {
-          uni.switchTab({ url })
-        } else if (type === 'reLaunch') {
-          uni.reLaunch({ url })
-        } else if (type === 'redirectTo') {
-          uni.redirectTo({ url })
-        } else {
-          uni.navigateTo({ url })
-        }
-        setTimeout(() => {
-          this.pageLoading = false
-        }, 500)
-      }, 100)
+      uni.navigateTo({ url: '/pages/coupon/center' })
     }
   }
 }

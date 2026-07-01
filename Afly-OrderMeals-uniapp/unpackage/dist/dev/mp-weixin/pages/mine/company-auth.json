@@ -2,8 +2,8 @@
   "navigationBarTitleText": "公司认证",
   "navigationBarBackgroundColor": "#FFFCF8",
   "navigationBarTextStyle": "black",
+  "animationType": "slide-in-right",
   "usingComponents": {
-    "dept-tree-picker": "../../components/dept-tree-picker/dept-tree-picker",
-    "page-loading": "../../components/page-loading/page-loading"
+    "dept-tree-picker": "../../components/dept-tree-picker/dept-tree-picker"
   }
 }

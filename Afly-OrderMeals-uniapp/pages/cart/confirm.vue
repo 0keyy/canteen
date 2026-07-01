@@ -108,7 +108,7 @@
           <text class="checkout__submit-label">合计:</text>
           <text class="checkout__submit-price">¥{{ finalAmount }}</text>
         </view>
-        <view class="checkout__submit-btn" @click="handleSubmit">
+        <view class="checkout__submit-btn" @click="handleSubmit" :class="{ 'checkout__submit-btn--disabled': loading }">
           <text class="checkout__submit-btn-text">{{ loading ? '提交中...' : '去支付' }}</text>
         </view>
       </view>
@@ -145,15 +145,15 @@ export default {
       order: null,
       remark: '',
       loading: false,
+      pageLoading: false,
+      pageLoadingTip: '',
       diningMode: 1,
       payChannel: DEFAULT_PAY_CHANNEL,
       couponInfo: null,
       selectedCouponId: 0,
       couponDiscount: 0,
       showPayPicker: false,
-      payMethodList: [],
-      pageLoading: false,
-      pageLoadingTip: '加载中...'
+      payMethodList: []
     }
   },
   computed: {
@@ -191,10 +191,10 @@ export default {
   },
   methods: {
     goBack() {
-      this.goWithLoading('', 'navigateBack')
+      uni.navigateBack()
     },
     goAddress() {
-      this.goWithLoading('/pages/address/list?select=1', 'navigateTo')
+      uni.navigateTo({ url: '/pages/address/list?select=1' })
     },
     calcDishesAmount(dishes) {
       if (!Array.isArray(dishes) || dishes.length === 0) return '0.00'
@@ -243,11 +243,14 @@ export default {
       this.payMethodList = list || []
     },
     async handleSubmit() {
+      if (this.loading) return
       if (!this.payChannel) {
         uni.showToast({ title: '请选择支付方式', icon: 'none' })
         return
       }
       this.loading = true
+      this.pageLoading = true
+      this.pageLoadingTip = '提交中...'
       try {
         const addressId = uni.getStorageSync('addressId') || null
         await orderApi.submit({
@@ -259,25 +262,14 @@ export default {
         await payOrder(this.orderId, this.payChannel, 'mp')
         uni.showToast({ title: '支付成功', icon: 'success' })
         setTimeout(() => {
-          this.goWithLoading(`/pages/order/detail?orderId=${this.orderId}`, 'redirectTo')
+          uni.redirectTo({ url: `/pages/order/detail?orderId=${this.orderId}` })
         }, 500)
       } catch (e) {
         uni.showToast({ title: e.message || e, icon: 'none' })
       } finally {
         this.loading = false
+        this.pageLoading = false
       }
-    },
-    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
-      this.pageLoadingTip = tip
-      this.pageLoading = true
-      setTimeout(() => {
-        if (type === 'switchTab') { uni.switchTab({ url }) }
-        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
-        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
-        else if (type === 'navigateBack') { uni.navigateBack() }
-        else { uni.navigateTo({ url }) }
-        setTimeout(() => { this.pageLoading = false }, 500)
-      }, 100)
     }
   }
 }
@@ -606,6 +598,12 @@ export default {
     &:active {
       transform: scale(0.97);
       opacity: 0.9;
+    }
+
+    &--disabled {
+      background: #CCCCCC;
+      box-shadow: none;
+      pointer-events: none;
     }
   }
 

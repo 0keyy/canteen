@@ -19,23 +19,18 @@
         </text>
       </view>
     </template>
-    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 import { couponApi } from '../../api/index'
-import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
-  components: { PageLoading },
   data() {
     return {
       loading: false,
       code: '',
-      couponId: null,
-      pageLoading: false,
-      pageLoadingTip: '加载中...'
+      couponId: null
     }
   },
   onLoad(options) {
@@ -52,18 +47,6 @@ export default {
       } finally {
         this.loading = false
       }
-    },
-    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
-      this.pageLoadingTip = tip
-      this.pageLoading = true
-      setTimeout(() => {
-        if (type === 'switchTab') { uni.switchTab({ url }) }
-        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
-        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
-        else if (type === 'navigateBack') { uni.navigateBack() }
-        else { uni.navigateTo({ url }) }
-        setTimeout(() => { this.pageLoading = false }, 500)
-      }, 100)
     }
   }
 }

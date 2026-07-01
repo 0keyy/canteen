@@ -62,17 +62,15 @@
         提交认证
       </button>
     </view>
-    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 import { companyApi } from '../../api/index'
 import DeptTreePicker from '../../components/dept-tree-picker/dept-tree-picker.vue'
-import PageLoading from '../../components/page-loading/page-loading.vue'
 
 export default {
-  components: { DeptTreePicker, PageLoading },
+  components: { DeptTreePicker },
   data() {
     return {
       verified: false,
@@ -83,9 +81,7 @@ export default {
         username: '',
         password: ''
       },
-      submitting: false,
-      pageLoading: false,
-      pageLoadingTip: '加载中...'
+      submitting: false
     }
   },
   async onLoad() {
@@ -156,18 +152,6 @@ export default {
       } finally {
         this.submitting = false
       }
-    },
-    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
-      this.pageLoadingTip = tip
-      this.pageLoading = true
-      setTimeout(() => {
-        if (type === 'switchTab') { uni.switchTab({ url }) }
-        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
-        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
-        else if (type === 'navigateBack') { uni.navigateBack() }
-        else { uni.navigateTo({ url }) }
-        setTimeout(() => { this.pageLoading = false }, 500)
-      }, 100)
     }
   }
 }

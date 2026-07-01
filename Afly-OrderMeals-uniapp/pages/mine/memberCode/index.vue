@@ -48,19 +48,14 @@
     <view class="footer-tip">
       <text class="tip-text">使用会员码，可在门店享受会员优惠与积分抵扣</text>
     </view>
-    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 import { memberApi } from '../../../api/index'
-import PageLoading from '../../../components/page-loading/page-loading.vue'
 export default {
-  components: { PageLoading },
   data() {
     return {
-      pageLoading: false,
-      pageLoadingTip: '加载中...',
       memberId: "",
       nickname: "",
       level: "",
@@ -109,19 +104,7 @@ export default {
       this.qrCodeContent = `https://你的后端核销接口.com/verify?uid=${this.memberId}&ts=${timeStamp}`
     },
     goBack() {
-      this.goWithLoading('', 'navigateBack')
-    },
-    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
-      this.pageLoadingTip = tip
-      this.pageLoading = true
-      setTimeout(() => {
-        if (type === 'switchTab') { uni.switchTab({ url }) }
-        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
-        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
-        else if (type === 'navigateBack') { uni.navigateBack() }
-        else { uni.navigateTo({ url }) }
-        setTimeout(() => { this.pageLoading = false }, 500)
-      }, 100)
+      uni.navigateBack()
     }
   }
 }
@@ -232,7 +215,7 @@ export default {
 .card-no {
   margin-top: 16rpx;
   font-size: 24rpx;
-  color: red;
+  color: #b10a0f;
 }
 
 /* 二维码 */
@@ -259,7 +242,7 @@ export default {
 .refresh-tip {
   margin-top: 20rpx;
   font-size: 24rpx;
-  color: red; /* 文字基准灰色 */
+  color: #b10a0f; /* 文字基准灰色 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -269,7 +252,7 @@ export default {
   width: 28rpx;
   height: 28rpx;
   filter: none;
-  tint-color: red;
+  color: #b10a0f;
 }
 
 /* 余额 */
@@ -286,13 +269,13 @@ export default {
 .balance-value {
   font-size: 48rpx;
   font-weight: 700;
-  color: red;
+  color: #b10a0f;
 }
 
 .balance-label {
   margin-top: 8rpx;
   font-size: 24rpx;
-  color: red;
+  color: #b10a0f;
 }
 
 /* 底部说明 */

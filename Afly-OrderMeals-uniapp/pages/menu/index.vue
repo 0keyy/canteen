@@ -1,12 +1,12 @@
 <template>
   <view class="order-page">
     <view class="order-page__header" :style="headerPaddingStyle">
-      <view class="order-page__search-row" :style="searchRowStyle">
+      <!-- <view class="order-page__search-row" :style="searchRowStyle">
         <view class="order-page__search" @tap.stop="goSearch">
           <view class="order-page__search-icon"></view>
           <text class="order-page__search-text">点击搜索</text>
         </view>
-      </view>
+      </view> -->
 
       <view class="order-page__banner">
         <swiper
@@ -41,6 +41,7 @@
       </view>
     </view>
 
+    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
     <view v-if="loading" class="order-page__loading">加载中...</view>
     <view v-else-if="menu.length === 0" class="order-page__empty">暂无菜品，请先在后台添加菜品分类和菜品</view>
     <view v-else class="order-page__main">
@@ -135,7 +136,6 @@
         </text>
       </view>
     </view>
-    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
@@ -165,9 +165,7 @@ export default {
       cartReady: false,
       cartBusy: false,
       cartInitPromise: null,
-      banners: [],
-      pageLoading: false,
-      pageLoadingTip: '加载中...'
+      banners: []
     }
   },
   computed: {
@@ -254,7 +252,7 @@ export default {
       uni.setStorageSync('diningMode', mode)
       this.diningMode = mode
       if (mode === 3) {
-        this.goWithLoading('/pages/address/list?select=1', 'navigateTo')
+        uni.navigateTo({ url: '/pages/address/list?select=1' })
         return
       }
       await this.bootstrap()
@@ -334,6 +332,8 @@ export default {
       this.cartMap = next
     },
     async bootstrap() {
+      this.pageLoading = true
+      this.pageLoadingTip = '加载中...'
       this.loading = true
       this.cartReady = false
       try {
@@ -346,10 +346,11 @@ export default {
         uni.showToast({ title: e.message || e || '页面加载失败', icon: 'none' })
       } finally {
         this.loading = false
+        this.pageLoading = false
       }
     },
     async loadMenu() {
-      const list = await orderApi.menu(this.aid)
+      const list = await orderApi.menu(this.aid, { silent: true })
       this.menu = (Array.isArray(list) ? list : []).map((cate) => ({
         ...cate,
         foods: (cate.foods || []).map((food) => ({
@@ -505,7 +506,7 @@ export default {
           return
         }
         uni.setStorageSync('orderId', this.orderId)
-        this.goWithLoading('/pages/cart/confirm', 'navigateTo')
+        uni.navigateTo({ url: '/pages/cart/confirm' })
       } catch (e) {
         uni.showToast({ title: e.message || e || '购物车未就绪', icon: 'none' })
       }
@@ -515,29 +516,12 @@ export default {
       if (!path) return
       if (this.tabbarSelected === index) return
       const url = `/${path}`
-      this.pageLoadingTip = '加载中...'
-      this.pageLoading = true
-      setTimeout(() => {
-        uni.switchTab({
-          url,
-          fail: () => {
-            uni.reLaunch({ url })
-          }
-        })
-        setTimeout(() => { this.pageLoading = false }, 500)
-      }, 100)
-    },
-    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
-      this.pageLoadingTip = tip
-      this.pageLoading = true
-      setTimeout(() => {
-        if (type === 'switchTab') { uni.switchTab({ url }) }
-        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
-        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
-        else if (type === 'navigateBack') { uni.navigateBack() }
-        else { uni.navigateTo({ url }) }
-        setTimeout(() => { this.pageLoading = false }, 500)
-      }, 100)
+      uni.switchTab({
+        url,
+        fail: () => {
+          uni.reLaunch({ url })
+        }
+      })
     }
   }
 }

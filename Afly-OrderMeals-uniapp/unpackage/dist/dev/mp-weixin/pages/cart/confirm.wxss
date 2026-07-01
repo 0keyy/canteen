@@ -282,6 +282,11 @@
   transform: scale(0.97);
   opacity: 0.9;
 }
+.checkout__submit-btn--disabled.data-v-aaa7ef6e {
+  background: #CCCCCC;
+  box-shadow: none;
+  pointer-events: none;
+}
 .checkout__submit-btn-text.data-v-aaa7ef6e {
   color: #FFFFFF;
   font-size: 30rpx;

@@ -14,6 +14,7 @@ function buildUrl(url, params) {
 export function request(options) {
   const token = uni.getStorageSync('token')
   const finalUrl = options.params ? buildUrl(options.url, options.params) : options.url
+
   return new Promise((resolve, reject) => {
     uni.request({
       url: BASE_URL + finalUrl,

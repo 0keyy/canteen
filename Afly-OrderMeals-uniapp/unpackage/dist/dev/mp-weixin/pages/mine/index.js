@@ -3,7 +3,6 @@ const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
 const utils_navbar = require("../../utils/navbar.js");
-const PageLoading = () => "../../components/page-loading/page-loading.js";
 const PRIMARY_ACTIONS = [
   { title: "我的订单", icon: "orders" },
   { title: "地址管理", icon: "address" },
@@ -20,9 +19,6 @@ const SECONDARY_ACTIONS = [
 ];
 const _sfc_main = {
   mixins: [mixins_tabbarPage.tabbarPageMixin],
-  components: {
-    PageLoading
-  },
   data() {
     return {
       navMetrics: utils_navbar.getNavMetrics(),
@@ -38,9 +34,7 @@ const _sfc_main = {
       avatarKey: "",
       showAvatarPicker: false,
       showServicePicker: false,
-      servicePhones: [{ phone: "400-800-1234", name: "客服热线" }],
-      pageLoading: false,
-      pageLoadingTip: "加载中..."
+      servicePhones: [{ phone: "400-800-1234", name: "客服热线" }]
     };
   },
   computed: {
@@ -90,11 +84,11 @@ const _sfc_main = {
     },
     onActionTap(item) {
       if (item.title === "我的订单") {
-        this.goWithLoading("/pages/order/list", "switchTab");
+        common_vendor.index.switchTab({ url: "/pages/order/list" });
         return;
       }
       if (item.title === "地址管理") {
-        this.goWithLoading("/pages/address/list");
+        common_vendor.index.navigateTo({ url: "/pages/address/list" });
         return;
       }
       if (item.title === "联系客服") {
@@ -102,23 +96,23 @@ const _sfc_main = {
         return;
       }
       if (item.title === "会员码") {
-        this.goWithLoading("/pages/mine/memberCode/index");
+        common_vendor.index.navigateTo({ url: "/pages/mine/memberCode/index" });
         return;
       }
       if (item.title === "公司认证") {
-        this.goWithLoading("/pages/mine/company-auth");
+        common_vendor.index.navigateTo({ url: "/pages/mine/company-auth" });
         return;
       }
       if (item.title === "优惠券包") {
-        this.goWithLoading("/pages/coupon/wallet");
+        common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
         return;
       }
       if (item.title === "充值中心") {
-        this.goWithLoading("/pages/coupon/recharge");
+        common_vendor.index.navigateTo({ url: "/pages/coupon/recharge" });
         return;
       }
       if (item.title === "积分商城") {
-        this.goWithLoading("/pages/integralShop/index");
+        common_vendor.index.navigateTo({ url: "/pages/integralShop/index" });
         return;
       }
       if (item.title === "会员日") {
@@ -133,28 +127,13 @@ const _sfc_main = {
     },
     onFeatureTap(title) {
       if (title === "会员码") {
-        this.goWithLoading("/pages/mine/memberCode/index");
+        common_vendor.index.navigateTo({ url: "/pages/mine/memberCode/index" });
         return;
       }
       common_vendor.index.showToast({ title: `${title}功能开发中`, icon: "none" });
     },
-    goWithLoading(url, type = "navigateTo", tip = "加载中...") {
-      this.pageLoadingTip = tip;
-      this.pageLoading = true;
-      setTimeout(() => {
-        if (type === "switchTab") {
-          common_vendor.index.switchTab({ url });
-        } else if (type === "reLaunch") {
-          common_vendor.index.reLaunch({ url });
-        } else if (type === "redirectTo") {
-          common_vendor.index.redirectTo({ url });
-        } else {
-          common_vendor.index.navigateTo({ url });
-        }
-        setTimeout(() => {
-          this.pageLoading = false;
-        }, 500);
-      }, 100);
+    goProfile() {
+      common_vendor.index.navigateTo({ url: "/pages/mine/profile" });
     },
     async callService() {
       try {
@@ -194,18 +173,10 @@ const _sfc_main = {
       } catch (e) {
       }
       common_vendor.index.clearStorageSync();
-      this.goWithLoading("/pages/login/index", "reLaunch");
+      common_vendor.index.reLaunch({ url: "/pages/login/index" });
     }
   }
 };
-if (!Array) {
-  const _easycom_page_loading2 = common_vendor.resolveComponent("page-loading");
-  _easycom_page_loading2();
-}
-const _easycom_page_loading = () => "../../components/page-loading/page-loading.js";
-if (!Math) {
-  _easycom_page_loading();
-}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $options.avatarSrc,
@@ -213,17 +184,18 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     c: common_vendor.t($data.nickname || "未登录用户"),
     d: $data.companyVerified
   }, $data.companyVerified ? {} : {}, {
-    e: common_vendor.t($data.mobile || "请登录后查看"),
-    f: $data.companyVerified && $data.companyDeptName
+    e: common_vendor.o((...args) => $options.goProfile && $options.goProfile(...args), "2b"),
+    f: common_vendor.t($data.mobile || "请登录后查看"),
+    g: $data.companyVerified && $data.companyDeptName
   }, $data.companyVerified && $data.companyDeptName ? {
-    g: common_vendor.t($data.companyDeptName)
+    h: common_vendor.t($data.companyDeptName)
   } : {}, {
-    h: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "5f"),
-    i: common_vendor.t($data.balance),
-    j: common_vendor.t($data.pointCount),
-    k: common_vendor.t($data.couponCount),
-    l: common_vendor.s($options.heroPaddingStyle),
-    m: common_vendor.f($data.primaryActions, (item, k0, i0) => {
+    i: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "01"),
+    j: common_vendor.t($data.balance),
+    k: common_vendor.t($data.pointCount),
+    l: common_vendor.t($data.couponCount),
+    m: common_vendor.s($options.heroPaddingStyle),
+    n: common_vendor.f($data.primaryActions, (item, k0, i0) => {
       return {
         a: common_vendor.n(`profile-page__action-icon--${item.icon}`),
         b: common_vendor.t(item.title),
@@ -231,7 +203,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       };
     }),
-    n: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
+    o: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
       return common_vendor.e({
         a: item.iconImg
       }, item.iconImg ? {
@@ -244,20 +216,20 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         f: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       });
     }),
-    o: $data.showAvatarPicker
+    p: $data.showAvatarPicker
   }, $data.showAvatarPicker ? {
-    p: $data.avatarKey === "1" ? 1 : "",
-    q: common_vendor.o(($event) => $options.selectAvatar("1"), "3c"),
-    r: $data.avatarKey === "2" ? 1 : "",
-    s: common_vendor.o(($event) => $options.selectAvatar("2"), "e0"),
-    t: common_vendor.o(($event) => $data.showAvatarPicker = false, "8d"),
-    v: common_vendor.o(() => {
-    }, "ba"),
-    w: common_vendor.o(($event) => $data.showAvatarPicker = false, "83")
+    q: $data.avatarKey === "1" ? 1 : "",
+    r: common_vendor.o(($event) => $options.selectAvatar("1"), "d8"),
+    s: $data.avatarKey === "2" ? 1 : "",
+    t: common_vendor.o(($event) => $options.selectAvatar("2"), "ed"),
+    v: common_vendor.o(($event) => $data.showAvatarPicker = false, "81"),
+    w: common_vendor.o(() => {
+    }, "60"),
+    x: common_vendor.o(($event) => $data.showAvatarPicker = false, "19")
   } : {}, {
-    x: $data.showServicePicker
+    y: $data.showServicePicker
   }, $data.showServicePicker ? {
-    y: common_vendor.f($data.servicePhones, (item, index, i0) => {
+    z: common_vendor.f($data.servicePhones, (item, index, i0) => {
       return {
         a: common_vendor.t(item.name || "客服热线"),
         b: common_vendor.t(item.phone),
@@ -265,12 +237,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.makeCall(item.phone), index)
       };
     }),
-    z: common_vendor.o(($event) => $data.showServicePicker = false, "05"),
-    A: common_vendor.o(() => {
-    }, "53"),
-    B: common_vendor.o(($event) => $data.showServicePicker = false, "59")
+    A: common_vendor.o(($event) => $data.showServicePicker = false, "4e"),
+    B: common_vendor.o(() => {
+    }, "0d"),
+    C: common_vendor.o(($event) => $data.showServicePicker = false, "6d")
   } : {}, {
-    C: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    D: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),
@@ -279,10 +251,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: _ctx.tabbarSelected === index ? 1 : "",
         f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
       };
-    }),
-    D: common_vendor.p({
-      visible: $data.pageLoading,
-      tip: $data.pageLoadingTip
     })
   });
 }

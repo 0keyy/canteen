@@ -24,9 +24,7 @@ const _sfc_main = {
       cartReady: false,
       cartBusy: false,
       cartInitPromise: null,
-      banners: [],
-      pageLoading: false,
-      pageLoadingTip: "加载中..."
+      banners: []
     };
   },
   computed: {
@@ -122,7 +120,7 @@ const _sfc_main = {
       common_vendor.index.setStorageSync("diningMode", mode);
       this.diningMode = mode;
       if (mode === 3) {
-        this.goWithLoading("/pages/address/list?select=1", "navigateTo");
+        common_vendor.index.navigateTo({ url: "/pages/address/list?select=1" });
         return;
       }
       await this.bootstrap();
@@ -206,6 +204,8 @@ const _sfc_main = {
       this.cartMap = next;
     },
     async bootstrap() {
+      this.pageLoading = true;
+      this.pageLoadingTip = "加载中...";
       this.loading = true;
       this.cartReady = false;
       try {
@@ -218,10 +218,11 @@ const _sfc_main = {
         common_vendor.index.showToast({ title: e.message || e || "页面加载失败", icon: "none" });
       } finally {
         this.loading = false;
+        this.pageLoading = false;
       }
     },
     async loadMenu() {
-      const list = await api_index.orderApi.menu(this.aid);
+      const list = await api_index.orderApi.menu(this.aid, { silent: true });
       this.menu = (Array.isArray(list) ? list : []).map((cate) => ({
         ...cate,
         foods: (cate.foods || []).map((food) => ({
@@ -380,7 +381,7 @@ const _sfc_main = {
           return;
         }
         common_vendor.index.setStorageSync("orderId", this.orderId);
-        this.goWithLoading("/pages/cart/confirm", "navigateTo");
+        common_vendor.index.navigateTo({ url: "/pages/cart/confirm" });
       } catch (e) {
         common_vendor.index.showToast({ title: e.message || e || "购物车未就绪", icon: "none" });
       }
@@ -393,77 +394,52 @@ const _sfc_main = {
       if (this.tabbarSelected === index)
         return;
       const url = `/${path}`;
-      this.pageLoadingTip = "加载中...";
-      this.pageLoading = true;
-      setTimeout(() => {
-        common_vendor.index.switchTab({
-          url,
-          fail: () => {
-            common_vendor.index.reLaunch({ url });
-          }
-        });
-        setTimeout(() => {
-          this.pageLoading = false;
-        }, 500);
-      }, 100);
-    },
-    goWithLoading(url, type = "navigateTo", tip = "加载中...") {
-      this.pageLoadingTip = tip;
-      this.pageLoading = true;
-      setTimeout(() => {
-        if (type === "switchTab") {
-          common_vendor.index.switchTab({ url });
-        } else if (type === "reLaunch") {
+      common_vendor.index.switchTab({
+        url,
+        fail: () => {
           common_vendor.index.reLaunch({ url });
-        } else if (type === "redirectTo") {
-          common_vendor.index.redirectTo({ url });
-        } else if (type === "navigateBack") {
-          common_vendor.index.navigateBack();
-        } else {
-          common_vendor.index.navigateTo({ url });
         }
-        setTimeout(() => {
-          this.pageLoading = false;
-        }, 500);
-      }, 100);
+      });
     }
   }
 };
 if (!Array) {
-  const _easycom_menu_category_sidebar2 = common_vendor.resolveComponent("menu-category-sidebar");
   const _easycom_page_loading2 = common_vendor.resolveComponent("page-loading");
-  (_easycom_menu_category_sidebar2 + _easycom_page_loading2)();
+  const _easycom_menu_category_sidebar2 = common_vendor.resolveComponent("menu-category-sidebar");
+  (_easycom_page_loading2 + _easycom_menu_category_sidebar2)();
 }
-const _easycom_menu_category_sidebar = () => "../../components/menu-category-sidebar/menu-category-sidebar.js";
 const _easycom_page_loading = () => "../../components/page-loading/page-loading.js";
+const _easycom_menu_category_sidebar = () => "../../components/menu-category-sidebar/menu-category-sidebar.js";
 if (!Math) {
-  (_easycom_menu_category_sidebar + _easycom_page_loading)();
+  (_easycom_page_loading + _easycom_menu_category_sidebar)();
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.o((...args) => $options.goSearch && $options.goSearch(...args), "a3"),
-    b: common_vendor.s($options.searchRowStyle),
-    c: common_vendor.f($options.displayBanners, (item, index, i0) => {
+    a: common_vendor.f($options.displayBanners, (item, index, i0) => {
       return {
         a: item.image,
         b: index
       };
     }),
-    d: $options.displayBanners.length > 1,
-    e: common_vendor.t($options.shopName),
-    f: common_vendor.t($data.diningMode === 3 ? "外卖" : "堂食"),
-    g: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "15"),
-    h: common_vendor.s($options.headerPaddingStyle),
-    i: $data.loading
+    b: $options.displayBanners.length > 1,
+    c: common_vendor.t($options.shopName),
+    d: common_vendor.t($data.diningMode === 3 ? "外卖" : "堂食"),
+    e: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "b5"),
+    f: common_vendor.s($options.headerPaddingStyle),
+    g: common_vendor.p({
+      visible: _ctx.pageLoading,
+      tip: _ctx.pageLoadingTip
+    }),
+    h: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    k: common_vendor.o($options.selectCategory, "6e"),
-    l: common_vendor.p({
+    j: common_vendor.o($options.selectCategory, "ab"),
+    k: common_vendor.p({
       menu: $data.menu,
       ["active-index"]: $data.activeIndex,
       ["cart-map"]: $data.cartMap
     }),
-    m: common_vendor.t($options.currentCategoryName),
-    n: common_vendor.f($options.currentFoods, (food, idx, i0) => {
+    l: common_vendor.t($options.currentCategoryName),
+    m: common_vendor.f($options.currentFoods, (food, idx, i0) => {
       return common_vendor.e({
         a: food.image,
         b: $options.foodTag(idx)
@@ -488,19 +464,19 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         m: food.id
       });
     }),
-    o: $data.cartBusy ? 1 : "",
-    p: $options.currentFoods.length === 0
+    n: $data.cartBusy ? 1 : "",
+    o: $options.currentFoods.length === 0
   }, $options.currentFoods.length === 0 ? {} : {}), {
-    j: $data.menu.length === 0,
-    q: $options.cartItemCount > 0
+    i: $data.menu.length === 0,
+    p: $options.cartItemCount > 0
   }, $options.cartItemCount > 0 ? {
-    r: common_vendor.t($options.cartItemCount)
+    q: common_vendor.t($options.cartItemCount)
   } : {}, {
-    s: common_vendor.t($options.cartSummary),
+    r: common_vendor.t($options.cartSummary),
+    s: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
     t: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    v: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    w: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "63"),
-    x: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    v: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "fb"),
+    w: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),
@@ -509,10 +485,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: _ctx.tabbarSelected === index ? 1 : "",
         f: common_vendor.o(($event) => $options.switchTabbar(item, index), index)
       };
-    }),
-    y: common_vendor.p({
-      visible: $data.pageLoading,
-      tip: $data.pageLoadingTip
     })
   });
 }

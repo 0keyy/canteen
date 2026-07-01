@@ -13,15 +13,15 @@ const _sfc_main = {
       order: null,
       remark: "",
       loading: false,
+      pageLoading: false,
+      pageLoadingTip: "",
       diningMode: 1,
       payChannel: utils_pay_channels.DEFAULT_PAY_CHANNEL,
       couponInfo: null,
       selectedCouponId: 0,
       couponDiscount: 0,
       showPayPicker: false,
-      payMethodList: [],
-      pageLoading: false,
-      pageLoadingTip: "加载中..."
+      payMethodList: []
     };
   },
   computed: {
@@ -61,10 +61,10 @@ const _sfc_main = {
   },
   methods: {
     goBack() {
-      this.goWithLoading("", "navigateBack");
+      common_vendor.index.navigateBack();
     },
     goAddress() {
-      this.goWithLoading("/pages/address/list?select=1", "navigateTo");
+      common_vendor.index.navigateTo({ url: "/pages/address/list?select=1" });
     },
     calcDishesAmount(dishes) {
       if (!Array.isArray(dishes) || dishes.length === 0)
@@ -114,11 +114,15 @@ const _sfc_main = {
       this.payMethodList = list || [];
     },
     async handleSubmit() {
+      if (this.loading)
+        return;
       if (!this.payChannel) {
         common_vendor.index.showToast({ title: "请选择支付方式", icon: "none" });
         return;
       }
       this.loading = true;
+      this.pageLoading = true;
+      this.pageLoadingTip = "提交中...";
       try {
         const addressId = common_vendor.index.getStorageSync("addressId") || null;
         await api_index.orderApi.submit({
@@ -130,33 +134,14 @@ const _sfc_main = {
         await utils_pay_index.payOrder(this.orderId, this.payChannel, "mp");
         common_vendor.index.showToast({ title: "支付成功", icon: "success" });
         setTimeout(() => {
-          this.goWithLoading(`/pages/order/detail?orderId=${this.orderId}`, "redirectTo");
+          common_vendor.index.redirectTo({ url: `/pages/order/detail?orderId=${this.orderId}` });
         }, 500);
       } catch (e) {
         common_vendor.index.showToast({ title: e.message || e, icon: "none" });
       } finally {
         this.loading = false;
+        this.pageLoading = false;
       }
-    },
-    goWithLoading(url, type = "navigateTo", tip = "加载中...") {
-      this.pageLoadingTip = tip;
-      this.pageLoading = true;
-      setTimeout(() => {
-        if (type === "switchTab") {
-          common_vendor.index.switchTab({ url });
-        } else if (type === "reLaunch") {
-          common_vendor.index.reLaunch({ url });
-        } else if (type === "redirectTo") {
-          common_vendor.index.redirectTo({ url });
-        } else if (type === "navigateBack") {
-          common_vendor.index.navigateBack();
-        } else {
-          common_vendor.index.navigateTo({ url });
-        }
-        setTimeout(() => {
-          this.pageLoading = false;
-        }, 500);
-      }, 100);
     }
   }
 };
@@ -201,21 +186,22 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     o: common_vendor.t($options.finalAmount),
     p: common_vendor.t($data.loading ? "提交中..." : "去支付"),
     q: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "99"),
-    r: $data.showPayPicker
+    r: $data.loading ? 1 : "",
+    s: $data.showPayPicker
   }, $data.showPayPicker ? {
-    s: common_vendor.o($options.onPayMethodChange, "47"),
-    t: common_vendor.o($options.onPayMethodsLoaded, "30"),
-    v: common_vendor.o(($event) => $data.payChannel = $event, "0c"),
-    w: common_vendor.p({
+    t: common_vendor.o($options.onPayMethodChange, "c7"),
+    v: common_vendor.o($options.onPayMethodsLoaded, "be"),
+    w: common_vendor.o(($event) => $data.payChannel = $event, "2b"),
+    x: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    x: common_vendor.o(($event) => $data.showPayPicker = false, "92"),
-    y: common_vendor.o(() => {
-    }, "13"),
-    z: common_vendor.o(($event) => $data.showPayPicker = false, "51")
+    y: common_vendor.o(($event) => $data.showPayPicker = false, "af"),
+    z: common_vendor.o(() => {
+    }, "3a"),
+    A: common_vendor.o(($event) => $data.showPayPicker = false, "32")
   } : {}, {
-    A: common_vendor.p({
+    B: common_vendor.p({
       visible: $data.pageLoading,
       tip: $data.pageLoadingTip
     })

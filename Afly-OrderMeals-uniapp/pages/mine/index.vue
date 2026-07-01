@@ -10,7 +10,7 @@
             </view>
           </view>
           <view class="profile-page__user-info">
-            <view class="profile-page__name-row">
+            <view class="profile-page__name-row" @tap="goProfile">
               <text class="profile-page__nickname">{{ nickname || '未登录用户' }}</text>
               <text v-if="companyVerified" class="profile-page__level-tag profile-page__level-tag--verified">已认证</text>
               <text v-else class="profile-page__level-tag">默认等级</text>
@@ -172,14 +172,12 @@
       </view>
     </view>
   </view>
-  <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
 </template>
 
 <script>
 import { authApi, couponApi, serviceApi } from '../../api/index'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getNavMetrics } from '../../utils/navbar'
-import PageLoading from '../../components/page-loading/page-loading.vue'
 
 const PRIMARY_ACTIONS = [
   { title: '我的订单', icon: 'orders' },
@@ -199,9 +197,6 @@ const SECONDARY_ACTIONS = [
 
 export default {
   mixins: [tabbarPageMixin],
-  components: {
-    PageLoading
-  },
   data() {
     return {
       navMetrics: getNavMetrics(),
@@ -217,9 +212,7 @@ export default {
       avatarKey: '',
       showAvatarPicker: false,
       showServicePicker: false,
-      servicePhones: [{ phone: '400-800-1234', name: '客服热线' }],
-      pageLoading: false,
-      pageLoadingTip: '加载中...'
+      servicePhones: [{ phone: '400-800-1234', name: '客服热线' }]
     }
   },
   computed: {
@@ -273,11 +266,11 @@ export default {
     },
     onActionTap(item) {
       if (item.title === '我的订单') {
-        this.goWithLoading('/pages/order/list', 'switchTab')
+        uni.switchTab({ url: '/pages/order/list' })
         return
       }
       if (item.title === '地址管理') {
-        this.goWithLoading('/pages/address/list')
+        uni.navigateTo({ url: '/pages/address/list' })
         return
       }
       if (item.title === '联系客服') {
@@ -285,23 +278,23 @@ export default {
         return
       }
       if (item.title === '会员码') {
-        this.goWithLoading('/pages/mine/memberCode/index')
+        uni.navigateTo({ url: '/pages/mine/memberCode/index' })
         return
       }
       if (item.title === '公司认证') {
-        this.goWithLoading('/pages/mine/company-auth')
+        uni.navigateTo({ url: '/pages/mine/company-auth' })
         return
       }
       if (item.title === '优惠券包') {
-        this.goWithLoading('/pages/coupon/wallet')
+        uni.navigateTo({ url: '/pages/coupon/wallet' })
         return
       }
       if (item.title === '充值中心') {
-        this.goWithLoading('/pages/coupon/recharge')
+        uni.navigateTo({ url: '/pages/coupon/recharge' })
         return
       }
       if (item.title === '积分商城') {
-        this.goWithLoading('/pages/integralShop/index')
+        uni.navigateTo({ url: '/pages/integralShop/index' })
         return
       }
       if (item.title === '会员日') {
@@ -316,28 +309,13 @@ export default {
     },
     onFeatureTap(title) {
       if (title === '会员码') {
-        this.goWithLoading('/pages/mine/memberCode/index')
+        uni.navigateTo({ url: '/pages/mine/memberCode/index' })
         return
       }
       uni.showToast({ title: `${title}功能开发中`, icon: 'none' })
     },
-    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
-      this.pageLoadingTip = tip
-      this.pageLoading = true
-      setTimeout(() => {
-        if (type === 'switchTab') {
-          uni.switchTab({ url })
-        } else if (type === 'reLaunch') {
-          uni.reLaunch({ url })
-        } else if (type === 'redirectTo') {
-          uni.redirectTo({ url })
-        } else {
-          uni.navigateTo({ url })
-        }
-        setTimeout(() => {
-          this.pageLoading = false
-        }, 500)
-      }, 100)
+    goProfile() {
+      uni.navigateTo({ url: '/pages/mine/profile' })
     },
     async callService() {
       try {
@@ -373,7 +351,7 @@ export default {
         await authApi.logout()
       } catch (e) {}
       uni.clearStorageSync()
-      this.goWithLoading('/pages/login/index', 'reLaunch')
+      uni.reLaunch({ url: '/pages/login/index' })
     }
   }
 }
