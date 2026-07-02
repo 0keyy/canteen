@@ -71,6 +71,7 @@
                   <view
                     class="menu-card__btn menu-card__btn--minus"
                     v-if="getCount(food.id) > 0"
+                    :class="{ 'menu-card__btn--disabled': cartBusy || !cartReady }"
                     @tap.stop="decFood(food)"
                   >
                     <text class="menu-card__btn-icon">−</text>
@@ -78,7 +79,7 @@
                   <text class="menu-card__count" v-if="getCount(food.id) > 0">{{ getCount(food.id) }}</text>
                   <view
                     class="menu-card__btn menu-card__btn--plus"
-                    :class="{ 'menu-card__btn--disabled': cartBusy }"
+                    :class="{ 'menu-card__btn--disabled': cartBusy || !cartReady }"
                     @tap.stop="addFood(food)"
                   >
                     <text class="menu-card__btn-icon menu-card__btn-icon--plus">+</text>
@@ -162,6 +163,8 @@ export default {
       activeIndex: 0,
       cartMap: {},
       loading: true,
+      pageLoading: false,
+      pageLoadingTip: '',
       cartReady: false,
       cartBusy: false,
       cartInitPromise: null,
@@ -224,8 +227,8 @@ export default {
       this.bootstrap()
       return
     }
-    if (!this.loading && this.cartReady) {
-      this.syncCart()
+    if (!this.loading && !this.cartBusy) {
+      this.refreshCartState()
     }
   },
   methods: {
@@ -321,15 +324,18 @@ export default {
     setCartMap(map) {
       this.cartMap = { ...map }
     },
-    patchCartItem(dishId, item) {
-      const key = this.dishKey(dishId)
-      const next = { ...this.cartMap }
-      if (item) {
-        next[key] = item
-      } else {
-        delete next[key]
-      }
-      this.cartMap = next
+    parseCartHasId(has) {
+      if (!has) return null
+      const id = has.oid ? Number(has.oid) : (has.id ? Number(has.id) : null)
+      return id || null
+    },
+    isCartHasSubmitted(has) {
+      if (!has) return false
+      return !!(has.submitTime || (has.status !== undefined && Number(has.status) > 0))
+    },
+    parseCartHasItems(has) {
+      if (!has) return []
+      return has.dish || has.dishes || []
     },
     async bootstrap() {
       this.pageLoading = true
@@ -338,19 +344,18 @@ export default {
       this.cartReady = false
       try {
         await this.loadMenu()
-        await this.initOrder()
-        await this.syncCart()
-        this.cartReady = !!this.orderId
+        await this.initCart()
       } catch (e) {
         this.cartReady = false
-        uni.showToast({ title: e.message || e || '页面加载失败', icon: 'none' })
+        console.error('菜单页加载失败:', e)
+        uni.showToast({ title: e.message || e || '页面加载失败', icon: 'none', duration: 3000 })
       } finally {
         this.loading = false
         this.pageLoading = false
       }
     },
     async loadMenu() {
-      const list = await orderApi.menu(this.aid, { silent: true })
+      const list = await orderApi.menu(this.aid)
       this.menu = (Array.isArray(list) ? list : []).map((cate) => ({
         ...cate,
         foods: (cate.foods || []).map((food) => ({
@@ -362,13 +367,12 @@ export default {
     },
     async initOrder() {
       const has = await orderApi.cartHas(this.aid)
-      if (has?.oid && Number(has.diningMode) === this.diningMode) {
-        this.orderId = Number(has.oid)
+      const existingId = this.parseCartHasId(has)
+      const existingMode = has?.diningMode !== undefined ? Number(has.diningMode) : null
+      const isSubmitted = this.isCartHasSubmitted(has)
+      if (existingId && existingMode === this.diningMode && !isSubmitted) {
+        this.orderId = existingId
         return
-      }
-      if (has?.oid) {
-        await orderApi.toEmpty(has.oid)
-        this.setCartMap({})
       }
       const orderId = await orderApi.cartCreate({
         aid: this.aid,
@@ -382,13 +386,10 @@ export default {
         throw new Error('购物车创建失败')
       }
     },
-    async ensureCart() {
-      if (this.orderId) {
-        return this.orderId
-      }
+    async initCart() {
       if (this.cartInitPromise) {
         await this.cartInitPromise
-        return this.orderId
+        return
       }
       this.cartInitPromise = (async () => {
         await this.initOrder()
@@ -399,6 +400,43 @@ export default {
         await this.cartInitPromise
       } finally {
         this.cartInitPromise = null
+      }
+    },
+    async refreshCartState() {
+      if (this.cartInitPromise) {
+        await this.cartInitPromise
+        return
+      }
+      try {
+        const has = await orderApi.cartHas(this.aid)
+        const activeCartId = this.parseCartHasId(has)
+        const isSubmitted = this.isCartHasSubmitted(has)
+        const validCartId = activeCartId && !isSubmitted ? activeCartId : null
+
+        if (!validCartId) {
+          if (this.orderId) {
+            this.orderId = 0
+            this.setCartMap({})
+          }
+          await this.initCart()
+          return
+        }
+
+        if (this.orderId !== validCartId) {
+          this.orderId = validCartId
+        }
+        await this.syncCart()
+        this.cartReady = true
+      } catch (e) {
+        console.error('购物车刷新失败:', e)
+      }
+    },
+    async ensureCart() {
+      if (this.cartInitPromise) {
+        await this.cartInitPromise
+      }
+      if (!this.cartReady || !this.orderId) {
+        await this.initCart()
       }
       if (!this.orderId) {
         throw new Error('购物车未就绪')
@@ -411,31 +449,34 @@ export default {
         return
       }
       const has = await orderApi.cartHas(this.aid)
-      if (!has?.oid || Number(has.oid) !== this.orderId) {
+      const hasId = this.parseCartHasId(has)
+      if (!hasId || hasId !== this.orderId || this.isCartHasSubmitted(has)) {
         this.setCartMap({})
         return
       }
+      const items = this.parseCartHasItems(has)
       const map = {}
-      ;(has.dish || []).forEach((item) => {
+      items.forEach((item) => {
         const dishId = Number(item.dishId)
         const food = this.findFood(dishId)
         const key = this.dishKey(dishId)
+        const count = Number(item.count || item.quantity) || 0
         const existing = map[key]
         if (existing) {
-          existing.count += Number(item.count) || 0
+          existing.count += count
           return
         }
         map[key] = {
           odid: Number(item.id),
           dishId,
-          count: Number(item.count) || 0,
+          count,
           price: food?.price || 0
         }
       })
       this.setCartMap(map)
     },
-    async addFood(food) {
-      if (this.cartBusy) return
+    async addFood(food, _isRetry = false) {
+      if (this.cartBusy || !this.cartReady) return
       this.cartBusy = true
       try {
         await this.ensureCart()
@@ -443,32 +484,31 @@ export default {
         const key = this.dishKey(dishId)
         const current = this.cartMap[key]
         if (!current) {
-          const odid = Number(await orderApi.dishAdd(this.orderId, dishId))
-          if (!odid) {
-            throw new Error('加购失败')
-          }
-          this.patchCartItem(dishId, {
-            odid,
-            dishId,
-            count: 1,
-            price: food.price
-          })
+          await orderApi.dishAdd(this.orderId, dishId)
         } else {
           await orderApi.dishInc(current.odid)
-          this.patchCartItem(dishId, {
-            ...current,
-            count: current.count + 1
-          })
         }
+        await this.syncCart()
       } catch (e) {
-        uni.showToast({ title: e.message || e || '加购失败', icon: 'none' })
+        const errMsg = e.message || String(e) || ''
+        if (!_isRetry && (errMsg.includes('不可用') || errMsg.includes('购物车'))) {
+          this.orderId = 0
+          this.cartReady = false
+          this.cartBusy = false
+          return this.addFood(food, true)
+        }
+        if (errMsg === '成功' || errMsg.includes('操作成功')) {
+          await this.syncCart()
+          return
+        }
+        uni.showToast({ title: errMsg || '加购失败', icon: 'none' })
         await this.syncCart()
       } finally {
         this.cartBusy = false
       }
     },
-    async decFood(food) {
-      if (this.cartBusy) return
+    async decFood(food, _isRetry = false) {
+      if (this.cartBusy || !this.cartReady) return
       const dishId = Number(food.id)
       const key = this.dishKey(dishId)
       const current = this.cartMap[key]
@@ -478,16 +518,23 @@ export default {
         await this.ensureCart()
         if (current.count <= 1) {
           await orderApi.dishDel(current.odid)
-          this.patchCartItem(dishId, null)
         } else {
           await orderApi.dishDec(current.odid)
-          this.patchCartItem(dishId, {
-            ...current,
-            count: current.count - 1
-          })
         }
+        await this.syncCart()
       } catch (e) {
-        uni.showToast({ title: e.message || e || '操作失败', icon: 'none' })
+        const errMsg = e.message || String(e) || ''
+        if (!_isRetry && (errMsg.includes('不可用') || errMsg.includes('购物车'))) {
+          this.orderId = 0
+          this.cartReady = false
+          this.cartBusy = false
+          return this.decFood(food, true)
+        }
+        if (errMsg === '成功' || errMsg.includes('操作成功')) {
+          await this.syncCart()
+          return
+        }
+        uni.showToast({ title: errMsg || '操作失败', icon: 'none' })
         await this.syncCart()
       } finally {
         this.cartBusy = false

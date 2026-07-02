@@ -133,20 +133,20 @@
         "animationType": "slide-in-right"
       }
     },
-	{
-	  "path": "pages/integralDraw/index",
-	  "style": {
-	    "navigationStyle": "custom",
-	    "animationType": "slide-in-right"
-	  }
-	},
-	{
-	  "path": "pages/mine/memberCode/index",
-	  "style": {
-	    "navigationBarTitleText": "会员码",
-	    "animationType": "slide-in-right"
-	  }
-	}
+    {
+      "path": "pages/integralDraw/index",
+      "style": {
+        "navigationStyle": "custom",
+        "animationType": "slide-in-right"
+      }
+    },
+    {
+      "path": "pages/mine/memberCode/index",
+      "style": {
+        "navigationBarTitleText": "会员码",
+        "animationType": "slide-in-right"
+      }
+    }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",

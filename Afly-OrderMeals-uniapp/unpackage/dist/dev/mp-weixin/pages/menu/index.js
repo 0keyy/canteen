@@ -21,6 +21,8 @@ const _sfc_main = {
       activeIndex: 0,
       cartMap: {},
       loading: true,
+      pageLoading: false,
+      pageLoadingTip: "",
       cartReady: false,
       cartBusy: false,
       cartInitPromise: null,
@@ -91,8 +93,8 @@ const _sfc_main = {
       this.bootstrap();
       return;
     }
-    if (!this.loading && this.cartReady) {
-      this.syncCart();
+    if (!this.loading && !this.cartBusy) {
+      this.refreshCartState();
     }
   },
   methods: {
@@ -193,15 +195,21 @@ const _sfc_main = {
     setCartMap(map) {
       this.cartMap = { ...map };
     },
-    patchCartItem(dishId, item) {
-      const key = this.dishKey(dishId);
-      const next = { ...this.cartMap };
-      if (item) {
-        next[key] = item;
-      } else {
-        delete next[key];
-      }
-      this.cartMap = next;
+    parseCartHasId(has) {
+      if (!has)
+        return null;
+      const id = has.oid ? Number(has.oid) : has.id ? Number(has.id) : null;
+      return id || null;
+    },
+    isCartHasSubmitted(has) {
+      if (!has)
+        return false;
+      return !!(has.submitTime || has.status !== void 0 && Number(has.status) > 0);
+    },
+    parseCartHasItems(has) {
+      if (!has)
+        return [];
+      return has.dish || has.dishes || [];
     },
     async bootstrap() {
       this.pageLoading = true;
@@ -210,19 +218,18 @@ const _sfc_main = {
       this.cartReady = false;
       try {
         await this.loadMenu();
-        await this.initOrder();
-        await this.syncCart();
-        this.cartReady = !!this.orderId;
+        await this.initCart();
       } catch (e) {
         this.cartReady = false;
-        common_vendor.index.showToast({ title: e.message || e || "页面加载失败", icon: "none" });
+        common_vendor.index.__f__("error", "at pages/menu/index.vue:350", "菜单页加载失败:", e);
+        common_vendor.index.showToast({ title: e.message || e || "页面加载失败", icon: "none", duration: 3e3 });
       } finally {
         this.loading = false;
         this.pageLoading = false;
       }
     },
     async loadMenu() {
-      const list = await api_index.orderApi.menu(this.aid, { silent: true });
+      const list = await api_index.orderApi.menu(this.aid);
       this.menu = (Array.isArray(list) ? list : []).map((cate) => ({
         ...cate,
         foods: (cate.foods || []).map((food) => ({
@@ -234,13 +241,12 @@ const _sfc_main = {
     },
     async initOrder() {
       const has = await api_index.orderApi.cartHas(this.aid);
-      if ((has == null ? void 0 : has.oid) && Number(has.diningMode) === this.diningMode) {
-        this.orderId = Number(has.oid);
+      const existingId = this.parseCartHasId(has);
+      const existingMode = (has == null ? void 0 : has.diningMode) !== void 0 ? Number(has.diningMode) : null;
+      const isSubmitted = this.isCartHasSubmitted(has);
+      if (existingId && existingMode === this.diningMode && !isSubmitted) {
+        this.orderId = existingId;
         return;
-      }
-      if (has == null ? void 0 : has.oid) {
-        await api_index.orderApi.toEmpty(has.oid);
-        this.setCartMap({});
       }
       const orderId = await api_index.orderApi.cartCreate({
         aid: this.aid,
@@ -254,13 +260,10 @@ const _sfc_main = {
         throw new Error("购物车创建失败");
       }
     },
-    async ensureCart() {
-      if (this.orderId) {
-        return this.orderId;
-      }
+    async initCart() {
       if (this.cartInitPromise) {
         await this.cartInitPromise;
-        return this.orderId;
+        return;
       }
       this.cartInitPromise = (async () => {
         await this.initOrder();
@@ -271,6 +274,41 @@ const _sfc_main = {
         await this.cartInitPromise;
       } finally {
         this.cartInitPromise = null;
+      }
+    },
+    async refreshCartState() {
+      if (this.cartInitPromise) {
+        await this.cartInitPromise;
+        return;
+      }
+      try {
+        const has = await api_index.orderApi.cartHas(this.aid);
+        const activeCartId = this.parseCartHasId(has);
+        const isSubmitted = this.isCartHasSubmitted(has);
+        const validCartId = activeCartId && !isSubmitted ? activeCartId : null;
+        if (!validCartId) {
+          if (this.orderId) {
+            this.orderId = 0;
+            this.setCartMap({});
+          }
+          await this.initCart();
+          return;
+        }
+        if (this.orderId !== validCartId) {
+          this.orderId = validCartId;
+        }
+        await this.syncCart();
+        this.cartReady = true;
+      } catch (e) {
+        common_vendor.index.__f__("error", "at pages/menu/index.vue:431", "购物车刷新失败:", e);
+      }
+    },
+    async ensureCart() {
+      if (this.cartInitPromise) {
+        await this.cartInitPromise;
+      }
+      if (!this.cartReady || !this.orderId) {
+        await this.initCart();
       }
       if (!this.orderId) {
         throw new Error("购物车未就绪");
@@ -283,31 +321,34 @@ const _sfc_main = {
         return;
       }
       const has = await api_index.orderApi.cartHas(this.aid);
-      if (!(has == null ? void 0 : has.oid) || Number(has.oid) !== this.orderId) {
+      const hasId = this.parseCartHasId(has);
+      if (!hasId || hasId !== this.orderId || this.isCartHasSubmitted(has)) {
         this.setCartMap({});
         return;
       }
+      const items = this.parseCartHasItems(has);
       const map = {};
-      (has.dish || []).forEach((item) => {
+      items.forEach((item) => {
         const dishId = Number(item.dishId);
         const food = this.findFood(dishId);
         const key = this.dishKey(dishId);
+        const count = Number(item.count || item.quantity) || 0;
         const existing = map[key];
         if (existing) {
-          existing.count += Number(item.count) || 0;
+          existing.count += count;
           return;
         }
         map[key] = {
           odid: Number(item.id),
           dishId,
-          count: Number(item.count) || 0,
+          count,
           price: (food == null ? void 0 : food.price) || 0
         };
       });
       this.setCartMap(map);
     },
-    async addFood(food) {
-      if (this.cartBusy)
+    async addFood(food, _isRetry = false) {
+      if (this.cartBusy || !this.cartReady)
         return;
       this.cartBusy = true;
       try {
@@ -316,32 +357,31 @@ const _sfc_main = {
         const key = this.dishKey(dishId);
         const current = this.cartMap[key];
         if (!current) {
-          const odid = Number(await api_index.orderApi.dishAdd(this.orderId, dishId));
-          if (!odid) {
-            throw new Error("加购失败");
-          }
-          this.patchCartItem(dishId, {
-            odid,
-            dishId,
-            count: 1,
-            price: food.price
-          });
+          await api_index.orderApi.dishAdd(this.orderId, dishId);
         } else {
           await api_index.orderApi.dishInc(current.odid);
-          this.patchCartItem(dishId, {
-            ...current,
-            count: current.count + 1
-          });
         }
+        await this.syncCart();
       } catch (e) {
-        common_vendor.index.showToast({ title: e.message || e || "加购失败", icon: "none" });
+        const errMsg = e.message || String(e) || "";
+        if (!_isRetry && (errMsg.includes("不可用") || errMsg.includes("购物车"))) {
+          this.orderId = 0;
+          this.cartReady = false;
+          this.cartBusy = false;
+          return this.addFood(food, true);
+        }
+        if (errMsg === "成功" || errMsg.includes("操作成功")) {
+          await this.syncCart();
+          return;
+        }
+        common_vendor.index.showToast({ title: errMsg || "加购失败", icon: "none" });
         await this.syncCart();
       } finally {
         this.cartBusy = false;
       }
     },
-    async decFood(food) {
-      if (this.cartBusy)
+    async decFood(food, _isRetry = false) {
+      if (this.cartBusy || !this.cartReady)
         return;
       const dishId = Number(food.id);
       const key = this.dishKey(dishId);
@@ -353,16 +393,23 @@ const _sfc_main = {
         await this.ensureCart();
         if (current.count <= 1) {
           await api_index.orderApi.dishDel(current.odid);
-          this.patchCartItem(dishId, null);
         } else {
           await api_index.orderApi.dishDec(current.odid);
-          this.patchCartItem(dishId, {
-            ...current,
-            count: current.count - 1
-          });
         }
+        await this.syncCart();
       } catch (e) {
-        common_vendor.index.showToast({ title: e.message || e || "操作失败", icon: "none" });
+        const errMsg = e.message || String(e) || "";
+        if (!_isRetry && (errMsg.includes("不可用") || errMsg.includes("购物车"))) {
+          this.orderId = 0;
+          this.cartReady = false;
+          this.cartBusy = false;
+          return this.decFood(food, true);
+        }
+        if (errMsg === "成功" || errMsg.includes("操作成功")) {
+          await this.syncCart();
+          return;
+        }
+        common_vendor.index.showToast({ title: errMsg || "操作失败", icon: "none" });
         await this.syncCart();
       } finally {
         this.cartBusy = false;
@@ -427,12 +474,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     e: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "b5"),
     f: common_vendor.s($options.headerPaddingStyle),
     g: common_vendor.p({
-      visible: _ctx.pageLoading,
-      tip: _ctx.pageLoadingTip
+      visible: $data.pageLoading,
+      tip: $data.pageLoadingTip
     }),
     h: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    j: common_vendor.o($options.selectCategory, "ab"),
+    j: common_vendor.o($options.selectCategory, "92"),
     k: common_vendor.p({
       menu: $data.menu,
       ["active-index"]: $data.activeIndex,
@@ -454,17 +501,18 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         g: common_vendor.t(food.price),
         h: $options.getCount(food.id) > 0
       }, $options.getCount(food.id) > 0 ? {
-        i: common_vendor.o(($event) => $options.decFood(food), food.id)
+        i: $data.cartBusy || !$data.cartReady ? 1 : "",
+        j: common_vendor.o(($event) => $options.decFood(food), food.id)
       } : {}, {
-        j: $options.getCount(food.id) > 0
+        k: $options.getCount(food.id) > 0
       }, $options.getCount(food.id) > 0 ? {
-        k: common_vendor.t($options.getCount(food.id))
+        l: common_vendor.t($options.getCount(food.id))
       } : {}, {
-        l: common_vendor.o(($event) => $options.addFood(food), food.id),
-        m: food.id
+        m: common_vendor.o(($event) => $options.addFood(food), food.id),
+        n: food.id
       });
     }),
-    n: $data.cartBusy ? 1 : "",
+    n: $data.cartBusy || !$data.cartReady ? 1 : "",
     o: $options.currentFoods.length === 0
   }, $options.currentFoods.length === 0 ? {} : {}), {
     i: $data.menu.length === 0,
@@ -475,7 +523,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     r: common_vendor.t($options.cartSummary),
     s: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
     t: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    v: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "fb"),
+    v: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "58"),
     w: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,

@@ -132,6 +132,7 @@ const _sfc_main = {
           couponId: this.selectedCouponId || null
         });
         await utils_pay_index.payOrder(this.orderId, this.payChannel, "mp");
+        common_vendor.index.removeStorageSync("orderId");
         common_vendor.index.showToast({ title: "支付成功", icon: "success" });
         setTimeout(() => {
           common_vendor.index.redirectTo({ url: `/pages/order/detail?orderId=${this.orderId}` });
@@ -160,12 +161,19 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     a: $data.order
   }, $data.order ? common_vendor.e({
     b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "26"),
-    c: $options.addressInfo
+    c: $data.diningMode === 3
+  }, $data.diningMode === 3 ? common_vendor.e({
+    d: $options.addressInfo
   }, $options.addressInfo ? {
-    d: common_vendor.t($options.addressInfo)
+    e: common_vendor.t($options.addressInfo)
   } : {}, {
-    e: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args), "79"),
-    f: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
+    f: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args), "88")
+  }) : {}, {
+    g: $data.diningMode === 1
+  }, $data.diningMode === 1 ? {} : {}, {
+    h: $data.diningMode === 3
+  }, $data.diningMode === 3 ? {} : {}, {
+    i: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
       return {
         a: dish.image || "/static/placeholder.png",
         b: common_vendor.t(dish.dishName),
@@ -173,35 +181,35 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: dish.id
       };
     }),
-    g: common_vendor.t($options.totalAmount),
-    h: $data.couponDiscount > 0
+    j: common_vendor.t($options.totalAmount),
+    k: $data.couponDiscount > 0
   }, $data.couponDiscount > 0 ? {
-    i: common_vendor.t($data.couponDiscount.toFixed(2))
+    l: common_vendor.t($data.couponDiscount.toFixed(2))
   } : {}, {
-    j: common_vendor.t($options.finalAmount),
-    k: common_vendor.t($options.payChannelText),
-    l: common_vendor.o(($event) => $data.showPayPicker = true, "8b"),
-    m: $data.remark,
-    n: common_vendor.o(($event) => $data.remark = $event.detail.value, "9a"),
-    o: common_vendor.t($options.finalAmount),
-    p: common_vendor.t($data.loading ? "提交中..." : "去支付"),
-    q: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "99"),
-    r: $data.loading ? 1 : "",
-    s: $data.showPayPicker
+    m: common_vendor.t($options.finalAmount),
+    n: common_vendor.t($options.payChannelText),
+    o: common_vendor.o(($event) => $data.showPayPicker = true, "85"),
+    p: $data.remark,
+    q: common_vendor.o(($event) => $data.remark = $event.detail.value, "d8"),
+    r: common_vendor.t($options.finalAmount),
+    s: common_vendor.t($data.loading ? "提交中..." : "去支付"),
+    t: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "0a"),
+    v: $data.loading ? 1 : "",
+    w: $data.showPayPicker
   }, $data.showPayPicker ? {
-    t: common_vendor.o($options.onPayMethodChange, "c7"),
-    v: common_vendor.o($options.onPayMethodsLoaded, "be"),
-    w: common_vendor.o(($event) => $data.payChannel = $event, "2b"),
-    x: common_vendor.p({
+    x: common_vendor.o($options.onPayMethodChange, "14"),
+    y: common_vendor.o($options.onPayMethodsLoaded, "c6"),
+    z: common_vendor.o(($event) => $data.payChannel = $event, "8b"),
+    A: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    y: common_vendor.o(($event) => $data.showPayPicker = false, "af"),
-    z: common_vendor.o(() => {
-    }, "3a"),
-    A: common_vendor.o(($event) => $data.showPayPicker = false, "32")
+    B: common_vendor.o(($event) => $data.showPayPicker = false, "ef"),
+    C: common_vendor.o(() => {
+    }, "94"),
+    D: common_vendor.o(($event) => $data.showPayPicker = false, "f5")
   } : {}, {
-    B: common_vendor.p({
+    E: common_vendor.p({
       visible: $data.pageLoading,
       tip: $data.pageLoadingTip
     })

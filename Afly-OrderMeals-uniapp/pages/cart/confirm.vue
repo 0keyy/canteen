@@ -12,8 +12,8 @@
     </view>
 
     <scroll-view class="checkout__scroll" scroll-y :show-scrollbar="false">
-      <!-- 配送信息 -->
-      <view class="checkout__section checkout__section--address" @tap="goAddress">
+      <!-- 配送信息（仅外卖） -->
+      <view v-if="diningMode === 3" class="checkout__section checkout__section--address" @tap="goAddress">
         <view class="checkout__address-row">
           <view class="checkout__address-left">
             <text class="checkout__address-label">请选择配送位置</text>
@@ -23,8 +23,18 @@
         </view>
       </view>
 
+      <!-- 堂食取餐信息 -->
+      <view v-if="diningMode === 1" class="checkout__section checkout__section--address">
+        <view class="checkout__address-row">
+          <view class="checkout__address-left">
+            <text class="checkout__address-label">堂食 · 到店自取</text>
+            <text class="checkout__address-detail">下单后请到前台取餐</text>
+          </view>
+        </view>
+      </view>
+
       <!-- 送达时间 -->
-      <view class="checkout__section checkout__section--delivery">
+      <view v-if="diningMode === 3"class="checkout__section checkout__section--delivery">
         <view class="checkout__info-row checkout__info-row--clickable">
           <text class="checkout__info-label">送达时间</text>
           <view class="checkout__info-right">
@@ -260,6 +270,7 @@ export default {
           couponId: this.selectedCouponId || null
         })
         await payOrder(this.orderId, this.payChannel, 'mp')
+        uni.removeStorageSync('orderId')
         uni.showToast({ title: '支付成功', icon: 'success' })
         setTimeout(() => {
           uni.redirectTo({ url: `/pages/order/detail?orderId=${this.orderId}` })
