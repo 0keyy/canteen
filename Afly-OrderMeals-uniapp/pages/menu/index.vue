@@ -45,12 +45,14 @@
     <view v-if="loading" class="order-page__loading">加载中...</view>
     <view v-else-if="menu.length === 0" class="order-page__empty">暂无菜品，请先在后台添加菜品分类和菜品</view>
     <view v-else class="order-page__main">
-      <menu-category-sidebar
-        :menu="menu"
-        :active-index="activeIndex"
-        :cart-map="cartMap"
-        @select="selectCategory"
-      />
+      <view class="order-page__sidebar-wrap">
+        <menu-category-sidebar
+          :menu="menu"
+          :active-index="activeIndex"
+          :cart-map="cartMap"
+          @select="selectCategory"
+        />
+      </view>
 
       <scroll-view scroll-y class="order-page__dishes" :show-scrollbar="false">
         <text class="order-page__section-title">{{ currentCategoryName }}</text>
@@ -147,10 +149,11 @@ import { resolveImageUrl } from '../../utils/image'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getMenuButtonMarginRight, getNavMetrics } from '../../utils/navbar'
 import PageLoading from '../../components/page-loading/page-loading.vue'
+import MenuCategorySidebar from '../../components/menu-category-sidebar/menu-category-sidebar.vue'
 
 export default {
   mixins: [tabbarPageMixin],
-  components: { PageLoading },
+  components: { PageLoading, MenuCategorySidebar },
   data() {
     return {
       navMetrics: getNavMetrics(),
@@ -791,8 +794,15 @@ export default {
   &__main {
     flex: 1;
     display: flex;
+    align-items: stretch;
     overflow: hidden;
     min-height: 0;
+  }
+
+  &__sidebar-wrap {
+    width: 172rpx;
+    flex-shrink: 0;
+    overflow: hidden;
   }
 
   &__dishes {

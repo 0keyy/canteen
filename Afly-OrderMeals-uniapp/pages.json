@@ -153,7 +153,10 @@
     "navigationBarTitleText": "点餐",
     "navigationBarBackgroundColor": "#FFFCF8",
     "backgroundColor": "#FFFCF8",
-    "backgroundTextStyle": "dark"
+    "backgroundTextStyle": "dark",
+    "usingComponents": {
+      "menu-category-sidebar": "components/menu-category-sidebar/menu-category-sidebar"
+    }
   },
   "tabBar": {
     "color": "#999999",

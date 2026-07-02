@@ -20,6 +20,9 @@
     "pages/integralDraw/index",
     "pages/mine/memberCode/index"
   ],
+  "usingComponents": {
+    "menu-category-sidebar": "components/menu-category-sidebar/menu-category-sidebar"
+  },
   "window": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "点餐",
@@ -63,6 +66,5 @@
     "scope.userLocation": {
       "desc": "用于外卖配送定位"
     }
-  },
-  "usingComponents": {}
+  }
 }

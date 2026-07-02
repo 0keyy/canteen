@@ -54,7 +54,6 @@ export default {
   width: 172rpx;
   height: 100%;
   background: rgba(245, 240, 234, 0.7);
-  flex-shrink: 0;
 
   &__item {
     position: relative;
@@ -119,4 +118,13 @@ export default {
     text-align: center;
   }
 }
+</style>
+
+<style lang="scss">
+/* #ifdef MP-WEIXIN || MP-TOUTIAO || MP-QQ */
+:host {
+  display: block;
+  height: 100%;
+}
+/* #endif */
 </style>

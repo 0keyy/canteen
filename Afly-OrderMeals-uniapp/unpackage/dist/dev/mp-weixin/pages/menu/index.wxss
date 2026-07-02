@@ -203,8 +203,14 @@
 .order-page__main.data-v-1f245baa {
   flex: 1;
   display: flex;
+  align-items: stretch;
   overflow: hidden;
   min-height: 0;
+}
+.order-page__sidebar-wrap.data-v-1f245baa {
+  width: 172rpx;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 .order-page__dishes.data-v-1f245baa {
   flex: 1;
