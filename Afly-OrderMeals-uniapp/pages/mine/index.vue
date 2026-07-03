@@ -20,7 +20,7 @@
           </view>
           <view class="profile-page__qr-btn" @tap="onFeatureTap('会员码')">
             <!-- 替换成自己的二维码图标，路径换成你的图片地址 -->
-            <image class="profile-page__qr-img" src="/static/tabbar/二维码图标.png" mode="aspectFit"></image>
+            <image class="profile-page__qr-img" :src="staticImgPrefix + '/tabbar/二维码图标.png'" mode="aspectFit"></image>
           </view>
         </view>
 
@@ -111,14 +111,14 @@
             :class="{ 'profile-page__avatar-option--active': avatarKey === '1' }"
             @tap="selectAvatar('1')"
           >
-            <image class="profile-page__avatar-option-img" src="/static/1.png" mode="aspectFill" />
+            <image class="profile-page__avatar-option-img" :src="staticImgPrefix + '/1.png'" mode="aspectFill" />
           </view>
           <view
             class="profile-page__avatar-option"
             :class="{ 'profile-page__avatar-option--active': avatarKey === '2' }"
             @tap="selectAvatar('2')"
           >
-            <image class="profile-page__avatar-option-img" src="/static/2.png" mode="aspectFill" />
+            <image class="profile-page__avatar-option-img" :src="staticImgPrefix + '/2.png'" mode="aspectFill" />
           </view>
         </view>
         <text class="profile-page__avatar-picker-close" @tap="showAvatarPicker = false">取消</text>
@@ -178,6 +178,7 @@
 import { authApi, couponApi, serviceApi } from '../../api/index'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getNavMetrics } from '../../utils/navbar'
+import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 const PRIMARY_ACTIONS = [
   { title: '我的订单', icon: 'orders' },
@@ -187,18 +188,19 @@ const PRIMARY_ACTIONS = [
 ]
 
 const SECONDARY_ACTIONS = [
-  { title: '公司认证', icon: 'check', iconImg: '/static/tabbar/公司认证.png' },
-  { title: '充值中心', icon: 'wallet', iconImg: '/static/tabbar/充值 1.png' },
-  { title: '积分商城', icon: 'coins', iconImg: '/static/tabbar/积分商城.png' },
-  { title: '优惠券包', icon: 'ticket', iconImg: '/static/tabbar/卡券 1.png' },
-  { title: '会员日', icon: 'crown', iconImg: '/static/tabbar/名词 1.png' },
-  { title: '退出登录', icon: 'logout', iconImg: '/static/tabbar/退出 1.png' }
+  { title: '公司认证', icon: 'check', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/公司认证.png' },
+  { title: '充值中心', icon: 'wallet', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/充值 1.png' },
+  { title: '积分商城', icon: 'coins', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/积分商城.png' },
+  { title: '优惠券包', icon: 'ticket', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.png' },
+  { title: '会员日', icon: 'crown', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/名词 1.png' },
+  { title: '退出登录', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/退出 1.png' }
 ]
 
 export default {
   mixins: [tabbarPageMixin],
   data() {
     return {
+      staticImgPrefix: STATIC_IMAGE_PREFIX,
       navMetrics: getNavMetrics(),
       nickname: '',
       mobile: '',
@@ -220,8 +222,8 @@ export default {
       return { paddingTop: `${this.navMetrics.statusBarHeight + 8}px` }
     },
     avatarSrc() {
-      if (this.avatarKey) return `/static/${this.avatarKey}.png`
-      return '/static/1.png'
+      if (this.avatarKey) return STATIC_IMAGE_PREFIX + `/${this.avatarKey}.png`
+      return STATIC_IMAGE_PREFIX + '/1.png'
     }
   },
   onShow() {

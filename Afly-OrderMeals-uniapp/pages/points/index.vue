@@ -9,7 +9,7 @@
               <text class="points-page__points-value">{{ pointsBalance }} <text class="points-page__points-text">积分</text></text>
               <text class="points-page__points-label">积分享好礼，别忘记使用哦</text>
             </view>
-            <image class="points-page__mascot" src="/static/看书.png" mode="aspectFit" />
+            <image class="points-page__mascot" :src="staticImgPrefix + '/static/看书.png'" mode="aspectFit" />
           </view>
           <view class="points-page__scan-btn" @tap="onScan">
             <view class="points-page__scan-icon"></view>
@@ -126,12 +126,14 @@ import { authApi } from '../../api/index'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getNavMetrics } from '../../utils/navbar'
 import { normalizeTabPath } from '../../utils/tabbar'
+import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 export default {
   mixins: [tabbarPageMixin],
   data() {
     return {
       navMetrics: getNavMetrics(),
+      staticImgPrefix: STATIC_IMAGE_PREFIX,
       pointsBalance: 0,
       activeTab: 1,
       activeCategory: 0,
@@ -140,7 +142,7 @@ export default {
       products: [
         {
           id: 1,
-          image: '/static/1.png',
+          image: STATIC_IMAGE_PREFIX + '/static/1.png',
           label: '可口可乐',
           title: '【堂食专享】可口可乐',
           points: 10,
@@ -148,7 +150,7 @@ export default {
         },
         {
           id: 2,
-          image: '/static/2.png',
+          image: STATIC_IMAGE_PREFIX + '/static/2.png',
           label: '薯条',
           title: '【堂食专享】香脆薯条',
           points: 20,
@@ -156,7 +158,7 @@ export default {
         },
         {
           id: 3,
-          image: '/static/3.png',
+          image: STATIC_IMAGE_PREFIX + '/static/3.png',
           label: '奶茶',
           title: '【外卖专享】珍珠奶茶',
           points: 30,
@@ -164,7 +166,7 @@ export default {
         },
         {
           id: 4,
-          image: '/static/4.png',
+          image: STATIC_IMAGE_PREFIX + '/static/4.png',
           label: '鸡翅',
           title: '【积分秒杀】香辣鸡翅',
           points: 50,

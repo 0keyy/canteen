@@ -2,6 +2,15 @@ import { BASE_URL } from './config'
 
 const API_ORIGIN = BASE_URL.replace(/\/api\/?$/, '')
 
+export const STATIC_IMAGE_PREFIX = 'https://canteen.zhongtang-group.com/api/uploads/image/static'
+
+export function resolveStaticUrl(path) {
+  if (!path) return ''
+  if (/^https?:\/\//i.test(path)) return path
+  const p = path.startsWith('/') ? path : `/${path}`
+  return `${STATIC_IMAGE_PREFIX}${p}`
+}
+
 export function resolveImageUrl(url) {
   if (!url) return ''
 

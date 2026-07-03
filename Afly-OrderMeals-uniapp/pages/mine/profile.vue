@@ -2,7 +2,7 @@
   <view class="profile-page">
     <view class="profile-page__nav" :style="navPaddingStyle">
       <view class="profile-page__nav-back" @tap="goBack">
-      <image class="profile-page__nav-icon" src="/static/tabbar/返回 2.png" mode="aspectFit" />
+      <image class="profile-page__nav-icon" :src="staticImgPrefix + '/static/tabbar/返回 2.png'" mode="aspectFit" />
     </view>
       <text class="profile-page__nav-title">会员资料</text>
       <view class="profile-page__nav-placeholder"></view>
@@ -13,7 +13,7 @@
         <view class="profile-page__avatar-wrap">
           <image class="profile-page__avatar" :src="avatarUrl || defaultAvatar" mode="aspectFill" />
           <view class="profile-page__avatar-edit">
-            <image class="profile-page__avatar-edit-img" src="/static/tabbar/写 1.png" mode="aspectFit" />
+            <image class="profile-page__avatar-edit-img" :src="staticImgPrefix + '/static/tabbar/写 1.png'" mode="aspectFit" />
           </view>
         </view>
       </view>
@@ -76,7 +76,7 @@
           >
             <image class="profile-page__avatar-grid-img" :src="item" mode="aspectFill" />
             <view v-if="avatarUrl === item" class="profile-page__avatar-grid-check">
-              <image class="profile-page__avatar-grid-check-icon" src="/static/tabbar/对勾小 2.png" mode="aspectFit" />
+              <image class="profile-page__avatar-grid-check-icon" :src="staticImgPrefix + '/static/tabbar/对勾小 2.png'" mode="aspectFit" />
             </view>
           </view>
         </view>
@@ -106,15 +106,17 @@
 
 <script>
 import { authApi } from '../../api/index'
+import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 export default {
   data: function() {
     return {
       navPaddingStyle: {},
-      defaultAvatar: '/static/tabbar/avatar-default.png',
+      staticImgPrefix: STATIC_IMAGE_PREFIX,
+      defaultAvatar: STATIC_IMAGE_PREFIX + '/static/tabbar/avatar-default.png',
       defaultAvatars: [
-        '/static/1.png',
-        '/static/2.png'
+        STATIC_IMAGE_PREFIX + '/static/1.png',
+        STATIC_IMAGE_PREFIX + '/static/2.png'
       ],
       form: {
         nickname: '',

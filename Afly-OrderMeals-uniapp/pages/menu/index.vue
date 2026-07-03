@@ -35,7 +35,7 @@
           <text class="order-page__store-time">营业时间：6:00_22:00</text>
         </view>
         <view class="order-page__mode-board" @tap="toggleMode">
-          <image class="order-page__mode-board-bg" src="/static/tabbar/矢量 38.png" mode="aspectFit" />?
+          <image class="order-page__mode-board-bg" :src="staticImgPrefix + '/tabbar/矢量 38.png'" mode="aspectFit" />?
           <text class="order-page__mode-board-text">{{ diningMode === 3 ? '外卖' : '堂食' }}</text>
         </view>
       </view>
@@ -102,7 +102,7 @@
       @tap="goConfirm"
     >
       <view class="cart-bar__bag">
-        <image class="cart-bar__person" src="/static/新版小唐.png" mode="aspectFit" />
+        <image class="cart-bar__person" :src="staticImgPrefix + '/新版小唐.png'" mode="aspectFit" />
         <view class="cart-bar__badge" v-if="cartItemCount > 0">
           <text class="cart-bar__badge-text">{{ cartItemCount }}</text>
         </view>
@@ -145,7 +145,7 @@
 <script>
 import { orderApi, decorateApi } from '../../api/index'
 import { DEFAULT_SHOP_ID } from '../../utils/config'
-import { resolveImageUrl } from '../../utils/image'
+import { resolveImageUrl, STATIC_IMAGE_PREFIX } from '../../utils/image'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getMenuButtonMarginRight, getNavMetrics } from '../../utils/navbar'
 import PageLoading from '../../components/page-loading/page-loading.vue'
@@ -171,7 +171,8 @@ export default {
       cartReady: false,
       cartBusy: false,
       cartInitPromise: null,
-      banners: []
+      banners: [],
+      staticImgPrefix: STATIC_IMAGE_PREFIX
     }
   },
   computed: {
@@ -196,7 +197,7 @@ export default {
     },
     displayBanners() {
       if (this.banners.length) return this.banners
-      return [{ image: '/static/首页广告.png' }]
+      return [{ image: STATIC_IMAGE_PREFIX + '/首页广告.png' }]
     },
     totalPrice() {
       let total = 0

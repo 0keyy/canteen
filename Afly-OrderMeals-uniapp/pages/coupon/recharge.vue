@@ -4,7 +4,7 @@
     <view class="recharge-page__header">
       <view class="recharge-page__balance-card">
         <view class="recharge-page__balance-icon">
-          <image src="/static/tabbar/充值金额 1.png" mode="" class="recharge-page__balance-image"></image>
+          <image :src="staticImgPrefix + '/static/tabbar/充值金额 1.png'" mode="" class="recharge-page__balance-image"></image>
         </view>
         <text class="recharge-page__balance-label">我的余额</text>
         <text class="recharge-page__balance-value">¥{{ formatBalance }}</text>
@@ -45,6 +45,7 @@
 
 <script>
 import { walletApi, payApi, authApi } from '../../api/index'
+import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 // #ifdef MP-WEIXIN
 import { wxPay } from '../../utils/pay/weixin'
@@ -57,6 +58,7 @@ import { aliPay } from '../../utils/pay/alipay'
 export default {
   data() {
     return {
+      staticImgPrefix: STATIC_IMAGE_PREFIX,
       balance: 0,
       selectedAmount: 10,
       amountOptions: [10, 20, 50, 100, 200, 500]

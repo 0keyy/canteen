@@ -46,7 +46,7 @@
                 <view class="home__primary-card-text">
                   <text class="home__primary-name">到店堂食</text>
                 </view>
-                <image class="home__primary-card-img" src="/static/图层 2.png" mode="aspectFit" />
+                <image class="home__primary-card-img" :src="staticImgPrefix + '/图层 2.png'" mode="aspectFit" />
               </view>
               <view
                 class="home__primary-card-item"
@@ -57,7 +57,7 @@
                   <text class="home__primary-name">外卖配送</text>
                   <text class="home__primary-desc">美味配送到家</text>
                 </view>
-                <image class="home__primary-card-img" src="/static/小唐骑车.png" mode="aspectFit" />
+                <image class="home__primary-card-img" :src="staticImgPrefix + '/小唐骑车.png'" mode="aspectFit" />
               </view>
             </view>
           </view>
@@ -157,7 +157,7 @@
 <script>
 import { orderApi, decorateApi } from '../../api/index'
 import { DEFAULT_SHOP_ID } from '../../utils/config'
-import { resolveImageUrl } from '../../utils/image'
+import { resolveImageUrl, STATIC_IMAGE_PREFIX } from '../../utils/image'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getMenuButtonMarginRight, getNavMetrics } from '../../utils/navbar'
 import PageLoading from '../../components/page-loading/page-loading.vue'
@@ -176,6 +176,7 @@ export default {
       recommendLoading: false,
       pageLoading: false,
       pageLoadingTip: '',
+      staticImgPrefix: STATIC_IMAGE_PREFIX,
       shortcuts: [
         { name: '积分商城', desc: '神秘好物等你来', iconClass: 'home__icon--points' },
         { name: '领券中心', desc: '限时领取优惠', iconClass: 'home__icon--coupon' },

@@ -20,6 +20,7 @@ const _sfc_main = {
       recommendLoading: false,
       pageLoading: false,
       pageLoadingTip: "",
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       shortcuts: [
         { name: "积分商城", desc: "神秘好物等你来", iconClass: "home__icon--points" },
         { name: "领券中心", desc: "限时领取优惠", iconClass: "home__icon--coupon" },
@@ -209,11 +210,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     b: $options.displayBanners.length > 1,
     c: $options.displayBanners.length > 0,
-    d: common_vendor.o(($event) => $options.selectMode(1), "be"),
-    e: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
-    f: common_vendor.o(($event) => $options.selectMode(3), "f5"),
-    g: common_vendor.s($options.heroPaddingStyle),
-    h: common_vendor.f($data.shortcuts, (item, k0, i0) => {
+    d: $data.staticImgPrefix + "/图层 2.png",
+    e: common_vendor.o(($event) => $options.selectMode(1), "be"),
+    f: $data.staticImgPrefix + "/小唐骑车.png",
+    g: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
+    h: common_vendor.o(($event) => $options.selectMode(3), "42"),
+    i: common_vendor.s($options.heroPaddingStyle),
+    j: common_vendor.f($data.shortcuts, (item, k0, i0) => {
       return {
         a: common_vendor.n(item.iconClass),
         b: common_vendor.t(item.name),
@@ -222,10 +225,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: common_vendor.o(($event) => $options.onShortcutTap(item), item.name)
       };
     }),
-    i: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "94"),
-    j: $options.homeRecommendDishes.length
+    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "f4"),
+    l: $options.homeRecommendDishes.length
   }, $options.homeRecommendDishes.length ? {
-    k: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
+    m: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
       return common_vendor.e({
         a: dish.image,
         b: dish.badge
@@ -241,13 +244,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       });
     })
   } : {}, {
-    l: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
+    n: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
   }, !$data.recommendLoading && $options.homeRecommendDishes.length === 0 ? {} : {}, {
-    m: common_vendor.p({
+    o: common_vendor.p({
       visible: $data.pageLoading,
       tip: $data.pageLoadingTip
     }),
-    n: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    p: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),
