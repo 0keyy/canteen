@@ -1,0 +1,144 @@
+/* 粮兴坊风格设计系统 v2 */
+/* ===== 主色：正红 / 暖橙 ===== */
+/* ===== 背景 ===== */
+/* ===== 我的页渐变背景 ===== */
+/* ===== 用户信息栏背景 ===== */
+/* ===== 文字 ===== */
+/* ===== 边框 / 分割 ===== */
+/* ===== 圆角 ===== */
+/* ===== 阴影 ===== */
+/* ===== 字号 ===== */
+/* ===== 间距 ===== */
+/* ===== 动画 ===== */
+/* 底部自定义 Tab 栏占位高度 */
+/* ===== 兼容旧变量 ===== */
+.draw-page.data-v-84fa3ceb {
+  min-height: 100vh;
+  position: relative;
+  padding: calc(60rpx + env(safe-area-inset-top)) 32rpx 40rpx;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffd1d1, #fff0f0);
+}
+.logo-water.data-v-84fa3ceb {
+  position: absolute;
+  left: 60rpx;
+  top: calc(env(safe-area-inset-top) + 100rpx);
+  width: 240rpx;
+  height: 240rpx;
+  opacity: 0.12;
+  z-index: 0;
+  pointer-events: none;
+}
+.draw-header.data-v-84fa3ceb {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 240rpx;
+  margin-bottom: 100rpx;
+}
+.draw-header .draw-back.data-v-84fa3ceb {
+  position: fixed;
+  left: 20rpx;
+  top: calc(env(safe-area-inset-top) + 60rpx);
+  font-size: 70rpx;
+  color: #222;
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  z-index: 99;
+}
+.draw-header .draw-title-wrap.data-v-84fa3ceb {
+  flex: 1;
+  padding-left: 30rpx;
+  padding-top: 10px;
+}
+.draw-header .draw-title-wrap .draw-title1.data-v-84fa3ceb {
+  font-size: 95rpx;
+  color: #b82222;
+  font-weight: 900;
+  display: block;
+  letter-spacing: 4rpx;
+}
+.draw-header .draw-title-wrap .draw-title2.data-v-84fa3ceb {
+  font-size: 95rpx;
+  color: #b82222;
+  font-weight: 900;
+  letter-spacing: 6rpx;
+}
+.draw-header .draw-avatar-wrap.data-v-84fa3ceb {
+  position: absolute;
+  right: -10px;
+  top: 18rpx;
+}
+.draw-header .draw-avatar.data-v-84fa3ceb {
+  width: 250rpx;
+  height: 350rpx;
+}
+.draw-box-wrap.data-v-84fa3ceb {
+  position: relative;
+  z-index: 2;
+  background: #a81c1c;
+  border-radius: 24rpx;
+  padding: 40rpx;
+}
+.draw-grid.data-v-84fa3ceb {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12rpx;
+}
+.draw-item.data-v-84fa3ceb {
+  background: #fff;
+  border-radius: 18rpx;
+  padding: 40rpx 16rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  transition: all 0.1s;
+}
+.draw-item.active.data-v-84fa3ceb {
+  background: #ffe6e6;
+  transform: scale(1.03);
+}
+.draw-item .item-num.data-v-84fa3ceb {
+  font-size: 45rpx;
+  color: #b82222;
+  font-weight: bold;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.draw-item .item-desc.data-v-84fa3ceb {
+  font-size: 25rpx;
+  color: #666;
+}
+.center-item.data-v-84fa3ceb {
+  background: #fff8f8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18rpx;
+  padding: 40rpx 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+.center-item.disabled.data-v-84fa3ceb {
+  opacity: 0.7;
+}
+.center-item .center-text.data-v-84fa3ceb {
+  font-size: 50rpx;
+  color: #b82222;
+  font-weight: bold;
+}
+.center-item .center-desc.data-v-84fa3ceb {
+  font-size: 20rpx;
+  color: #999;
+  margin-top: 8rpx;
+}

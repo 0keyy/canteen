@@ -1,0 +1,54 @@
+/* 粮兴坊风格设计系统 v2 */
+/* ===== 主色：正红 / 暖橙 ===== */
+/* ===== 背景 ===== */
+/* ===== 我的页渐变背景 ===== */
+/* ===== 用户信息栏背景 ===== */
+/* ===== 文字 ===== */
+/* ===== 边框 / 分割 ===== */
+/* ===== 圆角 ===== */
+/* ===== 阴影 ===== */
+/* ===== 字号 ===== */
+/* ===== 间距 ===== */
+/* ===== 动画 ===== */
+/* 底部自定义 Tab 栏占位高度 */
+/* ===== 兼容旧变量 ===== */
+.page-loading.data-v-e598955a {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: #FAF5EE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.page-loading__content.data-v-e598955a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.page-loading__icon.data-v-e598955a {
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 32rpx;
+}
+.page-loading__bar.data-v-e598955a {
+  width: 320rpx;
+  height: 16rpx;
+  background: #F0E6D8;
+  border-radius: 999rpx;
+  overflow: hidden;
+}
+.page-loading__bar-fill.data-v-e598955a {
+  height: 100%;
+  background: linear-gradient(90deg, #D44047, #B7272D);
+  border-radius: 999rpx;
+  transition: width 0.3s ease;
+}
+.page-loading__tip.data-v-e598955a {
+  margin-top: 20rpx;
+  font-size: 24rpx;
+  color: #999999;
+}

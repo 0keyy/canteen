@@ -17,7 +17,7 @@ export default defineConfig({
         // 本地开发：把 /api 转发到后端 like-admin（application.yml 默认 8082），避免 localhost:5173 下 404
         proxy: {
             '/api': {
-                target: 'http://47.97.4.12:8082',
+                target: 'http://localhost:8082',
                 changeOrigin: true
             }
         }

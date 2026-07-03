@@ -474,7 +474,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     c: common_vendor.t($options.shopName),
     d: $data.staticImgPrefix + "/tabbar/矢量 38.png",
     e: common_vendor.t($data.diningMode === 3 ? "外卖" : "堂食"),
-    f: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "b5"),
+    f: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args)),
     g: common_vendor.s($options.headerPaddingStyle),
     h: common_vendor.p({
       visible: $data.pageLoading,
@@ -482,7 +482,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     i: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    k: common_vendor.o($options.selectCategory, "56"),
+    k: common_vendor.o($options.selectCategory),
     l: common_vendor.p({
       menu: $data.menu,
       ["active-index"]: $data.activeIndex,
@@ -527,7 +527,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     t: common_vendor.t($options.cartSummary),
     v: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
     w: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    x: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "b4"),
+    x: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args)),
     y: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,

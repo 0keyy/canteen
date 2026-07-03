@@ -11,7 +11,7 @@ function resolveImageUrl(url) {
     value = nested[2];
   }
   if (/^https?:\/\//i.test(value)) {
-    return value;
+    return value.replace(/^http:/i, "https:");
   }
   if (value.startsWith("//")) {
     return `https:${value}`;

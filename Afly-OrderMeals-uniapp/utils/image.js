@@ -16,13 +16,15 @@ export function resolveImageUrl(url) {
 
   let value = String(url).trim()
 
+  // 处理嵌套 URL
   const nested = value.match(/^(https?:\/\/[^/]+(?:\/api\/uploads)?\/)(https?:\/\/.+)$/i)
   if (nested) {
     value = nested[2]
   }
 
+  // ⭐ 关键修改：只要是以 http:// 或 https:// 开头，都强制转成 https://
   if (/^https?:\/\//i.test(value)) {
-    return value
+    return value.replace(/^http:/i, 'https:')  // 替换协议
   }
 
   if (value.startsWith('//')) {

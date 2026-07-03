@@ -119,7 +119,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     j: common_vendor.t($data.order.number),
     k: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
       return {
-        a: dish.image || $data.staticImgPrefix + "/placeholder.png",
+        a: dish.dishImage || $data.staticImgPrefix + "/placeholder.png",
         b: common_vendor.t(dish.dishName),
         c: common_vendor.t(dish.quantity),
         d: common_vendor.t($options.lineAmount(dish)),
@@ -130,30 +130,30 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     m: $data.order.payStatus === 0 || $data.order.status === 4
   }, $data.order.payStatus === 0 || $data.order.status === 4 ? {
     n: common_vendor.t($options.payChannelText),
-    o: common_vendor.o(($event) => $data.showPayPicker = true, "29")
+    o: common_vendor.o(($event) => $data.showPayPicker = true)
   } : {}, {
     p: $data.order.payStatus === 0 || $data.order.status === 4
   }, $data.order.payStatus === 0 || $data.order.status === 4 ? {
     q: common_vendor.t($data.order.amount),
-    r: common_vendor.o((...args) => $options.payNow && $options.payNow(...args), "8b")
+    r: common_vendor.o((...args) => $options.payNow && $options.payNow(...args))
   } : {}, {
     s: $data.order.status === 1
   }, $data.order.status === 1 ? {
-    t: common_vendor.o((...args) => $options.cancelOrder && $options.cancelOrder(...args), "76")
+    t: common_vendor.o((...args) => $options.cancelOrder && $options.cancelOrder(...args))
   } : {}, {
     v: $data.showPayPicker
   }, $data.showPayPicker ? {
-    w: common_vendor.o($options.onPayMethodChange, "be"),
-    x: common_vendor.o($options.onPayMethodsLoaded, "0d"),
-    y: common_vendor.o(($event) => $data.payChannel = $event, "02"),
+    w: common_vendor.o($options.onPayMethodChange),
+    x: common_vendor.o($options.onPayMethodsLoaded),
+    y: common_vendor.o(($event) => $data.payChannel = $event),
     z: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    A: common_vendor.o(($event) => $data.showPayPicker = false, "de"),
+    A: common_vendor.o(($event) => $data.showPayPicker = false),
     B: common_vendor.o(() => {
-    }, "8e"),
-    C: common_vendor.o(($event) => $data.showPayPicker = false, "06")
+    }),
+    C: common_vendor.o(($event) => $data.showPayPicker = false)
   } : {}) : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-6b23c96c"]]);

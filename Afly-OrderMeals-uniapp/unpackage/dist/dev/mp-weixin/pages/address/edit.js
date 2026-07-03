@@ -62,26 +62,26 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
-    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "ad"),
+    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
     b: $data.form.contactName,
-    c: common_vendor.o(($event) => $data.form.contactName = $event.detail.value, "ba"),
+    c: common_vendor.o(($event) => $data.form.contactName = $event.detail.value),
     d: $data.gender === "先生" ? 1 : "",
-    e: common_vendor.o(($event) => $options.selectGender("先生"), "fb"),
+    e: common_vendor.o(($event) => $options.selectGender("先生")),
     f: $data.gender === "女士" ? 1 : "",
-    g: common_vendor.o(($event) => $options.selectGender("女士"), "68"),
+    g: common_vendor.o(($event) => $options.selectGender("女士")),
     h: $data.form.contactMobile,
-    i: common_vendor.o(($event) => $data.form.contactMobile = $event.detail.value, "25"),
+    i: common_vendor.o(($event) => $data.form.contactMobile = $event.detail.value),
     j: $data.form.province,
-    k: common_vendor.o(($event) => $data.form.province = $event.detail.value, "bc"),
+    k: common_vendor.o(($event) => $data.form.province = $event.detail.value),
     l: $data.form.city,
-    m: common_vendor.o(($event) => $data.form.city = $event.detail.value, "e7"),
+    m: common_vendor.o(($event) => $data.form.city = $event.detail.value),
     n: $data.form.district,
-    o: common_vendor.o(($event) => $data.form.district = $event.detail.value, "1a"),
+    o: common_vendor.o(($event) => $data.form.district = $event.detail.value),
     p: $data.form.detail,
-    q: common_vendor.o(($event) => $data.form.detail = $event.detail.value, "e0"),
+    q: common_vendor.o(($event) => $data.form.detail = $event.detail.value),
     r: $data.form.isDefault === 1,
-    s: common_vendor.o((...args) => $options.onDefaultChange && $options.onDefaultChange(...args), "0f"),
-    t: common_vendor.o((...args) => $options.save && $options.save(...args), "1a")
+    s: common_vendor.o((...args) => $options.onDefaultChange && $options.onDefaultChange(...args)),
+    t: common_vendor.o((...args) => $options.save && $options.save(...args))
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-dcb1f0d8"]]);
