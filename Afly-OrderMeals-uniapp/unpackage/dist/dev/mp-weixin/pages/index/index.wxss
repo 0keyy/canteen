@@ -17,11 +17,11 @@
   flex-direction: column;
   height: 100vh;
   background: #FFFCF8;
-  /* ===== 顶部渐变区（对齐 HomeView 结构） ===== */
+  /* 顶部轮播区域，移除红色渐变 */
+  /* 到店外卖卡片独立区块 */
   /* ===== 内容区 ===== */
   /* ===== 红色线描图标 ===== */
   /* ===== 招牌推荐 ===== */
-  /* ===== 储值营销条 ===== */
 }
 .home__scroll-inner.data-v-1cf27b2a {
   box-sizing: border-box;
@@ -31,114 +31,43 @@
   background: #FFFCF8;
   overflow: hidden;
 }
-.home__hero.data-v-1cf27b2a {
-  background: linear-gradient(135deg, #C82D24 0%, #E8453A 50%, #FF6B5B 100%);
-  color: #FFFFFF;
-  position: relative;
-}
-.home__hero.data-v-1cf27b2a::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 200, 150, 0.12) 0%, transparent 40%);
-  pointer-events: none;
-}
-.home__hero-inner.data-v-1cf27b2a {
-  padding: 0 24rpx 24rpx;
+.home__banner-top.data-v-1cf27b2a {
+  width: 100%;
   box-sizing: border-box;
-  position: relative;
-  z-index: 1;
-}
-.home__nav-row.data-v-1cf27b2a {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12rpx;
-}
-.home__search.data-v-1cf27b2a {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  height: 56rpx;
-  padding: 0 24rpx;
-  background: rgba(255, 252, 248, 0.9);
-  border-radius: 999rpx;
-  box-sizing: border-box;
-  transition: transform 0.15s ease;
-}
-.home__search.data-v-1cf27b2a:active {
-  transform: scale(0.97);
-}
-.home__search-icon.data-v-1cf27b2a {
-  width: 28rpx;
-  height: 28rpx;
-  border: 3rpx solid #A89B90;
-  border-radius: 50%;
-  position: relative;
-  flex-shrink: 0;
-  margin-right: 12rpx;
-}
-.home__search-icon.data-v-1cf27b2a::after {
-  content: "";
-  position: absolute;
-  width: 10rpx;
-  height: 3rpx;
-  background: #A89B90;
-  border-radius: 2rpx;
-  bottom: -2rpx;
-  right: -6rpx;
-  transform: rotate(45deg);
-}
-.home__search-text.data-v-1cf27b2a {
-  font-size: 24rpx;
-  font-weight: 600;
-  color: #1A1410;
-}
-.home__slogan.data-v-1cf27b2a {
-  display: block;
-  margin-bottom: 12rpx;
-  font-size: 20rpx;
-  color: rgba(255, 252, 248, 0.9);
-  line-height: 1.4;
-}
-.home__banner-section.data-v-1cf27b2a {
-  margin-top: 12rpx;
 }
 .home__banner-wrap.data-v-1cf27b2a {
-  padding: 4rpx;
-  border-radius: 32rpx;
-  background: rgba(255, 252, 248, 0.15);
-  border: 2rpx solid rgba(255, 255, 255, 0.3);
+  width: 100%;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
 }
 .home__swiper.data-v-1cf27b2a {
   width: 100%;
-  height: 280rpx;
-  border-radius: 24rpx;
+  height: 360rpx;
+  border-radius: 0;
   overflow: hidden;
-  background: linear-gradient(135deg, #A01829 0%, #C41E3A 50%, #FF8B1A 100%);
 }
 .home__swiper-item.data-v-1cf27b2a {
   width: 100%;
-  height: 280rpx;
+  height: 360rpx;
 }
 .home__banner-image.data-v-1cf27b2a {
   display: block;
   width: 100%;
-  height: 280rpx;
+  height: 360rpx;
 }
 .home__banner-placeholder.data-v-1cf27b2a {
   width: 100%;
-  height: 280rpx;
-  background: linear-gradient(135deg, #A01829 0%, #C41E3A 50%, #FF8B1A 100%);
+  height: 360rpx;
+  background: #f5f5f5;
 }
 .home__primary-cards.data-v-1cf27b2a {
   display: flex;
   gap: 16rpx;
-  margin: 20rpx -24rpx -24rpx;
-  padding: 24rpx 24rpx 16rpx;
-  background: #FFFFFF;
+  margin: 24rpx 24rpx;
+  padding: 0;
+  background: transparent;
 }
 .home__primary-card-item.data-v-1cf27b2a {
   flex: 1;
@@ -176,7 +105,6 @@
   color: #1A1410;
 }
 .home__sections.data-v-1cf27b2a {
-  margin-top: -4rpx;
   padding: 0 24rpx 16rpx;
   display: flex;
   flex-direction: column;
@@ -555,50 +483,6 @@
 .home__recommend-empty-text.data-v-1cf27b2a {
   font-size: 26rpx;
   color: #7F7368;
-}
-.home__promo.data-v-1cf27b2a {
-  display: flex;
-  align-items: center;
-  gap: 24rpx;
-  padding: 24rpx;
-  border-radius: 24rpx;
-  background: linear-gradient(135deg, #1A1410 0%, #C41E3A 100%);
-  box-shadow: 0 4rpx 16rpx rgba(196, 30, 58, 0.08);
-  transition: transform 0.15s ease;
-}
-.home__promo.data-v-1cf27b2a:active {
-  transform: scale(0.98);
-}
-.home__promo-icon.data-v-1cf27b2a {
-  flex-shrink: 0;
-  border-color: rgba(255, 252, 248, 0.85) !important;
-}
-.home__promo-icon.data-v-1cf27b2a::before, .home__promo-icon.data-v-1cf27b2a::after {
-  border-color: rgba(255, 252, 248, 0.85) !important;
-}
-.home__promo-content.data-v-1cf27b2a {
-  flex: 1;
-  min-width: 0;
-}
-.home__promo-sub.data-v-1cf27b2a {
-  display: block;
-  font-size: 24rpx;
-  color: rgba(255, 252, 248, 0.8);
-  line-height: 1.4;
-}
-.home__promo-title.data-v-1cf27b2a {
-  display: block;
-  margin-top: 4rpx;
-  font-size: 28rpx;
-  font-weight: 900;
-  color: #FFFFFF;
-  line-height: 1.35;
-}
-.home__promo-arrow.data-v-1cf27b2a {
-  flex-shrink: 0;
-  font-size: 40rpx;
-  color: #FFFFFF;
-  line-height: 1;
 }
 .home__bottom-space.data-v-1cf27b2a {
   height: calc(108rpx + env(safe-area-inset-bottom));

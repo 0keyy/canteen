@@ -182,18 +182,18 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $options.avatarSrc,
-    b: common_vendor.o(($event) => $data.showAvatarPicker = true),
+    b: common_vendor.o(($event) => $data.showAvatarPicker = true, "da"),
     c: common_vendor.t($data.nickname || "未登录用户"),
     d: $data.companyVerified
   }, $data.companyVerified ? {} : {}, {
-    e: common_vendor.o((...args) => $options.goProfile && $options.goProfile(...args)),
+    e: common_vendor.o((...args) => $options.goProfile && $options.goProfile(...args), "2b"),
     f: common_vendor.t($data.mobile || "请登录后查看"),
     g: $data.companyVerified && $data.companyDeptName
   }, $data.companyVerified && $data.companyDeptName ? {
     h: common_vendor.t($data.companyDeptName)
   } : {}, {
     i: $data.staticImgPrefix + "/tabbar/二维码图标.png",
-    j: common_vendor.o(($event) => $options.onFeatureTap("会员码")),
+    j: common_vendor.o(($event) => $options.onFeatureTap("会员码"), "01"),
     k: common_vendor.t($data.balance),
     l: common_vendor.t($data.pointCount),
     m: common_vendor.t($data.couponCount),
@@ -223,14 +223,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.showAvatarPicker ? {
     r: $data.staticImgPrefix + "/1.png",
     s: $data.avatarKey === "1" ? 1 : "",
-    t: common_vendor.o(($event) => $options.selectAvatar("1")),
+    t: common_vendor.o(($event) => $options.selectAvatar("1"), "2f"),
     v: $data.staticImgPrefix + "/2.png",
     w: $data.avatarKey === "2" ? 1 : "",
-    x: common_vendor.o(($event) => $options.selectAvatar("2")),
-    y: common_vendor.o(($event) => $data.showAvatarPicker = false),
+    x: common_vendor.o(($event) => $options.selectAvatar("2"), "4a"),
+    y: common_vendor.o(($event) => $data.showAvatarPicker = false, "07"),
     z: common_vendor.o(() => {
-    }),
-    A: common_vendor.o(($event) => $data.showAvatarPicker = false)
+    }, "2f"),
+    A: common_vendor.o(($event) => $data.showAvatarPicker = false, "c1")
   } : {}, {
     B: $data.showServicePicker
   }, $data.showServicePicker ? {
@@ -242,10 +242,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.makeCall(item.phone), index)
       };
     }),
-    D: common_vendor.o(($event) => $data.showServicePicker = false),
+    D: common_vendor.o(($event) => $data.showServicePicker = false, "1c"),
     E: common_vendor.o(() => {
-    }),
-    F: common_vendor.o(($event) => $data.showServicePicker = false)
+    }, "bc"),
+    F: common_vendor.o(($event) => $data.showServicePicker = false, "03")
   } : {}, {
     G: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {

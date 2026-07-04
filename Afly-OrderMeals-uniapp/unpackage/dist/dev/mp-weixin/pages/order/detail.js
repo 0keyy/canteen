@@ -130,30 +130,30 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     m: $data.order.payStatus === 0 || $data.order.status === 4
   }, $data.order.payStatus === 0 || $data.order.status === 4 ? {
     n: common_vendor.t($options.payChannelText),
-    o: common_vendor.o(($event) => $data.showPayPicker = true)
+    o: common_vendor.o(($event) => $data.showPayPicker = true, "a2")
   } : {}, {
     p: $data.order.payStatus === 0 || $data.order.status === 4
   }, $data.order.payStatus === 0 || $data.order.status === 4 ? {
     q: common_vendor.t($data.order.amount),
-    r: common_vendor.o((...args) => $options.payNow && $options.payNow(...args))
+    r: common_vendor.o((...args) => $options.payNow && $options.payNow(...args), "00")
   } : {}, {
     s: $data.order.status === 1
   }, $data.order.status === 1 ? {
-    t: common_vendor.o((...args) => $options.cancelOrder && $options.cancelOrder(...args))
+    t: common_vendor.o((...args) => $options.cancelOrder && $options.cancelOrder(...args), "79")
   } : {}, {
     v: $data.showPayPicker
   }, $data.showPayPicker ? {
-    w: common_vendor.o($options.onPayMethodChange),
-    x: common_vendor.o($options.onPayMethodsLoaded),
-    y: common_vendor.o(($event) => $data.payChannel = $event),
+    w: common_vendor.o($options.onPayMethodChange, "92"),
+    x: common_vendor.o($options.onPayMethodsLoaded, "05"),
+    y: common_vendor.o(($event) => $data.payChannel = $event, "19"),
     z: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    A: common_vendor.o(($event) => $data.showPayPicker = false),
+    A: common_vendor.o(($event) => $data.showPayPicker = false, "92"),
     B: common_vendor.o(() => {
-    }),
-    C: common_vendor.o(($event) => $data.showPayPicker = false)
+    }, "75"),
+    C: common_vendor.o(($event) => $data.showPayPicker = false, "e1")
   } : {}) : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-6b23c96c"]]);
