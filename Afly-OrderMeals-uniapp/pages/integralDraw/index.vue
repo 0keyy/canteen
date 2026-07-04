@@ -1,7 +1,7 @@
 <template>
   <view class="draw-page">
     <!-- 左上角水印logo -->
-    <image class="logo-water" src="/static/黑logo.png" mode="aspectFill"></image>
+    <image class="logo-water" :src="staticImgPrefix + '/static/黑logo.png'" mode="aspectFill"></image>
 
     <!-- 顶部头部 -->
     <view class="draw-header">
@@ -11,7 +11,7 @@
         <text class="draw-title2">积分抽奖</text>
       </view>
       <view class="draw-avatar-wrap">
-        <image class="draw-avatar" src="/static/雀跃.png" mode="aspectFill"></image>
+        <image class="draw-avatar" :src="staticImgPrefix + '/static/雀跃.png'" mode="aspectFill"></image>
       </view>
     </view>
 
@@ -51,9 +51,11 @@
 <script>
 // 对接后端积分接口
 import { getDrawPrizeList, startDrawApi } from '@/api/integral'
+import { STATIC_IMAGE_PREFIX } from '@/utils/image'
 export default {
   data() {
     return {
+      staticImgPrefix: STATIC_IMAGE_PREFIX,
       // 后端返回奖品数组
       prizeList: [],
       // 兜底本地默认文字奖品（接口异常时显示）

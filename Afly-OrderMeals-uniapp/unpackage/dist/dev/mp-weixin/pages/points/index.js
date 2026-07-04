@@ -4,11 +4,13 @@ const api_index = require("../../api/index.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
 const utils_navbar = require("../../utils/navbar.js");
 const utils_tabbar = require("../../utils/tabbar.js");
+const utils_image = require("../../utils/image.js");
 const _sfc_main = {
   mixins: [mixins_tabbarPage.tabbarPageMixin],
   data() {
     return {
       navMetrics: utils_navbar.getNavMetrics(),
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       pointsBalance: 0,
       activeTab: 1,
       activeCategory: 0,
@@ -17,7 +19,7 @@ const _sfc_main = {
       products: [
         {
           id: 1,
-          image: "/static/1.png",
+          image: utils_image.STATIC_IMAGE_PREFIX + "/static/1.png",
           label: "可口可乐",
           title: "【堂食专享】可口可乐",
           points: 10,
@@ -25,7 +27,7 @@ const _sfc_main = {
         },
         {
           id: 2,
-          image: "/static/2.png",
+          image: utils_image.STATIC_IMAGE_PREFIX + "/static/2.png",
           label: "薯条",
           title: "【堂食专享】香脆薯条",
           points: 20,
@@ -33,7 +35,7 @@ const _sfc_main = {
         },
         {
           id: 3,
-          image: "/static/3.png",
+          image: utils_image.STATIC_IMAGE_PREFIX + "/static/3.png",
           label: "奶茶",
           title: "【外卖专享】珍珠奶茶",
           points: 30,
@@ -41,7 +43,7 @@ const _sfc_main = {
         },
         {
           id: 4,
-          image: "/static/4.png",
+          image: utils_image.STATIC_IMAGE_PREFIX + "/static/4.png",
           label: "鸡翅",
           title: "【积分秒杀】香辣鸡翅",
           points: 50,
@@ -98,9 +100,10 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: common_vendor.t($data.pointsBalance),
-    b: common_vendor.o((...args) => $options.onScan && $options.onScan(...args), "49"),
-    c: common_vendor.s($options.heroPaddingStyle),
-    d: common_vendor.f($data.navTabs, (tab, index, i0) => {
+    b: $data.staticImgPrefix + "/static/看书.png",
+    c: common_vendor.o((...args) => $options.onScan && $options.onScan(...args)),
+    d: common_vendor.s($options.heroPaddingStyle),
+    e: common_vendor.f($data.navTabs, (tab, index, i0) => {
       return {
         a: common_vendor.t(tab),
         b: index,
@@ -108,7 +111,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.selectTab(index), index)
       };
     }),
-    e: common_vendor.f($data.categories, (cat, index, i0) => {
+    f: common_vendor.f($data.categories, (cat, index, i0) => {
       return {
         a: common_vendor.t(cat),
         b: index,
@@ -116,7 +119,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.selectCategory(index), index)
       };
     }),
-    f: common_vendor.f($data.products, (product, k0, i0) => {
+    g: common_vendor.f($data.products, (product, k0, i0) => {
       return {
         a: product.image,
         b: common_vendor.t(product.title),
@@ -125,7 +128,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: product.id
       };
     }),
-    g: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    h: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected !== index ? 1 : "",
         b: _ctx.tabbarSelected === index ? item.selected : item.unselected,

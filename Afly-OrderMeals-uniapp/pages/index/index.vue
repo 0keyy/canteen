@@ -37,7 +37,7 @@
           <view class="home__primary-card-item" @click="selectMode(1)">
             <view class="home__primary-card-text">
               <text class="home__primary-name">到店堂食</text>
-            </view>
+            </view> <!-- 补上这一行闭合 -->
             <image class="home__primary-card-img" src="/static/图层 2.png" mode="aspectFit" />
           </view>
           <view

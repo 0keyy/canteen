@@ -1,10 +1,12 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
+const utils_image = require("../../utils/image.js");
 const utils_pay_weixin = require("../../utils/pay/weixin.js");
 const _sfc_main = {
   data() {
     return {
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       balance: 0,
       selectedAmount: 10,
       amountOptions: [10, 20, 50, 100, 200, 500]
@@ -71,8 +73,9 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
-    a: common_vendor.t($options.formatBalance),
-    b: common_vendor.f($data.amountOptions, (item, index, i0) => {
+    a: $data.staticImgPrefix + "/static/tabbar/充值金额 1.png",
+    b: common_vendor.t($options.formatBalance),
+    c: common_vendor.f($data.amountOptions, (item, index, i0) => {
       return {
         a: common_vendor.t(item),
         b: index,
@@ -80,8 +83,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $data.selectedAmount = item, index)
       };
     }),
-    c: common_vendor.o((...args) => $options.onRecharge && $options.onRecharge(...args), "7b"),
-    d: common_vendor.o((...args) => $options.goRecord && $options.goRecord(...args), "f9")
+    d: common_vendor.o((...args) => $options.onRecharge && $options.onRecharge(...args)),
+    e: common_vendor.o((...args) => $options.goRecord && $options.goRecord(...args))
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-c45a7485"]]);

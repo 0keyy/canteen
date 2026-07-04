@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_image = require("../../utils/image.js");
 const MIN_DURATION = 300;
 const _sfc_main = {
   name: "PageLoading",
@@ -15,6 +16,7 @@ const _sfc_main = {
   },
   data() {
     return {
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       showContent: false,
       progress: 0,
       startTime: 0,
@@ -103,13 +105,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $data.showContent
   }, $data.showContent ? common_vendor.e({
-    b: $data.progress + "%",
-    c: $data.localTip
+    b: $data.staticImgPrefix + "/新版小唐.png",
+    c: $data.progress + "%",
+    d: $data.localTip
   }, $data.localTip ? {
-    d: common_vendor.t($data.localTip)
+    e: common_vendor.t($data.localTip)
   } : {}, {
-    e: common_vendor.o(() => {
-    }, "5e")
+    f: common_vendor.o(() => {
+    })
   }) : {});
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-e598955a"]]);

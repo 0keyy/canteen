@@ -12,7 +12,7 @@
         </view>
       </view>
 	  <view class="member-logo">
-	    <image src="/static/logo.png" mode="aspectFit" class="logo-img"></image>
+	    <image :src="staticImgPrefix + '/logo.png'" mode="aspectFit" class="logo-img"></image>
 	  </view>
     </view>
 
@@ -32,7 +32,7 @@
           <view v-else class="qrcode-placeholder">加载中...</view>
         </view>
         <view class="refresh-tip">
-          <image src="/static/tabbar/刷新.png" mode="aspectFit" class="refresh-icon"></image>
+          <image :src="staticImgPrefix + '/tabbar/刷新.png'" mode="aspectFit" class="refresh-icon"></image>
           <text>会员码每30秒自动更新，请在店内消费使用</text>
         </view>
       </view>
@@ -53,9 +53,11 @@
 
 <script>
 import { memberApi } from '../../../api/index'
+import { STATIC_IMAGE_PREFIX } from '../../../utils/image'
 export default {
   data() {
     return {
+      staticImgPrefix: STATIC_IMAGE_PREFIX,
       memberId: "",
       nickname: "",
       level: "",
@@ -67,7 +69,7 @@ export default {
   },
   computed: {
     avatarSrc() {
-      return `/static/${this.avatarKey || '1'}.png`
+      return `${STATIC_IMAGE_PREFIX}/${this.avatarKey || '1'}.png`
     }
   },
   onLoad() {

@@ -1,5 +1,9 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
+const utils_image = require("./image.js");
+function s(path) {
+  return `${utils_image.STATIC_IMAGE_PREFIX}${path}`;
+}
 const TAB_PAGES = [
   "pages/index/index",
   "pages/menu/index",
@@ -24,10 +28,10 @@ const DEFAULT_TABBAR = {
     selectedColor: "#C41E3A"
   },
   list: [
-    { name: "首页", selected: "/static/tabbar/首页 1.png", unselected: "/static/tabbar/首页 1.png", link: { path: "/pages/index/index" } },
-    { name: "点餐", selected: "/static/tabbar/面条 1.png", unselected: "/static/tabbar/面条 1.png", link: { path: "/pages/menu/index" } },
-    { name: "订单", selected: "/static/tabbar/全部订单 1.png", unselected: "/static/tabbar/全部订单 1.png", link: { path: "/pages/order/list" } },
-    { name: "我的", selected: "/static/tabbar/头像 1.png", unselected: "/static/tabbar/头像 1.png", link: { path: "/pages/mine/index" } }
+    { name: "首页", selected: s("/tabbar/首页 1.png"), unselected: s("/tabbar/首页 1.png"), link: { path: "/pages/index/index" } },
+    { name: "点餐", selected: s("/tabbar/面条 1.png"), unselected: s("/tabbar/面条 1.png"), link: { path: "/pages/menu/index" } },
+    { name: "订单", selected: s("/tabbar/全部订单 1.png"), unselected: s("/tabbar/全部订单 1.png"), link: { path: "/pages/order/list" } },
+    { name: "我的", selected: s("/tabbar/头像 1.png"), unselected: s("/tabbar/头像 1.png"), link: { path: "/pages/mine/index" } }
   ]
 };
 function normalizeTabPath(path) {

@@ -1,4 +1,5 @@
 "use strict";
+const utils_image = require("../../utils/image.js");
 const common_vendor = require("../../common/vendor.js");
 const _sfc_main = {
   props: {
@@ -14,6 +15,11 @@ const _sfc_main = {
       type: Object,
       default: () => ({})
     }
+  },
+  data() {
+    return {
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX
+    };
   },
   emits: ["select"],
   methods: {
@@ -34,16 +40,18 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         a: $props.activeIndex === index
       }, $props.activeIndex === index ? {} : {}, {
         b: index === 0
-      }, index === 0 ? {} : {}, {
-        c: common_vendor.t(index === 0 ? "猜你喜欢" : cate.name),
-        d: common_vendor.n($props.activeIndex === index ? "sidebar__name--active" : ""),
-        e: $options.badgeCount(index) > 0
-      }, $options.badgeCount(index) > 0 ? {
-        f: common_vendor.t($options.badgeCount(index))
+      }, index === 0 ? {
+        c: $data.staticImgPrefix + "/tabbar/爱心 _实心 1.png"
       } : {}, {
-        g: cate.id || cate.name || index,
-        h: common_vendor.n($props.activeIndex === index ? "sidebar__item--active" : ""),
-        i: common_vendor.o(($event) => _ctx.$emit("select", index), cate.id || cate.name || index)
+        d: common_vendor.t(index === 0 ? "猜你喜欢" : cate.name),
+        e: common_vendor.n($props.activeIndex === index ? "sidebar__name--active" : ""),
+        f: $options.badgeCount(index) > 0
+      }, $options.badgeCount(index) > 0 ? {
+        g: common_vendor.t($options.badgeCount(index))
+      } : {}, {
+        h: cate.id || cate.name || index,
+        i: common_vendor.n($props.activeIndex === index ? "sidebar__item--active" : ""),
+        j: common_vendor.o(($event) => _ctx.$emit("select", index), cate.id || cate.name || index)
       });
     })
   };

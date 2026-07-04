@@ -1,9 +1,11 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
+const utils_image = require("../../utils/image.js");
 const _sfc_main = {
   data() {
     return {
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       tabs: [
         { label: "可使用", status: 1 },
         { label: "已使用", status: 2 },
@@ -60,8 +62,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       };
     }),
     b: $data.loading
-  }, $data.loading ? {} : $data.coupons.length === 0 ? {} : {
-    d: common_vendor.f($data.coupons, (coupon, k0, i0) => {
+  }, $data.loading ? {} : $data.coupons.length === 0 ? {
+    d: $data.staticImgPrefix + "/static/tabbar/优惠券.png"
+  } : {
+    e: common_vendor.f($data.coupons, (coupon, k0, i0) => {
       return common_vendor.e({
         a: common_vendor.t(coupon.discountAmount),
         b: coupon.type === 2 && coupon.minAmount > 0
