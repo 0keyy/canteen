@@ -2,64 +2,53 @@
   <view class="home">
     <scroll-view class="home__content" scroll-y :show-scrollbar="false">
       <view class="home__scroll-inner">
-        <!-- 渐变顶栏：搜索 → 轮播 → 自提/外卖 -->
-        <view class="home__hero">
-          <view class="home__hero-inner" :style="heroPaddingStyle">
-            <!-- <view class="home__nav-row" :style="searchRowStyle">
-              <view class="home__search" @tap.stop="goSearch">
-                <view class="home__search-icon"></view>
-                <text class="home__search-text">点击搜索</text>
-              </view>
-            </view> -->
-
-            <view class="home__banner-section">
-              <view class="home__banner-wrap">
-                <swiper
-                  class="home__swiper"
-                  :circular="displayBanners.length > 1"
-                  :autoplay="displayBanners.length > 0"
-                  :interval="4000"
-                  :duration="600"
-                  indicator-dots
-                  indicator-color="rgba(255,255,255,0.45)"
-                  indicator-active-color="#FFFFFF"
-                >
-                  <swiper-item
-                    v-for="(item, index) in displayBanners"
-                    :key="index"
-                    class="home__swiper-item"
-                  >
-                    <image
-                      v-if="item.image"
-                      :src="item.image"
-                      class="home__banner-image"
-                      mode="aspectFill"
-                    />
-                    <view v-else class="home__banner-placeholder"></view>
-                  </swiper-item>
-                </swiper>
-              </view>
-            </view>
-
-            <view class="home__primary-cards">
-              <view class="home__primary-card-item" @click="selectMode(1)">
-                <view class="home__primary-card-text">
-                  <text class="home__primary-name">到店堂食</text>
-                </view>
-                <image class="home__primary-card-img" src="/static/图层 2.png" mode="aspectFit" />
-              </view>
-              <view
-                class="home__primary-card-item"
-                :class="{ 'home__primary-card-item--disabled': shop && shop.deliveryEnable !== 1 }"
-                @click="selectMode(3)"
+        <!-- 顶部纯轮播区域，无红色渐变 -->
+        <view class="home__banner-top" :style="heroPaddingStyle">
+          <view class="home__banner-wrap">
+            <swiper
+              class="home__swiper"
+              :circular="displayBanners.length > 1"
+              :autoplay="displayBanners.length > 0"
+              :interval="4000"
+              :duration="600"
+              indicator-dots
+              indicator-color="rgba(255,255,255,0.45)"
+              indicator-active-color="#FFFFFF"
+            >
+              <swiper-item
+                v-for="(item, index) in displayBanners"
+                :key="index"
+                class="home__swiper-item"
               >
-                <view class="home__primary-card-text">
-                  <text class="home__primary-name">外卖配送</text>
-                  <text class="home__primary-desc">美味配送到家</text>
-                </view>
-                <image class="home__primary-card-img" src="/static/小唐骑车.png" mode="aspectFit" />
-              </view>
+                <image
+                  v-if="item.image"
+                  :src="item.image"
+                  class="home__banner-image"
+                  mode="aspectFill"
+                />
+                <view v-else class="home__banner-placeholder"></view>
+              </swiper-item>
+            </swiper>
+          </view>
+        </view>
+
+        <!-- 到店/外卖卡片 独立区块 -->
+        <view class="home__primary-cards">
+          <view class="home__primary-card-item" @click="selectMode(1)">
+            <view class="home__primary-card-text">
+              <text class="home__primary-name">到店堂食</text>
             </view>
+            <image class="home__primary-card-img" src="/static/图层 2.png" mode="aspectFit" />
+          </view>
+          <view
+            class="home__primary-card-item"
+            :class="{ 'home__primary-card-item--disabled': shop && shop.deliveryEnable !== 1 }"
+            @click="selectMode(3)"
+          >
+            <view class="home__primary-card-text">
+              <text class="home__primary-name">外卖配送</text>
+            </view>
+            <image class="home__primary-card-img" src="/static/小唐骑车.png" mode="aspectFit" />
           </view>
         </view>
 
@@ -362,132 +351,51 @@ $section-gap: 20rpx;
     overflow: hidden;
   }
 
-  /* ===== 顶部渐变区（对齐 HomeView 结构） ===== */
-  &__hero {
-    background: linear-gradient(135deg, #C82D24 0%, #E8453A 50%, #FF6B5B 100%);
-    color: $text-white;
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-                  radial-gradient(circle at 80% 20%, rgba(255, 200, 150, 0.12) 0%, transparent 40%);
-      pointer-events: none;
-    }
-  }
-
-  &__hero-inner {
-    padding: 0 $page-pad 24rpx;
+  /* 顶部轮播区域，移除红色渐变 */
+  &__banner-top {
+    width: 100%;
     box-sizing: border-box;
-    position: relative;
-    z-index: 1;
-  }
-
-  &__nav-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12rpx;
-  }
-
-  &__search {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    height: 56rpx;
-    padding: 0 24rpx;
-    background: rgba(255,252,248,0.9);
-    border-radius: 999rpx;
-    box-sizing: border-box;
-    transition: transform $transition-fast;
-
-    &:active {
-      transform: scale(0.97);
-    }
-  }
-
-  &__search-icon {
-    width: 28rpx;
-    height: 28rpx;
-    border: 3rpx solid $text-tertiary;
-    border-radius: 50%;
-    position: relative;
-    flex-shrink: 0;
-    margin-right: 12rpx;
-
-    &::after {
-      content: '';
-      position: absolute;
-      width: 10rpx;
-      height: 3rpx;
-      background: $text-tertiary;
-      border-radius: 2rpx;
-      bottom: -2rpx;
-      right: -6rpx;
-      transform: rotate(45deg);
-    }
-  }
-
-  &__search-text {
-    font-size: 24rpx;
-    font-weight: 600;
-    color: $text-primary;
-  }
-
-  &__slogan {
-    display: block;
-    margin-bottom: 12rpx;
-    font-size: 20rpx;
-    color: rgba(255,252,248,0.9);
-    line-height: 1.4;
-  }
-
-  &__banner-section {
-    margin-top: 12rpx;
   }
 
   &__banner-wrap {
-    padding: 4rpx;
-    border-radius: $radius-lg;
-    background: rgba(255,252,248,0.15);
-    border: 2rpx solid rgba(255,255,255,0.3);
+    width: 100%;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: none;
   }
 
   &__swiper {
     width: 100%;
-    height: 280rpx;
-    border-radius: $radius-card;
+    height: 360rpx;
+    border-radius: 0;
     overflow: hidden;
-    background: linear-gradient(135deg, $brand-primary-dark 0%, $brand-primary 50%, $brand-orange-light 100%);
   }
 
   &__swiper-item {
     width: 100%;
-    height: 280rpx;
+    height: 360rpx;
   }
 
   &__banner-image {
     display: block;
     width: 100%;
-    height: 280rpx;
+    height: 360rpx;
   }
 
   &__banner-placeholder {
     width: 100%;
-    height: 280rpx;
-    background: linear-gradient(135deg, $brand-primary-dark 0%, $brand-primary 50%, $brand-orange-light 100%);
+    height: 360rpx;
+    background: #f5f5f5;
   }
 
+  /* 到店外卖卡片独立区块 */
   &__primary-cards {
     display: flex;
     gap: 16rpx;
-    margin: 20rpx -24rpx -24rpx;
-    padding: 24rpx 24rpx 16rpx;
-    background: #FFFFFF;
+    margin: 24rpx $page-pad;
+    padding: 0;
+    background: transparent;
   }
 
   &__primary-card-item {
@@ -533,7 +441,6 @@ $section-gap: 20rpx;
 
   /* ===== 内容区 ===== */
   &__sections {
-    margin-top: -4rpx;
     padding: 0 $page-pad 16rpx;
     display: flex;
     flex-direction: column;
@@ -971,60 +878,6 @@ $section-gap: 20rpx;
   &__recommend-empty-text {
     font-size: 26rpx;
     color: $text-secondary;
-  }
-
-  /* ===== 储值营销条 ===== */
-  &__promo {
-    display: flex;
-    align-items: center;
-    gap: 24rpx;
-    padding: 24rpx;
-    border-radius: $radius-card;
-    background: linear-gradient(135deg, $text-primary 0%, $brand-primary 100%);
-    box-shadow: $shadow-card;
-    transition: transform $transition-fast;
-
-    &:active {
-      transform: scale(0.98);
-    }
-  }
-
-  &__promo-icon {
-    flex-shrink: 0;
-    border-color: rgba(255,252,248,0.85) !important;
-
-    &::before,
-    &::after {
-      border-color: rgba(255,252,248,0.85) !important;
-    }
-  }
-
-  &__promo-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  &__promo-sub {
-    display: block;
-    font-size: 24rpx;
-    color: rgba(255,252,248,0.8);
-    line-height: 1.4;
-  }
-
-  &__promo-title {
-    display: block;
-    margin-top: 4rpx;
-    font-size: 28rpx;
-    font-weight: 900;
-    color: $text-white;
-    line-height: 1.35;
-  }
-
-  &__promo-arrow {
-    flex-shrink: 0;
-    font-size: 40rpx;
-    color: $text-white;
-    line-height: 1;
   }
 
   &__bottom-space {

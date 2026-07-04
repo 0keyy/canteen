@@ -222,7 +222,7 @@ const _sfc_main = {
         await this.initCart();
       } catch (e) {
         this.cartReady = false;
-        common_vendor.index.__f__("error", "at pages/menu/index.vue:353", "菜单页加载失败:", e);
+        common_vendor.index.__f__("error", "at pages/menu/index.vue:371", "菜单页加载失败:", e);
         common_vendor.index.showToast({ title: e.message || e || "页面加载失败", icon: "none", duration: 3e3 });
       } finally {
         this.loading = false;
@@ -301,7 +301,7 @@ const _sfc_main = {
         await this.syncCart();
         this.cartReady = true;
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/menu/index.vue:434", "购物车刷新失败:", e);
+        common_vendor.index.__f__("error", "at pages/menu/index.vue:452", "购物车刷新失败:", e);
       }
     },
     async ensureCart() {
@@ -472,7 +472,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: $options.displayBanners.length > 1,
     c: common_vendor.t($options.shopName),
     d: common_vendor.t($data.diningMode === 3 ? "外卖" : "堂食"),
-    e: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "b5"),
+    e: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "ab"),
     f: common_vendor.s($options.headerPaddingStyle),
     g: common_vendor.p({
       visible: $data.pageLoading,
@@ -480,7 +480,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     h: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    j: common_vendor.o($options.selectCategory, "72"),
+    j: common_vendor.o($options.selectCategory, "40"),
     k: common_vendor.p({
       menu: $data.menu,
       ["active-index"]: $data.activeIndex,
@@ -524,7 +524,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     r: common_vendor.t($options.cartSummary),
     s: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
     t: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    v: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "a8"),
+    v: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "99"),
     w: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
