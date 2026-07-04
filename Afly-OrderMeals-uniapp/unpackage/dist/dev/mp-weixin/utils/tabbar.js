@@ -7,7 +7,7 @@ function s(path) {
 const TAB_PAGES = [
   "pages/index/index",
   "pages/menu/index",
-  "pages/order/list",
+  "pages/points/index",
   "pages/mine/index"
 ];
 const TAB_NAME_PATH_MAP = {
@@ -16,8 +16,7 @@ const TAB_NAME_PATH_MAP = {
   "点单": "pages/menu/index",
   "菜单": "pages/menu/index",
   "堂食": "pages/menu/index",
-  "订单": "pages/order/list",
-  "我的订单": "pages/order/list",
+  "积分商城": "pages/points/index",
   "我的": "pages/mine/index",
   "个人中心": "pages/mine/index",
   "我的主页": "pages/mine/index"
@@ -30,7 +29,7 @@ const DEFAULT_TABBAR = {
   list: [
     { name: "首页", selected: s("/tabbar/首页 1.png"), unselected: s("/tabbar/首页 1.png"), link: { path: "/pages/index/index" } },
     { name: "点餐", selected: s("/tabbar/面条 1.png"), unselected: s("/tabbar/面条 1.png"), link: { path: "/pages/menu/index" } },
-    { name: "订单", selected: s("/tabbar/全部订单 1.png"), unselected: s("/tabbar/全部订单 1.png"), link: { path: "/pages/order/list" } },
+    { name: "积分商城", selected: s("/tabbar/积分商城.png"), unselected: s("/tabbar/积分商城.png"), link: { path: "/pages/points/index" } },
     { name: "我的", selected: s("/tabbar/头像 1.png"), unselected: s("/tabbar/头像 1.png"), link: { path: "/pages/mine/index" } }
   ]
 };
@@ -50,7 +49,8 @@ function resolveTabPagePath(item) {
 function filterTabbarList(list) {
   if (!Array.isArray(list))
     return DEFAULT_TABBAR.list;
-  const mapped = list.map((item) => ({
+  const excludedNames = ["订单", "我的订单"];
+  const mapped = list.filter((item) => !excludedNames.includes(item == null ? void 0 : item.name)).map((item) => ({
     ...item,
     pagePath: resolveTabPagePath(item)
   })).filter((item) => TAB_PAGES.includes(item.pagePath));
@@ -98,7 +98,7 @@ function normalizeTabbarItem(item) {
     unselected: unselectedImg
   };
 }
-const TABBAR_CACHE_VERSION = 9;
+const TABBAR_CACHE_VERSION = 12;
 function readTabbarCache() {
   const cached = common_vendor.index.getStorageSync("tabbarConfig");
   if (!cached || cached.version !== TABBAR_CACHE_VERSION)

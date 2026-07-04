@@ -1,34 +1,24 @@
 <template>
   <view class="order-page">
     <view class="order-page__header" :style="headerPaddingStyle">
-      <!-- <view class="order-page__search-row" :style="searchRowStyle">
-        <view class="order-page__search" @tap.stop="goSearch">
-          <view class="order-page__search-icon"></view>
-          <text class="order-page__search-text">点击搜索</text>
-        </view>
-      </view> -->
-
-      <view class="order-page__banner">
+      <!-- 轮播图 -->
+      <view class="order-page__banner" v-if="displayBanners.length">
         <swiper
           class="order-page__swiper"
+          :autoplay="displayBanners.length > 1"
           :circular="displayBanners.length > 1"
-          :autoplay="true"
           :interval="4000"
-          :duration="600"
+          :duration="500"
           indicator-dots
-          indicator-color="rgba(255,255,255,0.45)"
-          indicator-active-color="#FFFFFF"
+          indicator-color="rgba(255,255,255,0.4)"
+          indicator-active-color="#ffffff"
         >
-          <swiper-item
-            v-for="(item, index) in displayBanners"
-            :key="index"
-            class="order-page__swiper-item"
-          >
-            <image :src="item.image" class="order-page__banner-image" mode="aspectFill" />
+          <swiper-item v-for="(banner, idx) in displayBanners" :key="idx" class="order-page__swiper-item">
+            <image :src="banner.image" class="order-page__banner-image" mode="aspectFill" />
           </swiper-item>
         </swiper>
       </view>
-
+      
       <view class="order-page__store-card">
         <view class="order-page__store-info">
           <text class="order-page__store-open">{{ shopName }}正在营业中</text>
@@ -561,18 +551,6 @@ export default {
       } catch (e) {
         uni.showToast({ title: e.message || e || '购物车未就绪', icon: 'none' })
       }
-    },
-    switchTabbar(item, index) {
-      const path = (item?.link?.path || item?.link?.url || item?.pagePath || '').replace(/^\//, '')
-      if (!path) return
-      if (this.tabbarSelected === index) return
-      const url = `/${path}`
-      uni.switchTab({
-        url,
-        fail: () => {
-          uni.reLaunch({ url })
-        }
-      })
     }
   }
 }
@@ -594,62 +572,20 @@ export default {
     border-bottom: none;
   }
 
-  &__search-row {
-    position: relative;
-    z-index: 3;
-    margin-bottom: 18rpx;
-  }
-
-  &__search {
-    display: flex;
-    align-items: center;
-    height: 64rpx;
-    padding: 0 24rpx;
-    border: none;
-    border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.82);
-  }
-
-  &__search-icon {
-    width: 28rpx;
-    height: 28rpx;
-    border: 3rpx solid $text-tertiary;
-    border-radius: 50%;
-    position: relative;
-    flex-shrink: 0;
-    margin-right: 12rpx;
-
-    &::after {
-      content: '';
-      position: absolute;
-      width: 10rpx;
-      height: 3rpx;
-      background: $text-tertiary;
-      border-radius: 2rpx;
-      bottom: -2rpx;
-      right: -6rpx;
-      transform: rotate(45deg);
-    }
-  }
-
-  &__search-text {
-    font-size: 24rpx;
-    font-weight: 600;
-    color: $text-secondary;
-  }
-
+ 
   &__banner {
+    flex-shrink: 0;
     position: relative;
     z-index: 2;
-    margin: 0 0 18rpx;
-    border-radius: $radius-card;
-    overflow: hidden;
+    padding: 0 20rpx;
+    margin: 16rpx 0 0;
   }
 
   &__swiper {
     width: 100%;
     height: 280rpx;
-    border-radius: $radius-card;
+    border-radius: 16rpx;
+    overflow: hidden;
   }
 
   &__swiper-item {
@@ -661,6 +597,7 @@ export default {
     width: 100%;
     height: 280rpx;
     display: block;
+    border-radius: 16rpx;
   }
 
   &__brand-hero {

@@ -68,11 +68,16 @@ const serviceApi = {
 const memberApi = {
   code: () => utils_request.get("/front/member/code")
 };
+const integralApi = {
+  categoryList: () => utils_request.get("/front/integral/category/list"),
+  goodsList: (categoryId, page = 1, pageSize = 20) => utils_request.get("/front/integral/goods/list", { categoryId, page, pageSize })
+};
 exports.addressApi = addressApi;
 exports.authApi = authApi;
 exports.companyApi = companyApi;
 exports.couponApi = couponApi;
 exports.decorateApi = decorateApi;
+exports.integralApi = integralApi;
 exports.memberApi = memberApi;
 exports.orderApi = orderApi;
 exports.payApi = payApi;

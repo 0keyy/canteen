@@ -2,12 +2,13 @@
   <view class="profile-page">
     <scroll-view class="profile-page__scroll" scroll-y :show-scrollbar="false">
       <view class="profile-page__hero" :style="heroPaddingStyle">
+        <view class="profile-page__hero-bg">
+			<image :src="staticImgPrefix + '/白logo.png'" mode=""></image>
+		</view>
+		<!-- 用户信息 -->
         <view class="profile-page__user-row">
           <view class="profile-page__avatar-wrap" @tap="showAvatarPicker = true">
             <image class="profile-page__avatar" :src="avatarSrc" mode="aspectFill" />
-            <view class="profile-page__avatar-edit">
-              <text class="profile-page__avatar-edit-text">换</text>
-            </view>
           </view>
           <view class="profile-page__user-info">
             <view class="profile-page__name-row" @tap="goProfile">
@@ -18,9 +19,9 @@
             <text class="profile-page__mobile">{{ mobile || '请登录后查看' }}</text>
             <text v-if="companyVerified && companyDeptName" class="profile-page__company">{{ companyDeptName }}</text>
           </view>
-          <view class="profile-page__qr-btn" @tap="onFeatureTap('会员码')">
-            <!-- 替换成自己的二维码图标，路径换成你的图片地址 -->
-            <image class="profile-page__qr-img" :src="staticImgPrefix + '/tabbar/二维码图标.png'" mode="aspectFit"></image>
+          <view class="profile-page__member-btn" @tap="goMemberCode">
+            <image class="profile-page__member-img" src="/static/tabbar/二维码图标.png" mode="aspectFit"></image>
+            <!-- <text class="profile-page__member-text">会员码</text> -->
           </view>
         </view>
 
@@ -36,28 +37,19 @@
           </view>
           <view class="profile-page__stat-item">
             <text class="profile-page__stat-value">{{ couponCount }}</text>
-            <text class="profile-page__stat-label">优惠券</text>
+            <text class="profile-page__stat-label">卡券</text>
           </view>
         </view>
 
-        <view class="profile-page__vip-card">
-          <view class="profile-page__vip-top">
-            <view>
-              <text class="profile-page__vip-title">SVIP 1</text>
-              <text class="profile-page__vip-desc">再获得1000个成长值升级为青铜</text>
-            </view>
-            <view class="profile-page__vip-crown"></view>
-          </view>
-          <view class="profile-page__vip-progress">
-            <view class="profile-page__vip-progress-bar"></view>
-          </view>
-          <text class="profile-page__vip-progress-text">0/1000</text>
-        </view>
+        
       </view>
 
       <view class="profile-page__sections">
         <view class="profile-page__card">
-          <text class="profile-page__card-title">我的订单</text>
+          <view class="profile-page__card-header">
+            <text class="profile-page__card-title">我的订单</text>
+            <text class="profile-page__card-more" @tap="goOrderList">全部</text>
+          </view>
           <view class="profile-page__grid">
             <view
               v-for="item in primaryActions"
@@ -91,10 +83,6 @@
             </view>
             <text class="profile-page__grid-label">{{ item.title }}</text>
           </view>
-        </view>
-
-        <view class="profile-page__footer">
-          <text class="profile-page__footer-text">小程序餐饮系统 点击了解详情</text>
         </view>
 
         <view class="profile-page__bottom-space"></view>
@@ -181,19 +169,21 @@ import { getNavMetrics } from '../../utils/navbar'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 const PRIMARY_ACTIONS = [
-  { title: '我的订单', icon: 'orders' },
-  { title: '地址管理', icon: 'address' },
-  { title: '联系客服', icon: 'service' },
-  { title: '会员码', icon: 'code' }
+  { title: '待支付', icon: 'orders' },
+  { title: '待发货', icon: 'address' },
+  { title: '待收货', icon: 'service' },
+  { title: '退款售后', icon: 'code' }
 ]
 
 const SECONDARY_ACTIONS = [
-  { title: '公司认证', icon: 'check', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/公司认证.png' },
-  { title: '充值中心', icon: 'wallet', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/充值 1.png' },
-  { title: '积分商城', icon: 'coins', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/积分商城.png' },
-  { title: '优惠券包', icon: 'ticket', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.png' },
-  { title: '会员日', icon: 'crown', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/名词 1.png' },
-  { title: '退出登录', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/退出 1.png' }
+  { title: '我的订单', icon: 'check', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/公司认证.png' },
+  { title: '地址管理', icon: 'wallet', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/充值 1.png' },
+  { title: '客服中心', icon: 'coins', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/积分商城.png' },
+  { title: '充值中心', icon: 'ticket', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.png' },
+  { title: '红包卡券', icon: 'crown', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/名词 1.png' },
+  { title: '签到中心', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/退出 1.png' },
+  { title: '积分抽奖', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/退出 1.png' },
+  { title: '安全退出', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/退出 1.png' }
 ]
 
 export default {
@@ -309,11 +299,13 @@ export default {
       }
       this.onFeatureTap(item.title)
     },
+    goOrderList() {
+      uni.navigateTo({ url: '/pages/order/list' })
+    },
+    goMemberCode() {
+      uni.navigateTo({ url: '/pages/mine/memberCode/index' })
+    },
     onFeatureTap(title) {
-      if (title === '会员码') {
-        uni.navigateTo({ url: '/pages/mine/memberCode/index' })
-        return
-      }
       uni.showToast({ title: `${title}功能开发中`, icon: 'none' })
     },
     goProfile() {
@@ -372,14 +364,34 @@ export default {
   }
 
   &__hero {
-      padding: 0 32rpx 32rpx;
-      background: linear-gradient(135deg, rgba(177, 10, 15, 0.15) 0%, rgba(255, 139, 26, 0.1) 40%, #fff9f3 100%);
-  }
+	  height: 35vh;
+      padding: 0 32rpx 48rpx;
+      background: linear-gradient(180deg, #e63946 0%, #f8f8f8 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    &__hero-bg {
+      position: absolute;
+      top:-50rpx;
+	  right: 20rpx;
+      width: 400rpx;
+      height: 520rpx;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    &__hero-bg image {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
 
   &__user-row {
     display: flex;
     align-items: center;
     gap: 24rpx;
+	height:18vh;
   }
 
   &__avatar-wrap {
@@ -391,7 +403,7 @@ export default {
     width: 112rpx;
     height: 112rpx;
     border-radius: 50%;
-    border: 4rpx solid #C41E3A;
+    // border: 4rpx solid #C41E3A;
     box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08);
     display: block;
   }
@@ -607,79 +619,110 @@ export default {
   &__nickname {
     font-size: 32rpx;
     font-weight: 900;
-    color: #333333;
+    color: #ffffff;
   }
 
   &__level-tag {
     padding: 4rpx 16rpx;
     border-radius: 999rpx;
-    background: rgba(177, 10, 15, 0.1);
+    background: rgba(255, 255, 255, 0.25);
     font-size: 20rpx;
-    color: #C41E3A;
+    color: #ffffff;
 
     &--verified {
-      background: rgba(34, 139, 34, 0.12);
-      color: #228B22;
+      background: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
     }
-  }
-
-  &__company {
-    display: block;
-    margin-top: 4rpx;
-    font-size: 22rpx;
-    color: #999999;
   }
 
   &__mobile {
     display: block;
     margin-top: 6rpx;
     font-size: 24rpx;
-    color: #999999;
+    color: rgba(255, 255, 255, 0.85);
   }
 
-  &__qr-btn {
-    width: 80rpx;
-    height: 80rpx;
+  &__company {
+    display: block;
+    margin-top: 4rpx;
+    font-size: 22rpx;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  &__member-btn {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    padding: 8rpx 16rpx;
   }
   
-  &__qr-img {
-    width: 44rpx;
-    height: 44rpx;
+  &__member-img {
+    width: 60rpx;
+    height: 60rpx;
     display: block;
+  }
+  
+  &__member-text {
+    font-size: 20rpx;
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 4rpx;
   }
 
   &__stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16rpx;
+	  height: 200rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin-top: 32rpx;
-      text-align: center;
+      padding: 24rpx 0;
+      background: #ffffff;
+      border-radius: 20rpx;
+      box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.1);
     }
   
     &__stat-item {
+
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      position: relative;
+	  border-right: 2px solid #c3c3c3;
+	  
+	  &:last-child {
+	      border-right: none; 
+	    }
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1rpx;
+        height: 60rpx;
+        background: #e8e8e8;
+      }
     }
   
     &__stat-value {
+	  line-height: 50rpx;
       display: block;
-      font-size: 36rpx;
+      font-size: 32rpx;
       font-weight: 900;
-      color: #333333;
+      color: #5f5f5f;
+	  
     }
   
     &__stat-label {
+	  line-height: 40rpx;
       display: block;
-      margin-top: 4rpx;
-      font-size: 24rpx;
+      margin-top: 6rpx;
+      font-size: 26rpx;
       font-weight: 600;
-      color: #999999;
+      color: #838383;
     }
 
   &__vip-card {
@@ -740,29 +783,42 @@ export default {
   }
 
   &__sections {
-    padding: 30rpx 20rpx 0;
+    padding: 20rpx 20rpx 0;
+	background: #f8f8f8;
+    // margin-top: -16rpx;
   }
 
   &__card {
     background: #ffffff;
-    border-radius: 24rpx;
+    border-radius: 16rpx;
     padding: 24rpx;
-    box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08);
-    margin-bottom: 30rpx;
+    box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+	margin-top: 20rpx;
+    margin-bottom: 20rpx;
 
     &--grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 20rpx;
+      gap: 24rpx 12rpx;
     }
   }
 
-  &__card-title {
-    display: block;
-    font-size: 32rpx;
-    font-weight: 900;
-    color: #333333;
+  &__card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 24rpx;
+  }
+
+  &__card-title {
+    font-size: 30rpx;
+    font-weight: 700;
+    color: #333333;
+  }
+
+  &__card-more {
+    font-size: 24rpx;
+    color: #999999;
   }
 
   &__grid {
@@ -787,14 +843,12 @@ export default {
     width: 80rpx;
     height: 80rpx;
     border-radius: 24rpx;
-    background: rgba(177, 10, 15, 0.08);
+    // background: rgba(177, 10, 15, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
 
-    &--primary {
-      background: rgba(177, 10, 15, 0.1);
-    }
+
   }
 
   &__grid-label {
@@ -876,19 +930,6 @@ export default {
     display: block;
   }
 
-  &__footer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 32rpx 0 16rpx;
-  }
-
-  &__footer-text {
-    font-size: 24rpx;
-    color: #999999;
-    line-height: 1.6;
-    text-align: center;
-  }
 
   &__footer-sub {
     font-size: 24rpx;

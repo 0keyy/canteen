@@ -81,3 +81,8 @@ export const serviceApi = {
 export const memberApi = {
   code: () => get('/front/member/code')
 }
+
+export const integralApi = {
+  categoryList: () => get('/front/integral/category/list'),
+  goodsList: (categoryId, page = 1, pageSize = 20) => get('/front/integral/goods/list', { categoryId, page, pageSize })
+}

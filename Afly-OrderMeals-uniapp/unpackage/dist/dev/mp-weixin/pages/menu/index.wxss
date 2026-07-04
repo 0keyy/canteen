@@ -26,56 +26,18 @@
   overflow: hidden;
   border-bottom: none;
 }
-.order-page__search-row.data-v-1f245baa {
-  position: relative;
-  z-index: 3;
-  margin-bottom: 18rpx;
-}
-.order-page__search.data-v-1f245baa {
-  display: flex;
-  align-items: center;
-  height: 64rpx;
-  padding: 0 24rpx;
-  border: none;
-  border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.82);
-}
-.order-page__search-icon.data-v-1f245baa {
-  width: 28rpx;
-  height: 28rpx;
-  border: 3rpx solid #A89B90;
-  border-radius: 50%;
-  position: relative;
-  flex-shrink: 0;
-  margin-right: 12rpx;
-}
-.order-page__search-icon.data-v-1f245baa::after {
-  content: "";
-  position: absolute;
-  width: 10rpx;
-  height: 3rpx;
-  background: #A89B90;
-  border-radius: 2rpx;
-  bottom: -2rpx;
-  right: -6rpx;
-  transform: rotate(45deg);
-}
-.order-page__search-text.data-v-1f245baa {
-  font-size: 24rpx;
-  font-weight: 600;
-  color: #7F7368;
-}
 .order-page__banner.data-v-1f245baa {
+  flex-shrink: 0;
   position: relative;
   z-index: 2;
-  margin: 0 0 18rpx;
-  border-radius: 24rpx;
-  overflow: hidden;
+  padding: 0 20rpx;
+  margin: 16rpx 0 0;
 }
 .order-page__swiper.data-v-1f245baa {
   width: 100%;
   height: 280rpx;
-  border-radius: 24rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
 }
 .order-page__swiper-item.data-v-1f245baa {
   width: 100%;
@@ -85,6 +47,7 @@
   width: 100%;
   height: 280rpx;
   display: block;
+  border-radius: 16rpx;
 }
 .order-page__brand-hero.data-v-1f245baa {
   position: relative;

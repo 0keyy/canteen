@@ -5,12 +5,7 @@
         <!-- 渐变顶栏：搜索 → 轮播 → 自提/外卖 -->
         <view class="home__hero">
           <view class="home__hero-inner" :style="heroPaddingStyle">
-            <!-- <view class="home__nav-row" :style="searchRowStyle">
-              <view class="home__search" @tap.stop="goSearch">
-                <view class="home__search-icon"></view>
-                <text class="home__search-text">点击搜索</text>
-              </view>
-            </view> -->
+            
 
             <view class="home__banner-section">
               <view class="home__banner-wrap">

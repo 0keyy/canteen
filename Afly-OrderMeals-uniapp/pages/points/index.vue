@@ -9,11 +9,11 @@
               <text class="points-page__points-value">{{ pointsBalance }} <text class="points-page__points-text">积分</text></text>
               <text class="points-page__points-label">积分享好礼，别忘记使用哦</text>
             </view>
-            <image class="points-page__mascot" :src="staticImgPrefix + '/static/看书.png'" mode="aspectFit" />
+            <image class="points-page__mascot" :src="staticImgPrefix + '/看书.png'" mode="aspectFit" />
           </view>
-          <view class="points-page__scan-btn" @tap="onScan">
+          <!-- <view class="points-page__scan-btn" @tap="onScan">
             <view class="points-page__scan-icon"></view>
-          </view>
+          </view> -->
         </view>
       </view>
 
@@ -38,14 +38,14 @@
               <text class="points-page__promo-title">积分抽奖</text>
               <text class="points-page__promo-sub">赢取优惠券</text>
             </view>
-            <text class="points-page__promo-watermark">惠</text>
+            <image :src="staticImgPrefix + '/白logo.png'" mode="" class="points-page__promo-watermark"></image>
           </view>
           <view class="points-page__promo-card points-page__promo-card--checkin">
             <view class="points-page__promo-main">
               <text class="points-page__promo-title">每日签到</text>
               <text class="points-page__promo-sub">每天有惊喜</text>
             </view>
-            <text class="points-page__promo-watermark">惠</text>
+            <image :src="staticImgPrefix + '/白logo.png'" mode="" class="points-page__promo-watermark"></image>
           </view>
         </view>
 
@@ -55,12 +55,12 @@
             <view class="points-page__category-list">
               <view
                 v-for="(cat, index) in categories"
-                :key="index"
+                :key="cat.id"
                 class="points-page__category-item"
                 :class="{ 'points-page__category-item--active': activeCategory === index }"
                 @tap="selectCategory(index)"
               >
-                <text class="points-page__category-text">{{ cat }}</text>
+                <text class="points-page__category-text">{{ cat.name }}</text>
               </view>
             </view>
           </scroll-view>
@@ -122,11 +122,48 @@
 </template>
 
 <script>
-import { authApi } from '../../api/index'
+import { authApi, integralApi } from '../../api/index'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getNavMetrics } from '../../utils/navbar'
-import { normalizeTabPath } from '../../utils/tabbar'
-import { STATIC_IMAGE_PREFIX } from '../../utils/image'
+import { resolveImageUrl, STATIC_IMAGE_PREFIX } from '../../utils/image'
+
+const DEFAULT_CATEGORIES = [
+  { id: 0, name: '全部' },
+  { id: 1, name: '积分秒杀' },
+  { id: 2, name: '堂食专享' },
+  { id: 3, name: '外卖专享' }
+]
+
+const DEFAULT_PRODUCTS = [
+  {
+    id: 1,
+    image: STATIC_IMAGE_PREFIX + '/static/1.png',
+    title: '【堂食专享】可口可乐',
+    points: 10,
+    redeemed: 47
+  },
+  {
+    id: 2,
+    image: STATIC_IMAGE_PREFIX + '/static/2.png',
+    title: '【堂食专享】香脆薯条',
+    points: 20,
+    redeemed: 32
+  },
+  {
+    id: 3,
+    image: STATIC_IMAGE_PREFIX + '/static/3.png',
+    title: '【外卖专享】珍珠奶茶',
+    points: 30,
+    redeemed: 58
+  },
+  {
+    id: 4,
+    image: STATIC_IMAGE_PREFIX + '/static/4.png',
+    title: '【积分秒杀】香辣鸡翅',
+    points: 50,
+    redeemed: 19
+  }
+]
 
 export default {
   mixins: [tabbarPageMixin],
@@ -138,41 +175,9 @@ export default {
       activeTab: 1,
       activeCategory: 0,
       navTabs: ['积分规则', '积分明细', '兑换记录'],
-      categories: ['全部', '积分秒杀', '堂食专享', '外卖专享'],
-      products: [
-        {
-          id: 1,
-          image: STATIC_IMAGE_PREFIX + '/static/1.png',
-          label: '可口可乐',
-          title: '【堂食专享】可口可乐',
-          points: 10,
-          redeemed: 47
-        },
-        {
-          id: 2,
-          image: STATIC_IMAGE_PREFIX + '/static/2.png',
-          label: '薯条',
-          title: '【堂食专享】香脆薯条',
-          points: 20,
-          redeemed: 32
-        },
-        {
-          id: 3,
-          image: STATIC_IMAGE_PREFIX + '/static/3.png',
-          label: '奶茶',
-          title: '【外卖专享】珍珠奶茶',
-          points: 30,
-          redeemed: 58
-        },
-        {
-          id: 4,
-          image: STATIC_IMAGE_PREFIX + '/static/4.png',
-          label: '鸡翅',
-          title: '【积分秒杀】香辣鸡翅',
-          points: 50,
-          redeemed: 19
-        }
-      ]
+      categories: DEFAULT_CATEGORIES,
+      products: DEFAULT_PRODUCTS,
+      goodsLoading: false
     }
   },
   computed: {
@@ -184,6 +189,8 @@ export default {
     this.navMetrics = getNavMetrics()
     this.setupTabbar(2)
     this.loadPoints()
+    this.loadCategories()
+    this.loadGoods()
   },
   methods: {
     async loadPoints() {
@@ -194,25 +201,54 @@ export default {
         }
       } catch (e) {}
     },
+    async loadCategories() {
+      try {
+        const list = await integralApi.categoryList()
+        if (Array.isArray(list) && list.length) {
+          this.categories = [{ id: 0, name: '全部' }, ...list.map(item => ({
+            id: item.id ?? item.categoryId ?? item.key,
+            name: item.name ?? item.categoryName ?? item.title
+          }))]
+        }
+      } catch (e) {}
+    },
+    normalizeGoodsItem(item) {
+      return {
+        id: item.id ?? item.goodsId,
+        image: resolveImageUrl(item.image ?? item.cover ?? item.img),
+        title: item.title ?? item.name ?? item.goodsName,
+        points: item.points ?? item.integral ?? item.point,
+        redeemed: item.redeemed ?? item.exchangeCount ?? item.sales ?? 0
+      }
+    },
+    async loadGoods() {
+      const categoryId = this.categories[this.activeCategory]?.id
+      if (categoryId == null) return
+      this.goodsLoading = true
+      try {
+        const data = await integralApi.goodsList(categoryId || null)
+        const list = data?.list || data || []
+        if (Array.isArray(list) && list.length) {
+          this.products = list.map(item => this.normalizeGoodsItem(item))
+        } else {
+          this.products = []
+        }
+      } catch (e) {
+        this.products = categoryId === 0 ? DEFAULT_PRODUCTS : []
+      } finally {
+        this.goodsLoading = false
+      }
+    },
     selectCategory(index) {
+      if (this.activeCategory === index) return
       this.activeCategory = index
+      this.loadGoods()
     },
     selectTab(index) {
       this.activeTab = index
     },
     onScan() {
       uni.showToast({ title: '扫码功能开发中', icon: 'none' })
-    },
-    switchTabbar(item, index) {
-      const path = normalizeTabPath(item?.link?.path || item?.link?.url || item?.pagePath)
-      if (!path) return
-      if (this.tabbarSelected === index) return
-      uni.switchTab({
-        url: `/${path}`,
-        fail: () => {
-          uni.reLaunch({ url: `/${path}` })
-        }
-      })
     }
   }
 }
@@ -238,7 +274,7 @@ export default {
   }
 
   &__hero-content {
-    padding: 26rpx $spacing-page 34rpx;
+    padding: 36rpx $spacing-page 70rpx;
     position: relative;
   }
 
@@ -246,6 +282,7 @@ export default {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
+    position: relative;
   }
 
   &__points-info {
@@ -254,26 +291,29 @@ export default {
   }
 
   &__points-value {
-    font-size: 80rpx;
+    font-size:64rpx;
     font-weight: 900;
-    color: $brand-primary;
+    color: #D00000;
     line-height: 1.1;
   }
 	&__points-text{
-		font-size: 16px;
-		color: #000;
+		font-size: 32rpx;
+		color: #0a0606;
 	}
   &__points-label {
-    margin-top: 8rpx;
+    margin-top: 6rpx;
     font-size: 16rpx;
-    color: #5a5a5a;
+    color: #625b5b;
     line-height: 1.4;
   }
 
   &__mascot {
-    width: 178rpx;
-    height: 178rpx;
+    width: 180rpx;
+    height: 180rpx;
     flex-shrink: 0;
+    position: absolute;
+    top: -60rpx;
+	right: 100rpx;
   }
 
   &__scan-btn {
@@ -318,6 +358,14 @@ export default {
     }
   }
 
+  &__content-panel {
+    position: relative;
+    margin-top: -18rpx;
+    background: #FFFFFF;
+    border-radius: 20rpx 20rpx 0 0;
+    overflow: hidden;
+  }
+
   /* ===== 导航标签 ===== */
   &__nav-tabs {
     display: flex;
@@ -333,6 +381,7 @@ export default {
     justify-content: center;
     padding: 24rpx 0;
     position: relative;
+	color: #676767;
 
     &--active {
       .points-page__nav-tab-text {
@@ -370,13 +419,13 @@ export default {
   &__promo-card {
     flex: 1;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    padding: 28rpx 24rpx;
-    border-radius: 16rpx;
+    padding: 20rpx 24rpx 48rpx;
+    border-radius: 20rpx;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #FF4F59 0%, #FFB5A8 100%);
+    background: linear-gradient(135deg, #ff6d6d 0%, #f8e7d6 100%);
   }
 
   &__promo-main {
@@ -388,7 +437,7 @@ export default {
   &__promo-title {
     font-size: 48rpx;
     font-weight: 900;
-    color: #D00000;
+    color: #be0000;
   }
 
   &__promo-sub {
@@ -400,11 +449,11 @@ export default {
   &__promo-watermark {
     position: absolute;
     right: 12rpx;
-    bottom: -28rpx;
-    font-size: 132rpx;
-    line-height: 1;
-    color: rgba(255, 255, 255, 0.42);
-    font-weight: 900;
+	width: 170rpx;
+	height: 210rpx;
+	top: -30rpx;
+	opacity: 0.3;
+	pointer-events: none;
   }
 
   /* ===== 分类筛选 ===== */
@@ -426,7 +475,7 @@ export default {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12rpx 32rpx;
+    padding: 12rpx 42rpx;
     border-radius: $radius-tag;
     background: #FFFFFF;
     box-shadow: none;
@@ -603,15 +652,8 @@ export default {
 }
 
 .app-tab-text {
-  font-size: 22rpx;
-  font-weight: 600;
-  line-height: 1.2;
-}
-</style>
-  &__content-panel {
-    position: relative;
-    margin-top: -18rpx;
-    background: #FFFFFF;
-    border-radius: 20rpx 20rpx 0 0;
-    overflow: hidden;
+    font-size: 22rpx;
+    font-weight: 600;
+    line-height: 1.2;
   }
+</style>

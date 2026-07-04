@@ -177,8 +177,8 @@
         "selectedIconPath": "static/tabbar/icon-active.png"
       },
       {
-        "pagePath": "pages/order/list",
-        "text": "订单",
+        "pagePath": "pages/points/index",
+        "text": "积分商城",
         "iconPath": "static/tabbar/icon.png",
         "selectedIconPath": "static/tabbar/icon-active.png"
       },

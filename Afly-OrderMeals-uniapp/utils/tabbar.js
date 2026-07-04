@@ -7,7 +7,15 @@ function s(path) {
 const TAB_PAGES = [
   'pages/index/index',
   'pages/menu/index',
-  'pages/order/list',
+  'pages/points/index',
+  'pages/mine/index'
+]
+
+// 原生 tabBar 页面（pages.json 中 tabBar.list 注册的页面）
+export const NATIVE_TAB_PAGES = [
+  'pages/index/index',
+  'pages/menu/index',
+  'pages/points/index',
   'pages/mine/index'
 ]
 
@@ -17,8 +25,7 @@ const TAB_NAME_PATH_MAP = {
   '点单': 'pages/menu/index',
   '菜单': 'pages/menu/index',
   '堂食': 'pages/menu/index',
-  '订单': 'pages/order/list',
-  '我的订单': 'pages/order/list',
+  '积分商城': 'pages/points/index',
   '我的': 'pages/mine/index',
   '个人中心': 'pages/mine/index',
   '我的主页': 'pages/mine/index'
@@ -32,7 +39,7 @@ const DEFAULT_TABBAR = {
   list: [
     { name: '首页', selected: s('/tabbar/首页 1.png'), unselected: s('/tabbar/首页 1.png'), link: { path: '/pages/index/index' } },
     { name: '点餐', selected: s('/tabbar/面条 1.png'), unselected: s('/tabbar/面条 1.png'), link: { path: '/pages/menu/index' } },
-    { name: '订单', selected: s('/tabbar/全部订单 1.png'), unselected: s('/tabbar/全部订单 1.png'), link: { path: '/pages/order/list' } },
+    { name: '积分商城', selected: s('/tabbar/积分商城.png'), unselected: s('/tabbar/积分商城.png'), link: { path: '/pages/points/index' } },
     { name: '我的', selected: s('/tabbar/头像 1.png'), unselected: s('/tabbar/头像 1.png'), link: { path: '/pages/mine/index' } }
   ]
 }
@@ -52,7 +59,10 @@ export function resolveTabPagePath(item) {
 export function filterTabbarList(list) {
   if (!Array.isArray(list)) return DEFAULT_TABBAR.list
 
+  const excludedNames = ['订单', '我的订单']
+
   const mapped = list
+    .filter((item) => !excludedNames.includes(item?.name))
     .map((item) => ({
       ...item,
       pagePath: resolveTabPagePath(item)
@@ -122,7 +132,7 @@ export function normalizeTabbarItem(item) {
   }
 }
 
-export const TABBAR_CACHE_VERSION = 9
+export const TABBAR_CACHE_VERSION = 12
 
 export function readTabbarCache() {
   const cached = uni.getStorageSync('tabbarConfig')

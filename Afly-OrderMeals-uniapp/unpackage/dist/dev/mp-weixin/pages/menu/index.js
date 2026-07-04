@@ -223,7 +223,7 @@ const _sfc_main = {
         await this.initCart();
       } catch (e) {
         this.cartReady = false;
-        common_vendor.index.__f__("error", "at pages/menu/index.vue:354", "菜单页加载失败:", e);
+        common_vendor.index.__f__("error", "at pages/menu/index.vue:344", "菜单页加载失败:", e);
         common_vendor.index.showToast({ title: e.message || e || "页面加载失败", icon: "none", duration: 3e3 });
       } finally {
         this.loading = false;
@@ -302,7 +302,7 @@ const _sfc_main = {
         await this.syncCart();
         this.cartReady = true;
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/menu/index.vue:435", "购物车刷新失败:", e);
+        common_vendor.index.__f__("error", "at pages/menu/index.vue:425", "购物车刷新失败:", e);
       }
     },
     async ensureCart() {
@@ -434,21 +434,6 @@ const _sfc_main = {
       } catch (e) {
         common_vendor.index.showToast({ title: e.message || e || "购物车未就绪", icon: "none" });
       }
-    },
-    switchTabbar(item, index) {
-      var _a, _b;
-      const path = (((_a = item == null ? void 0 : item.link) == null ? void 0 : _a.path) || ((_b = item == null ? void 0 : item.link) == null ? void 0 : _b.url) || (item == null ? void 0 : item.pagePath) || "").replace(/^\//, "");
-      if (!path)
-        return;
-      if (this.tabbarSelected === index)
-        return;
-      const url = `/${path}`;
-      common_vendor.index.switchTab({
-        url,
-        fail: () => {
-          common_vendor.index.reLaunch({ url });
-        }
-      });
     }
   }
 };
@@ -464,32 +449,36 @@ if (!Math) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.f($options.displayBanners, (item, index, i0) => {
+    a: $options.displayBanners.length
+  }, $options.displayBanners.length ? {
+    b: common_vendor.f($options.displayBanners, (banner, idx, i0) => {
       return {
-        a: item.image,
-        b: index
+        a: banner.image,
+        b: idx
       };
     }),
-    b: $options.displayBanners.length > 1,
-    c: common_vendor.t($options.shopName),
-    d: $data.staticImgPrefix + "/tabbar/矢量 38.png",
-    e: common_vendor.t($data.diningMode === 3 ? "外卖" : "堂食"),
-    f: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "b5"),
-    g: common_vendor.s($options.headerPaddingStyle),
-    h: common_vendor.p({
+    c: $options.displayBanners.length > 1,
+    d: $options.displayBanners.length > 1
+  } : {}, {
+    e: common_vendor.t($options.shopName),
+    f: $data.staticImgPrefix + "/tabbar/矢量 38.png",
+    g: common_vendor.t($data.diningMode === 3 ? "外卖" : "堂食"),
+    h: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "e2"),
+    i: common_vendor.s($options.headerPaddingStyle),
+    j: common_vendor.p({
       visible: $data.pageLoading,
       tip: $data.pageLoadingTip
     }),
-    i: $data.loading
+    k: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    k: common_vendor.o($options.selectCategory, "56"),
-    l: common_vendor.p({
+    m: common_vendor.o($options.selectCategory, "f4"),
+    n: common_vendor.p({
       menu: $data.menu,
       ["active-index"]: $data.activeIndex,
       ["cart-map"]: $data.cartMap
     }),
-    m: common_vendor.t($options.currentCategoryName),
-    n: common_vendor.f($options.currentFoods, (food, idx, i0) => {
+    o: common_vendor.t($options.currentCategoryName),
+    p: common_vendor.f($options.currentFoods, (food, idx, i0) => {
       return common_vendor.e({
         a: food.image,
         b: $options.foodTag(idx)
@@ -515,27 +504,27 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         n: food.id
       });
     }),
-    o: $data.cartBusy || !$data.cartReady ? 1 : "",
-    p: $options.currentFoods.length === 0
+    q: $data.cartBusy || !$data.cartReady ? 1 : "",
+    r: $options.currentFoods.length === 0
   }, $options.currentFoods.length === 0 ? {} : {}), {
-    j: $data.menu.length === 0,
-    q: $data.staticImgPrefix + "/新版小唐.png",
-    r: $options.cartItemCount > 0
+    l: $data.menu.length === 0,
+    s: $data.staticImgPrefix + "/新版小唐.png",
+    t: $options.cartItemCount > 0
   }, $options.cartItemCount > 0 ? {
-    s: common_vendor.t($options.cartItemCount)
+    v: common_vendor.t($options.cartItemCount)
   } : {}, {
-    t: common_vendor.t($options.cartSummary),
-    v: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    w: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    x: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "b4"),
-    y: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    w: common_vendor.t($options.cartSummary),
+    x: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
+    y: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
+    z: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "8e"),
+    A: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),
         c: _ctx.tabbarSelected === index ? _ctx.tabbarSelectedColor : _ctx.tabbarDefaultColor,
         d: index,
         e: _ctx.tabbarSelected === index ? 1 : "",
-        f: common_vendor.o(($event) => $options.switchTabbar(item, index), index)
+        f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
       };
     })
   });
