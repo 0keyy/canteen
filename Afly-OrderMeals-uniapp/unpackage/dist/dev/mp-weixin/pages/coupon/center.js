@@ -20,10 +20,29 @@ const _sfc_main = {
     async loadCoupons() {
       this.loading = true;
       try {
-        this.coupons = await api_index.couponApi.center() || [];
+        const coupons = await api_index.couponApi.center() || [];
+        const myCoupons1 = await api_index.couponApi.myCoupons(1) || [];
+        const myCoupons2 = await api_index.couponApi.myCoupons(2) || [];
+        const myCoupons3 = await api_index.couponApi.myCoupons(3) || [];
+        const allMyCoupons = [...myCoupons1, ...myCoupons2, ...myCoupons3];
+        this.coupons = coupons;
+        common_vendor.index.__f__("log", "at pages/coupon/center.vue:96", "=== 领券中心数据 ===", JSON.stringify(coupons));
+        common_vendor.index.__f__("log", "at pages/coupon/center.vue:97", "=== 用户已领券数据 ===", JSON.stringify(allMyCoupons));
+        const myCouponTemplateIds = /* @__PURE__ */ new Set();
+        allMyCoupons.forEach((c) => {
+          if (c.templateId)
+            myCouponTemplateIds.add(String(c.templateId));
+          if (c.couponTemplateId)
+            myCouponTemplateIds.add(String(c.couponTemplateId));
+        });
         const claimed = common_vendor.index.getStorageSync("claimedCoupons") || {};
+        common_vendor.index.__f__("log", "at pages/coupon/center.vue:106", "=== 本地已领记录 ===", JSON.stringify(claimed));
         this.coupons.forEach((c) => {
-          c.claimed = !!claimed[c.id];
+          const centerCouponId = String(c.id);
+          const centerTemplateId = String(c.templateId || c.id);
+          const isClaimed = c.claimed || c.status === 1 || !!claimed[centerCouponId] || !!claimed[centerTemplateId] || myCouponTemplateIds.has(centerCouponId) || myCouponTemplateIds.has(centerTemplateId);
+          c.claimed = isClaimed;
+          common_vendor.index.__f__("log", "at pages/coupon/center.vue:119", `=== 券 ${c.name}: id=${c.id}, templateId=${c.templateId}, claimed=${isClaimed}, status=${c.status} ===`);
         });
       } catch (e) {
         common_vendor.index.showToast({ title: e || "加载失败", icon: "none" });
@@ -36,6 +55,9 @@ const _sfc_main = {
         const result = await api_index.couponApi.claim(coupon.id);
         const claimed = common_vendor.index.getStorageSync("claimedCoupons") || {};
         claimed[coupon.id] = true;
+        if (coupon.templateId) {
+          claimed[coupon.templateId] = true;
+        }
         common_vendor.index.setStorageSync("claimedCoupons", claimed);
         coupon.claimed = true;
         common_vendor.index.showToast({ title: "领取成功！", icon: "success" });

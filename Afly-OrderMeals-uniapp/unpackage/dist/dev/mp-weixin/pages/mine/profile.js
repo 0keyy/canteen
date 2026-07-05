@@ -128,25 +128,25 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: common_assets._imports_0$6,
-    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "c6"),
+    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "dd"),
     c: common_vendor.s(_ctx.navPaddingStyle),
     d: _ctx.avatarUrl || _ctx.defaultAvatar,
     e: common_assets._imports_1$1,
-    f: common_vendor.o((...args) => $options.chooseAvatar && $options.chooseAvatar(...args), "3d"),
+    f: common_vendor.o((...args) => $options.chooseAvatar && $options.chooseAvatar(...args), "b8"),
     g: common_vendor.t(_ctx.form.nickname || "未设置"),
-    h: common_vendor.o((...args) => $options.editNickname && $options.editNickname(...args), "fa"),
+    h: common_vendor.o((...args) => $options.editNickname && $options.editNickname(...args), "dc"),
     i: common_vendor.t($options.maskedPhone || "未绑定"),
     j: _ctx.form.gender === 1
   }, _ctx.form.gender === 1 ? {} : {}, {
     k: common_vendor.n(_ctx.form.gender === 1 ? "profile-page__radio--checked" : ""),
-    l: common_vendor.o(($event) => $options.setGender(1), "1d"),
+    l: common_vendor.o(($event) => $options.setGender(1), "82"),
     m: _ctx.form.gender === 2
   }, _ctx.form.gender === 2 ? {} : {}, {
     n: common_vendor.n(_ctx.form.gender === 2 ? "profile-page__radio--checked" : ""),
-    o: common_vendor.o(($event) => $options.setGender(2), "46"),
+    o: common_vendor.o(($event) => $options.setGender(2), "7a"),
     p: common_vendor.t(_ctx.form.birthday || "请选择"),
     q: _ctx.form.birthday || "2000-01-01",
-    r: common_vendor.o((...args) => $options.onBirthdayChange && $options.onBirthdayChange(...args), "a0"),
+    r: common_vendor.o((...args) => $options.onBirthdayChange && $options.onBirthdayChange(...args), "a5"),
     s: _ctx.showAvatarModal
   }, _ctx.showAvatarModal ? {
     t: common_vendor.f(_ctx.defaultAvatars, (item, idx, i0) => {
@@ -161,22 +161,22 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         f: common_vendor.o(($event) => $options.selectAvatar(item), idx)
       });
     }),
-    v: common_vendor.o(($event) => _ctx.showAvatarModal = false, "c6"),
+    v: common_vendor.o(($event) => _ctx.showAvatarModal = false, "ea"),
     w: common_vendor.o(() => {
-    }, "1b"),
-    x: common_vendor.o(($event) => _ctx.showAvatarModal = false, "c3")
+    }, "d5"),
+    x: common_vendor.o(($event) => _ctx.showAvatarModal = false, "10")
   } : {}, {
     y: _ctx.saving,
-    z: common_vendor.o((...args) => $options.saveProfile && $options.saveProfile(...args), "9f"),
+    z: common_vendor.o((...args) => $options.saveProfile && $options.saveProfile(...args), "4a"),
     A: _ctx.showNicknameModal
   }, _ctx.showNicknameModal ? {
     B: _ctx.tempNickname,
-    C: common_vendor.o(($event) => _ctx.tempNickname = $event.detail.value, "d9"),
-    D: common_vendor.o((...args) => $options.closeNicknameModal && $options.closeNicknameModal(...args), "ea"),
-    E: common_vendor.o((...args) => $options.confirmNickname && $options.confirmNickname(...args), "59"),
+    C: common_vendor.o(($event) => _ctx.tempNickname = $event.detail.value, "ca"),
+    D: common_vendor.o((...args) => $options.closeNicknameModal && $options.closeNicknameModal(...args), "18"),
+    E: common_vendor.o((...args) => $options.confirmNickname && $options.confirmNickname(...args), "de"),
     F: common_vendor.o(() => {
-    }, "80"),
-    G: common_vendor.o((...args) => $options.closeNicknameModal && $options.closeNicknameModal(...args), "b5")
+    }, "de"),
+    G: common_vendor.o((...args) => $options.closeNicknameModal && $options.closeNicknameModal(...args), "36")
   } : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-935803c6"]]);

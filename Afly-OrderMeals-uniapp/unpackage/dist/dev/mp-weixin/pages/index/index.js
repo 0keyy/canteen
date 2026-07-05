@@ -21,10 +21,14 @@ const _sfc_main = {
       recommendLoading: false,
       pageLoading: false,
       pageLoadingTip: "",
+      nickname: "",
+      pointCount: 0,
+      couponCount: 0,
       shortcuts: [
-        { name: "积分商城", desc: "神秘好物等你来", iconClass: "home__icon--points" },
-        { name: "领券中心", desc: "限时领取优惠", iconClass: "home__icon--coupon" },
-        { name: "优惠券包", desc: "享多重优惠", iconClass: "home__icon--wallet" }
+        { name: "充值中心", desc: "", iconPath: "/static/充值中心.png" },
+        { name: "红包卡券", desc: "", iconPath: "/static/红包卡券.png" },
+        { name: "订单详情", desc: "", iconPath: "/static/订单详情.png" },
+        { name: "客服中心", desc: "", iconPath: "/static/客服中心.png" }
       ]
     };
   },
@@ -32,7 +36,7 @@ const _sfc_main = {
     heroPaddingStyle() {
       const { statusBarHeight } = this.navMetrics;
       return {
-        paddingTop: `${statusBarHeight + -55}px`
+        paddingTop: `${statusBarHeight - 55}px`
       };
     },
     searchRowStyle() {
@@ -70,8 +74,31 @@ const _sfc_main = {
         await this.loadShop();
         await this.loadDecoration();
         await this.loadRecommend();
+        await this.loadUserInfo();
       } finally {
         this.pageLoading = false;
+      }
+    },
+    async loadUserInfo() {
+      try {
+        const profile = await api_index.authApi.profile();
+        if (profile) {
+          this.nickname = profile.nickname || common_vendor.index.getStorageSync("nickname") || "";
+          this.pointCount = profile.point ?? 0;
+          common_vendor.index.setStorageSync("nickname", this.nickname);
+        } else {
+          this.nickname = common_vendor.index.getStorageSync("nickname") || "";
+          this.pointCount = parseInt(common_vendor.index.getStorageSync("pointCount")) || 0;
+        }
+      } catch (e) {
+        this.nickname = common_vendor.index.getStorageSync("nickname") || "";
+        this.pointCount = parseInt(common_vendor.index.getStorageSync("pointCount")) || 0;
+      }
+      try {
+        const myCoupons = await api_index.couponApi.myCoupons(1) || [];
+        this.couponCount = myCoupons.length;
+      } catch (e) {
+        this.couponCount = 0;
       }
     },
     parsePageWidgets(pageData) {
@@ -170,22 +197,35 @@ const _sfc_main = {
       common_vendor.index.showToast({ title: "搜索功能开发中", icon: "none" });
     },
     onShortcutTap(item) {
-      if ((item == null ? void 0 : item.name) === "积分商城") {
-        common_vendor.index.navigateTo({ url: "/pages/integralShop/index" });
+      if ((item == null ? void 0 : item.name) === "充值中心") {
+        common_vendor.index.navigateTo({ url: "/pages/coupon/recharge" });
         return;
       }
-      if ((item == null ? void 0 : item.name) === "优惠券包") {
-        common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
-        return;
-      }
-      if ((item == null ? void 0 : item.name) === "领券中心") {
+      if ((item == null ? void 0 : item.name) === "红包卡券") {
         common_vendor.index.navigateTo({ url: "/pages/coupon/center" });
+        return;
+      }
+      if ((item == null ? void 0 : item.name) === "订单详情") {
+        common_vendor.index.navigateTo({ url: "/pages/order/list" });
+        return;
+      }
+      if ((item == null ? void 0 : item.name) === "客服中心") {
+        common_vendor.index.showToast({ title: "客服中心开发中", icon: "none" });
         return;
       }
       common_vendor.index.showToast({ title: "功能开发中", icon: "none" });
     },
     goCouponCenter() {
       common_vendor.index.navigateTo({ url: "/pages/coupon/center" });
+    },
+    goMine() {
+      common_vendor.index.switchTab({ url: "/pages/mine/index" });
+    },
+    goIntegralShop() {
+      common_vendor.index.switchTab({ url: "/pages/points/index" });
+    },
+    goCouponWallet() {
+      common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
     }
   }
 };
@@ -199,7 +239,13 @@ if (!Math) {
 }
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.f($options.displayBanners, (item, index, i0) => {
+    a: common_vendor.t($data.nickname || "用户123"),
+    b: common_vendor.o((...args) => $options.goMine && $options.goMine(...args), "3f"),
+    c: common_vendor.t($data.pointCount),
+    d: common_vendor.o((...args) => $options.goIntegralShop && $options.goIntegralShop(...args), "56"),
+    e: common_vendor.t($data.couponCount),
+    f: common_vendor.o((...args) => $options.goCouponWallet && $options.goCouponWallet(...args), "7b"),
+    g: common_vendor.f($options.displayBanners, (item, index, i0) => {
       return common_vendor.e({
         a: item.image
       }, item.image ? {
@@ -208,27 +254,26 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         c: index
       });
     }),
-    b: $options.displayBanners.length > 1,
-    c: $options.displayBanners.length > 0,
-    d: common_vendor.s($options.heroPaddingStyle),
-    e: common_assets._imports_0,
-    f: common_vendor.o(($event) => $options.selectMode(1), "6f"),
-    g: common_assets._imports_1,
-    h: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
-    i: common_vendor.o(($event) => $options.selectMode(3), "b9"),
-    j: common_vendor.f($data.shortcuts, (item, k0, i0) => {
+    h: $options.displayBanners.length > 1,
+    i: $options.displayBanners.length > 0,
+    j: common_vendor.s($options.heroPaddingStyle),
+    k: common_assets._imports_0,
+    l: common_vendor.o(($event) => $options.selectMode(1), "29"),
+    m: common_assets._imports_1,
+    n: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
+    o: common_vendor.o(($event) => $options.selectMode(3), "35"),
+    p: common_vendor.f($data.shortcuts, (item, k0, i0) => {
       return {
-        a: common_vendor.n(item.iconClass),
+        a: item.iconPath,
         b: common_vendor.t(item.name),
-        c: common_vendor.t(item.desc),
-        d: item.name,
-        e: common_vendor.o(($event) => $options.onShortcutTap(item), item.name)
+        c: item.name,
+        d: common_vendor.o(($event) => $options.onShortcutTap(item), item.name)
       };
     }),
-    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "30"),
-    l: $options.homeRecommendDishes.length
+    q: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "80"),
+    r: $options.homeRecommendDishes.length
   }, $options.homeRecommendDishes.length ? {
-    m: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
+    s: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
       return common_vendor.e({
         a: dish.image,
         b: dish.badge
@@ -244,13 +289,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       });
     })
   } : {}, {
-    n: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
+    t: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
   }, !$data.recommendLoading && $options.homeRecommendDishes.length === 0 ? {} : {}, {
-    o: common_vendor.p({
+    v: common_vendor.p({
       visible: $data.pageLoading,
       tip: $data.pageLoadingTip
     }),
-    p: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    w: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),

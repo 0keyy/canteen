@@ -6,10 +6,10 @@
         <view class="home__banner-top" :style="heroPaddingStyle">
           <!-- 悬浮积分卡片，贴轮播底部，盖在轮播上面 -->
           <view class="banner-user-card">
-            <text class="card-name">用户123</text>
+            <text class="card-name" @tap.stop="goMine">{{ nickname || '用户123' }}</text>
             <view class="card-right">
-              <text class="card-num">0 积分</text>
-              <text class="card-num">0 优惠券</text>
+              <text class="card-num" @tap.stop="goIntegralShop">{{ pointCount }} 积分</text>
+              <text class="card-num" @tap.stop="goCouponWallet">{{ couponCount }} 优惠券</text>
             </view>
           </view>
         
@@ -68,9 +68,8 @@
               :key="item.name"
               @tap="onShortcutTap(item)"
             >
-              <view class="home__icon" :class="item.iconClass"></view>
+              <image class="home__shortcut-img" :src="item.iconPath" mode="aspectFit" />
               <text class="home__shortcut-name">{{ item.name }}</text>
-              <text class="home__shortcut-desc">{{ item.desc }}</text>
             </view>
           </view>
 
@@ -152,7 +151,7 @@
 </template>
 
 <script>
-import { orderApi, decorateApi } from '../../api/index'
+import { orderApi, decorateApi, authApi, couponApi } from '../../api/index'
 import { DEFAULT_SHOP_ID } from '../../utils/config'
 import { resolveImageUrl } from '../../utils/image'
 import tabbarPageMixin from '../../mixins/tabbar-page'
@@ -173,19 +172,22 @@ export default {
       recommendLoading: false,
       pageLoading: false,
       pageLoadingTip: '',
+      nickname: '',
+      pointCount: 0,
+      couponCount: 0,
       shortcuts: [
-        { name: '积分商城', desc: '神秘好物等你来', iconClass: 'home__icon--points' },
-        { name: '领券中心', desc: '限时领取优惠', iconClass: 'home__icon--coupon' },
-        { name: '优惠券包', desc: '享多重优惠', iconClass: 'home__icon--wallet' }
+        { name: '充值中心', desc: '', iconPath: '/static/充值中心.png' },
+        { name: '红包卡券', desc: '', iconPath: '/static/红包卡券.png' },
+        { name: '订单详情', desc: '', iconPath: '/static/订单详情.png' },
+        { name: '客服中心', desc: '', iconPath: '/static/客服中心.png' }
       ]
     }
   },
   computed: {
     heroPaddingStyle() {
       const { statusBarHeight } = this.navMetrics
-      // 修复：不要负数，避免轮播顶到刘海遮挡卡片
       return {
-        paddingTop: `${statusBarHeight + -55}px`
+        paddingTop: `${statusBarHeight - 55}px`
       }
     },
     searchRowStyle() {
@@ -222,8 +224,32 @@ export default {
         await this.loadShop()
         await this.loadDecoration()
         await this.loadRecommend()
+        await this.loadUserInfo()
       } finally {
         this.pageLoading = false
+      }
+    },
+    async loadUserInfo() {
+      try {
+        const profile = await authApi.profile()
+        if (profile) {
+          this.nickname = profile.nickname || uni.getStorageSync('nickname') || ''
+          this.pointCount = profile.point ?? 0
+          uni.setStorageSync('nickname', this.nickname)
+        } else {
+          this.nickname = uni.getStorageSync('nickname') || ''
+          this.pointCount = parseInt(uni.getStorageSync('pointCount')) || 0
+        }
+      } catch (e) {
+        this.nickname = uni.getStorageSync('nickname') || ''
+        this.pointCount = parseInt(uni.getStorageSync('pointCount')) || 0
+      }
+
+      try {
+        const myCoupons = await couponApi.myCoupons(1) || []
+        this.couponCount = myCoupons.length
+      } catch (e) {
+        this.couponCount = 0
       }
     },
     parsePageWidgets(pageData) {
@@ -319,22 +345,35 @@ export default {
       uni.showToast({ title: '搜索功能开发中', icon: 'none' })
     },
     onShortcutTap(item) {
-      if (item?.name === '积分商城') {
-        uni.navigateTo({ url: '/pages/integralShop/index' })
+      if (item?.name === '充值中心') {
+        uni.navigateTo({ url: '/pages/coupon/recharge' })
         return
       }
-      if (item?.name === '优惠券包') {
-        uni.navigateTo({ url: '/pages/coupon/wallet' })
-        return
-      }
-      if (item?.name === '领券中心') {
+      if (item?.name === '红包卡券') {
         uni.navigateTo({ url: '/pages/coupon/center' })
+        return
+      }
+      if (item?.name === '订单详情') {
+        uni.navigateTo({ url: '/pages/order/list' })
+        return
+      }
+      if (item?.name === '客服中心') {
+        uni.showToast({ title: '客服中心开发中', icon: 'none' })
         return
       }
       uni.showToast({ title: '功能开发中', icon: 'none' })
     },
     goCouponCenter() {
       uni.navigateTo({ url: '/pages/coupon/center' })
+    },
+    goMine() {
+      uni.switchTab({ url: '/pages/mine/index' })
+    },
+    goIntegralShop() {
+      uni.switchTab({ url: '/pages/points/index' })
+    },
+    goCouponWallet() {
+      uni.navigateTo({ url: '/pages/coupon/wallet' })
     }
   }
 }
@@ -376,12 +415,11 @@ $section-gap: 20rpx;
     border: none;
   }
 
-  /* 悬浮积分卡片，贴轮播底部，只占一小条 */
   .banner-user-card {
     position: absolute;
     left: 40rpx;
     right: 35rpx;
-    bottom: 30rpx;
+    bottom: -15rpx;
     height: 100rpx;
     z-index: 99;
     display: flex;
@@ -389,25 +427,21 @@ $section-gap: 20rpx;
     justify-content: space-between;
     padding: 0 30rpx;
   
-    /* 背景渐变：底部深棕红，往上半透明渐变 */
     background: linear-gradient(
-      180deg,
-      rgba(80, 40, 30, 0.95) 0%,
-      rgba(60, 25, 20, 0.85) 50%,
-      rgba(40, 15, 10, 0.75) 100%
+      90deg,
+      rgba(138, 76, 62, 0.98) 0%,
+      rgba(92, 46, 34, 0.95) 35%,
+      rgba(52, 22, 16, 0.90) 100%
     );
   
-    /* 圆角：上面圆弧，下面隐藏 */
     border-radius: 20rpx 20rpx 0 0;
   
     .card-name {
       font-size: 28rpx;
-  
-      /* 用户123：浅米黄色，和图中品牌文字更接近 */
-      color: #ffdd99;
-  
-      font-weight: 500;
+      color: #F7D776;
+      font-weight: 400;
 	  transform: translateY(-8rpx);
+      cursor: pointer;
     }
   
     .card-right {
@@ -417,37 +451,34 @@ $section-gap: 20rpx;
   
       .card-num {
         font-size: 28rpx;
-  
-        /* 积分/优惠券文字：白色更清楚 */
-        color: #ffffff;
-  
-        /* 如果想和用户123同色，就改成： */
-        /* color: #f7e8c8; */
+        color: #FFFFFF;
+		font-weight: 300;
+        cursor: pointer;
       }
     }
   }
 
   &__swiper {
     width: 100%;
-    height: 600rpx;
+    height: 520rpx;
     border-radius: 0;
     overflow: hidden;
   }
 
   &__swiper-item {
     width: 100%;
-    height: 550rpx;
+    height: 520rpx;
   }
 
   &__banner-image {
     display: block;
     width: 100%;
-    height: 550rpx;
+    height: 520rpx;
   }
 
   &__banner-placeholder {
     width: 100%;
-    height: 550rpx;
+    height: 520rpx;
     background: #f5f5f5;
   }
 
@@ -455,50 +486,56 @@ $section-gap: 20rpx;
   &__primary-cards {
     display: flex;
     gap: 16rpx;
-    margin: 24rpx $page-pad;
-    padding: 0;
+    margin: 20rpx $page-pad 0;
+    padding: 0 20rpx;
     background: transparent;
   }
-
+  
   &__primary-card-item {
     flex: 1;
     position: relative;
-    background: linear-gradient(180deg, #FFDADA 0%, #FFFFFF 76%);
-	height: 200rpx;
-    border-radius: $radius-card;
-    padding: 24rpx 20rpx 20rpx;
+    /* 完整从上浅粉到纯白渐变，匹配UI */
+    background: linear-gradient(180deg, #FFDADA 0%, #ffffff 100%);
+	width: 100rpx;
+  	height: 200rpx;
+    border-radius: 20rpx;
+    padding: 0;
     box-shadow: $shadow-sm;
     overflow: hidden;
     transition: transform $transition-fast;
-
+  
     &:active {
       transform: scale(0.96);
     }
-
+  
     &--disabled {
       opacity: 0.45;
     }
   }
-
+  
   &__primary-card-img {
-    width: 180rpx;
-    height: 140rpx;
+    width: 200rpx;
+    height: 160rpx;
     flex-shrink: 0;
     position: absolute;
-    right: 8rpx;
-    bottom: 8rpx;
+    right: -30rpx;
+    bottom: 20rpx;
   }
-
+  
   &__primary-card-text {
     display: flex;
     flex-direction: column;
-    gap: 4rpx;
+    gap: 0rpx;
+    padding: 20rpx 0 0 16rpx;
   }
-
+  
   &__primary-name {
-    font-size: 36rpx;
+    font-size: 44rpx;
     font-weight: 900;
-    color: $text-primary;
+    color: #000000;
+    letter-spacing: 4rpx;
+    /* 放弃fantasy，使用国内设备统一黑体 */
+    font-family: "Microsoft YaHei", "PingFang SC", SimHei, sans-serif;
   }
 
   /* ===== 内容区 ===== */
@@ -512,18 +549,15 @@ $section-gap: 20rpx;
   &__shortcut-row {
     display: flex;
     gap: 16rpx;
-    margin-top: 14rpx;
+    margin-top: 20rpx;
+    padding: 0 20rpx;
   }
 
   &__shortcut-item {
     flex: 1;
-    background: $bg-surface;
-    border-radius: $radius-card;
-    padding: 20rpx 12rpx 16rpx;
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: $shadow-sm;
     box-sizing: border-box;
     transition: transform $transition-fast;
 
@@ -532,9 +566,14 @@ $section-gap: 20rpx;
     }
   }
 
+  &__shortcut-img {
+    width: 20px;
+    height: 80rpx;
+  }
+
   &__shortcut-name {
-    margin-top: 8rpx;
-    font-size: 26rpx;
+    margin-top: 5rpx;
+    font-size: 23rpx;
     font-weight: 900;
     color: $text-primary;
   }
@@ -547,14 +586,17 @@ $section-gap: 20rpx;
     line-height: 1.35;
   }
 
-  /* ===== 红色线描图标 ===== */
+  /* ===== 红色图标 ===== */
   &__icon {
-    width: 48rpx;
-    height: 48rpx;
+    width: 60rpx;
+    height: 60rpx;
     position: relative;
     box-sizing: border-box;
-    background: rgba(177,10,15,0.08);
+    background: $brand-primary;
     border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &--store {
       border: 3rpx solid $brand-primary;
@@ -694,63 +736,82 @@ $section-gap: 20rpx;
     }
 
     &--recharge {
-      border: 3rpx solid $brand-primary;
+      background: $brand-primary;
       border-radius: 50%;
 
       &::before {
-        content: '￥';
+        content: '¥';
         position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -52%);
-        font-size: 26rpx;
+        font-size: 28rpx;
         line-height: 1;
-        color: $brand-primary;
+        color: #fff;
+        font-weight: 700;
+      }
+    }
+
+    &--redpacket {
+      background: $brand-primary;
+      border-radius: 50%;
+
+      &::before {
+        content: '';
+        position: absolute;
+        width: 28rpx;
+        height: 28rpx;
+        border: 3rpx solid #fff;
+        border-radius: 50%;
+      }
+
+      &::after {
+        content: '¥';
+        position: absolute;
+        font-size: 14rpx;
+        line-height: 1;
+        color: #fff;
         font-weight: 700;
       }
     }
 
     &--order {
-      border: 3rpx solid $brand-primary;
-      border-radius: 6rpx;
-
-      &::before {
-        content: '';
-        position: absolute;
-        left: 12rpx;
-        top: 10rpx;
-        width: 20rpx;
-        height: 3rpx;
-        background: $brand-primary;
-        box-shadow: 0 10rpx 0 $brand-primary, 0 20rpx 0 $brand-primary;
-      }
-    }
-
-    &--service {
-      border: 3rpx solid $brand-primary;
-      border-top-color: transparent;
+      background: $brand-primary;
       border-radius: 50%;
 
       &::before {
         content: '';
         position: absolute;
-        left: -8rpx;
-        top: 18rpx;
-        width: 10rpx;
-        height: 16rpx;
-        border: 3rpx solid $brand-primary;
-        border-radius: 8rpx;
-        box-shadow: 42rpx 0 0 -3rpx transparent, 42rpx 0 0 0 $brand-primary;
+        left: 16rpx;
+        top: 14rpx;
+        width: 24rpx;
+        height: 3rpx;
+        background: #fff;
+        box-shadow: 0 10rpx 0 #fff, 0 20rpx 0 #fff;
+      }
+    }
+
+    &--service {
+      background: $brand-primary;
+      border-radius: 50%;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 10rpx;
+        top: 20rpx;
+        width: 12rpx;
+        height: 18rpx;
+        border: 3rpx solid #fff;
+        border-radius: 10rpx;
+        box-shadow: 46rpx 0 0 -3rpx transparent, 46rpx 0 0 0 #fff;
       }
 
       &::after {
         content: '';
         position: absolute;
-        right: 4rpx;
-        bottom: 2rpx;
-        width: 12rpx;
+        right: 8rpx;
+        bottom: 6rpx;
+        width: 14rpx;
         height: 3rpx;
-        background: $brand-primary;
+        background: #fff;
         border-radius: 999rpx;
       }
     }
