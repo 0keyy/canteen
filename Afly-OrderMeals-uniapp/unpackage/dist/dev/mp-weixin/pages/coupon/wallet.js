@@ -1,16 +1,16 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
-const common_assets = require("../../common/assets.js");
+const utils_image = require("../../utils/image.js");
 const _sfc_main = {
   data() {
     return {
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       tabs: [
-        { label: "可使用", status: 1 },
-        { label: "已使用", status: 2 },
-        { label: "已过期", status: 3 }
+        { label: "到店堂食", value: "instore" },
+        { label: "外卖配送", value: "delivery" }
       ],
-      activeTab: 1,
+      activeTab: "instore",
       loading: false,
       coupons: []
     };
@@ -19,85 +19,90 @@ const _sfc_main = {
     this.loadCoupons();
   },
   methods: {
-    typeLabel(type) {
-      const map = { 1: "无门槛", 2: "满减", 3: "兑换券", 4: "套餐券", 5: "夜间券" };
-      return map[type] || "";
+    goBack() {
+      common_vendor.index.navigateBack();
     },
     formatTime(ts) {
       if (!ts || ts === 0)
         return "不限";
       const d = new Date(ts * 1e3);
+      const y = d.getFullYear();
       const M = String(d.getMonth() + 1).padStart(2, "0");
       const D = String(d.getDate()).padStart(2, "0");
-      return `${M}/${D}`;
+      return `${y}.${M}.${D}`;
     },
-    switchTab(status) {
-      this.activeTab = status;
+    switchTab(value) {
+      this.activeTab = value;
       this.loadCoupons();
     },
     async loadCoupons() {
       this.loading = true;
       try {
-        this.coupons = await api_index.couponApi.myCoupons(this.activeTab) || [];
+        const list = await api_index.couponApi.myCoupons(this.activeTab) || [];
+        this.coupons = list;
       } catch (e) {
-        common_vendor.index.showToast({ title: e || "加载失败", icon: "none" });
+        this.coupons = [];
       } finally {
         this.loading = false;
       }
     },
-    goVerifyCode(coupon) {
-      common_vendor.index.navigateTo({ url: `/pages/coupon/verify-code?id=${coupon.id}` });
+    getMockCoupons() {
+      return [];
+    },
+    useCoupon(coupon) {
+      if (coupon.type === 3 || coupon.type === 4) {
+        common_vendor.index.navigateTo({ url: `/pages/coupon/verify-code?id=${coupon.id}` });
+      } else {
+        common_vendor.index.switchTab({ url: "/pages/menu/index" });
+      }
+    },
+    goExchange() {
+      common_vendor.index.navigateTo({ url: "/pages/coupon/center" });
     }
   }
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.f($data.tabs, (tab, k0, i0) => {
+    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "2a"),
+    b: common_vendor.f($data.tabs, (tab, k0, i0) => {
       return {
         a: common_vendor.t(tab.label),
-        b: tab.status,
-        c: $data.activeTab === tab.status ? 1 : "",
-        d: common_vendor.o(($event) => $options.switchTab(tab.status), tab.status)
+        b: tab.value,
+        c: $data.activeTab === tab.value ? 1 : "",
+        d: common_vendor.o(($event) => $options.switchTab(tab.value), tab.value)
       };
     }),
-    b: $data.loading
+    c: $data.loading
   }, $data.loading ? {} : $data.coupons.length === 0 ? {
-    d: common_assets._imports_0$8
+    e: $data.staticImgPrefix + "/tabbar/优惠券.png"
   } : {
-    e: common_vendor.f($data.coupons, (coupon, k0, i0) => {
+    f: common_vendor.f($data.coupons, (coupon, k0, i0) => {
       return common_vendor.e({
         a: common_vendor.t(coupon.discountAmount),
         b: coupon.type === 2 && coupon.minAmount > 0
       }, coupon.type === 2 && coupon.minAmount > 0 ? {
         c: common_vendor.t(coupon.minAmount)
-      } : coupon.type === 5 ? {} : coupon.type === 3 || coupon.type === 4 ? {} : {}, {
-        d: coupon.type === 5,
-        e: coupon.type === 3 || coupon.type === 4,
-        f: common_vendor.t(coupon.templateName),
-        g: common_vendor.t($options.typeLabel(coupon.type)),
-        h: common_vendor.t($options.formatTime(coupon.useStartTime)),
-        i: common_vendor.t($options.formatTime(coupon.useEndTime)),
-        j: coupon.nightUnavailable
-      }, coupon.nightUnavailable ? {} : {}, {
-        k: coupon.status === 2
-      }, coupon.status === 2 ? {
-        l: common_vendor.t($options.formatTime(coupon.useTime))
       } : {}, {
-        m: coupon.status === 1 && (coupon.type === 3 || coupon.type === 4)
-      }, coupon.status === 1 && (coupon.type === 3 || coupon.type === 4) ? {
-        n: common_vendor.o(($event) => $options.goVerifyCode(coupon), coupon.id)
+        d: common_vendor.t(coupon.templateName),
+        e: common_vendor.t($options.formatTime(coupon.useStartTime)),
+        f: common_vendor.t($options.formatTime(coupon.useEndTime)),
+        g: common_vendor.t(coupon.tip || "限堂食到店使用"),
+        h: coupon.status === 1
+      }, coupon.status === 1 ? {
+        i: common_vendor.o(($event) => $options.useCoupon(coupon), coupon.id)
       } : {}, {
-        o: coupon.status === 2
+        j: coupon.status === 2
       }, coupon.status === 2 ? {} : {}, {
-        p: coupon.status === 3
+        k: coupon.status === 3
       }, coupon.status === 3 ? {} : {}, {
-        q: coupon.id,
-        r: coupon.status === 2 ? 1 : "",
-        s: coupon.status === 3 ? 1 : ""
+        l: coupon.id,
+        m: coupon.status === 2 ? 1 : "",
+        n: coupon.status === 3 ? 1 : ""
       });
     })
   }, {
-    c: $data.coupons.length === 0
+    d: $data.coupons.length === 0,
+    g: common_vendor.o((...args) => $options.goExchange && $options.goExchange(...args), "59")
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-0b2f6175"]]);

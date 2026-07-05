@@ -2,8 +2,8 @@ package com.mdd.admin.service.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.yulichang.query.MPJQueryWrapper;
 import com.mdd.admin.service.IFrontService;
+import com.mdd.admin.service.MenuCatalogService;
 import com.mdd.admin.socket.BackSocket;
 import com.mdd.admin.validate.front.FrontOrdersCreateValidate;
 import com.mdd.admin.validate.order.OrderSubmitValidate;
@@ -20,7 +20,6 @@ import com.mdd.common.entity.system.SystemAuthDept;
 import com.mdd.common.enums.HttpEnum;
 import com.mdd.common.exception.BaseException;
 import com.mdd.common.mapper.article.ArticleCategoryMapper;
-import com.mdd.common.mapper.article.ArticleMapper;
 import com.mdd.common.mapper.orders.OrdersDishMapper;
 import com.mdd.common.mapper.orders.OrdersMapper;
 import com.mdd.common.mapper.shop.ShopConfigMapper;
@@ -36,8 +35,6 @@ import java.util.*;
 public class FrontServiceImpl implements IFrontService {
 
     @Resource
-    private ArticleMapper articleMapper;
-    @Resource
     private ArticleCategoryMapper articleCategoryMapper;
     @Resource
     private ShopConfigMapper shopConfigMapper;
@@ -47,16 +44,30 @@ public class FrontServiceImpl implements IFrontService {
     private OrdersMapper ordersMapper;
     @Resource
     private OrdersDishMapper ordersDishMapper;
+    @Resource
+    private MenuCatalogService menuCatalogService;
 
     @Override
     public List<GoodsVo> goods(Integer aid) {
+        List<ArticleCategory> categories = articleCategoryMapper.selectList(
+                new QueryWrapper<ArticleCategory>().eq("aid", aid));
+        Map<Integer, List<Article>> articlesByCategory = menuCatalogService.loadArticlesByCategory(aid, false, false);
+
         List<GoodsVo> goodsVos = new ArrayList<>();
-        List<ArticleCategory> categories = articleCategoryMapper.selectList(new QueryWrapper<ArticleCategory>().eq("aid", aid));
         for (ArticleCategory articleCategory : categories) {
-            List<FoodsVo> foodsVos = articleMapper.selectJoinList(FoodsVo.class, new MPJQueryWrapper<Article>()
-                    .select("t.id as id, t.title as title, t.intro as intro, t.summary as price, t.image as image")
-                    .eq("t.aid", aid)
-                    .eq("t.cid", articleCategory.getId()));
+            List<Article> articles = articlesByCategory.get(articleCategory.getId());
+            List<FoodsVo> foodsVos = new ArrayList<>();
+            if (articles != null) {
+                for (Article article : articles) {
+                    FoodsVo food = new FoodsVo();
+                    food.setId(String.valueOf(article.getId()));
+                    food.setTitle(article.getTitle());
+                    food.setIntro(article.getIntro());
+                    food.setPrice(article.getSummary());
+                    food.setImage(article.getImage());
+                    foodsVos.add(food);
+                }
+            }
             GoodsVo goodsVo = new GoodsVo();
             goodsVo.setName(articleCategory.getName());
             goodsVo.setFoods(foodsVos);

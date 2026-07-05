@@ -34,7 +34,7 @@ export const orderApi = {
   dishDel: (id) => post('/front/order/cart/dishDel', null, { id }),
   toEmpty: (orderId) => post('/front/order/cart/toEmpty', null, { orderId }),
   submit: (data) => post('/front/order/submit', data),
-  list: () => get('/front/order/list'),
+  list: (status, page = 1, pageSize = 20) => get('/front/order/list', { status, page, pageSize }),
   detail: (orderId) => get('/front/order/detail', { orderId }),
   cancel: (orderId, reason) => post('/front/order/cancel', null, { orderId, reason })
 }
@@ -85,4 +85,16 @@ export const memberApi = {
 export const integralApi = {
   categoryList: () => get('/front/integral/category/list'),
   goodsList: (categoryId, page = 1, pageSize = 20) => get('/front/integral/goods/list', { categoryId, page, pageSize })
+}
+
+export const signinApi = {
+  status: () => get('/front/signin/status'),
+  sign: () => post('/front/signin/sign'),
+  rewards: () => get('/front/signin/rewards')
+}
+
+export const lotteryApi = {
+  info: () => get('/front/lottery/info'),
+  draw: () => post('/front/lottery/draw'),
+  prizes: () => get('/front/lottery/prizes')
 }

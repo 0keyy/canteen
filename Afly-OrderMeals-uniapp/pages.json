@@ -95,9 +95,7 @@
     {
       "path": "pages/coupon/wallet",
       "style": {
-        "navigationBarTitleText": "我的券包",
-        "navigationBarBackgroundColor": "#FFFCF8",
-        "navigationBarTextStyle": "black",
+        "navigationStyle": "custom",
         "animationType": "slide-in-right"
       }
     },
@@ -135,6 +133,20 @@
     },
     {
       "path": "pages/integralDraw/index",
+      "style": {
+        "navigationStyle": "custom",
+        "animationType": "slide-in-right"
+      }
+    },
+    {
+      "path": "pages/signin/index",
+      "style": {
+        "navigationStyle": "custom",
+        "animationType": "slide-in-right"
+      }
+    },
+    {
+      "path": "pages/lottery/index",
       "style": {
         "navigationStyle": "custom",
         "animationType": "slide-in-right"

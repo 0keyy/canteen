@@ -2,12 +2,14 @@
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const utils_pay_index = require("../../utils/pay/index.js");
+const utils_image = require("../../utils/image.js");
 const utils_pay_channels = require("../../utils/pay/channels.js");
 const PayMethodPicker = () => "../../components/pay-method-picker/pay-method-picker.js";
 const _sfc_main = {
   components: { PayMethodPicker },
   data() {
     return {
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       orderId: 0,
       order: null,
       payChannel: utils_pay_channels.DEFAULT_PAY_CHANNEL,
@@ -18,6 +20,9 @@ const _sfc_main = {
   computed: {
     isCalled() {
       return this.order && Number(this.order.calledTime) > 0;
+    },
+    isPendingPay() {
+      return this.order && (this.order.payStatus === 0 || this.order.status === 4);
     },
     statusText() {
       if (!this.order)
@@ -74,8 +79,19 @@ const _sfc_main = {
       }
     },
     async cancelOrder() {
-      await api_index.orderApi.cancel(this.orderId, "用户取消");
-      this.loadDetail();
+      const { confirm } = await common_vendor.index.showModal({
+        title: "取消订单",
+        content: "确定取消该待支付订单吗？已使用的优惠券将退还至您的账户。"
+      });
+      if (!confirm)
+        return;
+      try {
+        await api_index.orderApi.cancel(this.orderId, "用户取消");
+        common_vendor.index.showToast({ title: "订单已取消", icon: "success" });
+        this.loadDetail();
+      } catch (e) {
+        common_vendor.index.showToast({ title: e.message || e, icon: "none" });
+      }
     },
     onPayMethodChange(channel) {
       this.payChannel = channel;
@@ -117,7 +133,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     j: common_vendor.t($data.order.number),
     k: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
       return {
-        a: dish.image || "/static/placeholder.png",
+        a: dish.image || $data.staticImgPrefix + "/placeholder.png",
         b: common_vendor.t(dish.dishName),
         c: common_vendor.t(dish.quantity),
         d: common_vendor.t($options.lineAmount(dish)),
@@ -128,30 +144,27 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     m: $data.order.payStatus === 0 || $data.order.status === 4
   }, $data.order.payStatus === 0 || $data.order.status === 4 ? {
     n: common_vendor.t($options.payChannelText),
-    o: common_vendor.o(($event) => $data.showPayPicker = true, "5f")
+    o: common_vendor.o(($event) => $data.showPayPicker = true, "29")
   } : {}, {
-    p: $data.order.payStatus === 0 || $data.order.status === 4
-  }, $data.order.payStatus === 0 || $data.order.status === 4 ? {
+    p: $options.isPendingPay
+  }, $options.isPendingPay ? {
     q: common_vendor.t($data.order.amount),
-    r: common_vendor.o((...args) => $options.payNow && $options.payNow(...args), "47")
+    r: common_vendor.o((...args) => $options.cancelOrder && $options.cancelOrder(...args), "98"),
+    s: common_vendor.o((...args) => $options.payNow && $options.payNow(...args), "c6")
   } : {}, {
-    s: $data.order.status === 1
-  }, $data.order.status === 1 ? {
-    t: common_vendor.o((...args) => $options.cancelOrder && $options.cancelOrder(...args), "ce")
-  } : {}, {
-    v: $data.showPayPicker
+    t: $data.showPayPicker
   }, $data.showPayPicker ? {
-    w: common_vendor.o($options.onPayMethodChange, "12"),
-    x: common_vendor.o($options.onPayMethodsLoaded, "11"),
-    y: common_vendor.o(($event) => $data.payChannel = $event, "a9"),
-    z: common_vendor.p({
+    v: common_vendor.o($options.onPayMethodChange, "ae"),
+    w: common_vendor.o($options.onPayMethodsLoaded, "2d"),
+    x: common_vendor.o(($event) => $data.payChannel = $event, "05"),
+    y: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    A: common_vendor.o(($event) => $data.showPayPicker = false, "b2"),
-    B: common_vendor.o(() => {
-    }, "a9"),
-    C: common_vendor.o(($event) => $data.showPayPicker = false, "86")
+    z: common_vendor.o(($event) => $data.showPayPicker = false, "b4"),
+    A: common_vendor.o(() => {
+    }, "04"),
+    B: common_vendor.o(($event) => $data.showPayPicker = false, "6b")
   } : {}) : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-6b23c96c"]]);

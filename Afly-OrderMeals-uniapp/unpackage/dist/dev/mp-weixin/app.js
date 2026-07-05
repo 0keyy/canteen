@@ -22,6 +22,8 @@ if (!Math) {
   "./pages/points/index.js";
   "./pages/integralShop/index.js";
   "./pages/integralDraw/index.js";
+  "./pages/signin/index.js";
+  "./pages/lottery/index.js";
   "./pages/mine/memberCode/index.js";
 }
 async function preloadTabbar() {

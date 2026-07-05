@@ -5,8 +5,8 @@ package com.mdd.common.config;
  */
 public class GlobalConfig {
 
-    // 开启调试模式
-    public static Boolean debug = true;
+    // 开启调试模式（启动时由 GlobalConfigInitializer 按 profile 覆盖）
+    public static Boolean debug = false;
 
     // 获取地址开关
     public static Boolean isAddressEnabled = false;

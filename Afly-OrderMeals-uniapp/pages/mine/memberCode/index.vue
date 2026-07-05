@@ -12,7 +12,7 @@
         </view>
       </view>
 	  <view class="member-logo">
-	    <image src="/static/logo.png" mode="aspectFit" class="logo-img"></image>
+	    <image :src="staticImgPrefix + '/logo.png'" mode="aspectFit" class="logo-img"></image>
 	  </view>
     </view>
 
@@ -32,7 +32,7 @@
           <view v-else class="qrcode-placeholder">加载中...</view>
         </view>
         <view class="refresh-tip">
-          <image src="/static/tabbar/刷新.png" mode="aspectFit" class="refresh-icon"></image>
+          <image :src="staticImgPrefix + '/tabbar/刷新.png'" mode="aspectFit" class="refresh-icon"></image>
           <text>会员码每30秒自动更新，请在店内消费使用</text>
         </view>
       </view>
@@ -52,10 +52,12 @@
 </template>
 
 <script>
-import { memberApi } from '../../../api/index'
+import { memberApi, authApi } from '../../../api/index'
+import { STATIC_IMAGE_PREFIX } from '../../../utils/image'
 export default {
   data() {
     return {
+      staticImgPrefix: STATIC_IMAGE_PREFIX,
       memberId: "",
       nickname: "",
       level: "",
@@ -67,7 +69,7 @@ export default {
   },
   computed: {
     avatarSrc() {
-      return `/static/${this.avatarKey || '1'}.png`
+      return `${this.staticImgPrefix}/${this.avatarKey || '1'}.png`
     }
   },
   onLoad() {
@@ -84,14 +86,27 @@ export default {
   },
   methods: {
     async loadMemberCode() {
+      // 先用 profile 接口获取用户信息（与 mine.vue 一致）
+      try {
+        const profile = await authApi.profile()
+        if (profile) {
+          this.nickname = profile.nickname || profile.name || '会员'
+          this.balance = profile.balance != null ? profile.balance : '0.00'
+          this.memberId = profile.memberId || profile.id || profile.userId || ''
+          this.level = profile.level || '普通会员'
+        }
+      } catch (e) {
+        console.log('获取用户信息失败', e)
+      }
+      // 再尝试会员码接口（后期对接）
       try {
         const res = await memberApi.code()
         if (res && res.code === 200 && res.data) {
           const data = res.data
-          this.memberId = data.memberId || ''
-          this.nickname = data.nickname || '会员'
-          this.level = data.level || '普通会员'
-          this.balance = data.balance != null ? data.balance : '0.00'
+          if (data.memberId) this.memberId = data.memberId
+          if (data.nickname) this.nickname = data.nickname
+          if (data.level) this.level = data.level
+          if (data.balance != null) this.balance = data.balance
         }
       } catch (e) {
         console.log('会员码接口暂未开发', e)

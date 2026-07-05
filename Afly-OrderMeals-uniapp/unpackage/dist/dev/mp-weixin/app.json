@@ -18,6 +18,8 @@
     "pages/points/index",
     "pages/integralShop/index",
     "pages/integralDraw/index",
+    "pages/signin/index",
+    "pages/lottery/index",
     "pages/mine/memberCode/index"
   ],
   "usingComponents": {

@@ -330,6 +330,38 @@ public class AppCouponServiceImpl implements IAppCouponService {
     }
 
     @Override
+    @Transactional
+    public void restoreForOrderCancel(Integer orderId, Integer userId) {
+        Orders orders = ordersMapper.selectById(orderId);
+        if (orders == null || orders.getCouponId() == null || orders.getCouponId() <= 0) {
+            return;
+        }
+        if (!orders.getUserId().equals(userId)) {
+            return;
+        }
+
+        UserCoupon userCoupon = userCouponMapper.selectOne(new QueryWrapper<UserCoupon>()
+                .eq("id", orders.getCouponId())
+                .eq("user_id", userId)
+                .eq("order_id", orderId)
+                .eq("status", 2));
+        if (userCoupon == null) {
+            return;
+        }
+
+        long now = TimeUtils.timestamp();
+        int newStatus = 1;
+        if (userCoupon.getUseEndTime() != null && userCoupon.getUseEndTime() > 0 && now > userCoupon.getUseEndTime()) {
+            newStatus = 3;
+        }
+
+        userCoupon.setStatus(newStatus);
+        userCoupon.setUseTime(0L);
+        userCoupon.setOrderId(0);
+        userCouponMapper.updateById(userCoupon);
+    }
+
+    @Override
     public String verifyCode(Integer userCouponId, Integer userId) {
         UserCoupon userCoupon = userCouponMapper.selectOne(
                 new QueryWrapper<UserCoupon>()
