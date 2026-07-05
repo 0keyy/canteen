@@ -31,8 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrdersServiceImpl implements IOrdersServcice {
@@ -79,12 +82,22 @@ public class OrdersServiceImpl implements IOrdersServcice {
                 Orders.class,
                 mpjQueryWrapper);
 
+        List<Integer> orderIdsNeedPayLookup = new ArrayList<>();
+        for (Orders item : iPage.getRecords()) {
+            if (StringUtils.isEmpty(item.getPayType())) {
+                orderIdsNeedPayLookup.add(item.getId());
+            }
+        }
+        Map<Integer, String> payTypeByOrderId = batchResolvePayType(orderIdsNeedPayLookup);
+
         List<OrdersListVo> list = new LinkedList<>();
         for (Orders item : iPage.getRecords()) {
             OrdersListVo vo = new OrdersListVo();
             BeanUtils.copyProperties(item, vo);
             vo.setDeskName(item.getDeskName());
-            String payType = resolvePayType(item);
+            String payType = StringUtils.isNotEmpty(item.getPayType())
+                    ? item.getPayType()
+                    : payTypeByOrderId.getOrDefault(item.getId(), "");
             vo.setPayType(payType);
             vo.setPayTypeText(PayChannelConstant.displayName(payType));
             vo.setCreateTime(TimeUtils.timestampToDate(item.getCreateTime()));
@@ -208,18 +221,19 @@ public class OrdersServiceImpl implements IOrdersServcice {
         return timestamp != null && timestamp > 0 ? TimeUtils.timestampToDate(timestamp) : "-";
     }
 
-    private String resolvePayType(Orders orders) {
-        if (orders == null) {
-            return "";
+    private Map<Integer, String> batchResolvePayType(List<Integer> orderIds) {
+        if (orderIds == null || orderIds.isEmpty()) {
+            return Collections.emptyMap();
         }
-        if (StringUtils.isNotEmpty(orders.getPayType())) {
-            return orders.getPayType();
-        }
-        OrderPay orderPay = orderPayMapper.selectOne(new QueryWrapper<OrderPay>()
-                .eq("order_id", orders.getId())
+        List<OrderPay> orderPays = orderPayMapper.selectList(new QueryWrapper<OrderPay>()
+                .in("order_id", orderIds)
                 .eq("pay_status", 1)
-                .orderByDesc("id")
-                .last("limit 1"));
-        return orderPay == null || orderPay.getPayChannel() == null ? "" : orderPay.getPayChannel();
+                .orderByDesc("id"));
+        Map<Integer, String> payTypeByOrderId = new HashMap<>();
+        for (OrderPay orderPay : orderPays) {
+            payTypeByOrderId.putIfAbsent(orderPay.getOrderId(),
+                    orderPay.getPayChannel() == null ? "" : orderPay.getPayChannel());
+        }
+        return payTypeByOrderId;
     }
 }

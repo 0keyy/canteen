@@ -161,7 +161,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $data.order
   }, $data.order ? common_vendor.e({
-    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "fb"),
+    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
     c: common_assets._imports_0$3,
     d: $data.diningMode === 3
   }, $data.diningMode === 3 ? common_vendor.e({
@@ -169,7 +169,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $options.addressInfo ? {
     f: common_vendor.t($options.addressInfo)
   } : {}, {
-    g: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args), "49")
+    g: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args))
   }) : {}, {
     h: $data.diningMode === 1
   }, $data.diningMode === 1 ? {} : {}, {
@@ -191,26 +191,26 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   } : {}, {
     n: common_vendor.t($options.finalAmount),
     o: common_vendor.t($options.payChannelText),
-    p: common_vendor.o(($event) => $data.showPayPicker = true, "65"),
+    p: common_vendor.o(($event) => $data.showPayPicker = true),
     q: $data.remark,
-    r: common_vendor.o(($event) => $data.remark = $event.detail.value, "76"),
+    r: common_vendor.o(($event) => $data.remark = $event.detail.value),
     s: common_vendor.t($options.finalAmount),
     t: common_vendor.t($data.loading ? "提交中..." : "去支付"),
-    v: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "fa"),
+    v: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args)),
     w: $data.loading ? 1 : "",
     x: $data.showPayPicker
   }, $data.showPayPicker ? {
-    y: common_vendor.o($options.onPayMethodChange, "a5"),
-    z: common_vendor.o($options.onPayMethodsLoaded, "32"),
-    A: common_vendor.o(($event) => $data.payChannel = $event, "72"),
+    y: common_vendor.o($options.onPayMethodChange),
+    z: common_vendor.o($options.onPayMethodsLoaded),
+    A: common_vendor.o(($event) => $data.payChannel = $event),
     B: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    C: common_vendor.o(($event) => $data.showPayPicker = false, "63"),
+    C: common_vendor.o(($event) => $data.showPayPicker = false),
     D: common_vendor.o(() => {
-    }, "2d"),
-    E: common_vendor.o(($event) => $data.showPayPicker = false, "79")
+    }),
+    E: common_vendor.o(($event) => $data.showPayPicker = false)
   } : {}, {
     F: common_vendor.p({
       visible: $data.pageLoading,

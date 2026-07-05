@@ -5,4 +5,4 @@
 export const WX_APP_NAME = '点餐小程序'
 
 export const DEV_API_BASE_URL = 'https://backend.zhongtang-group.com/api'
-export const PROD_API_BASE_URL = 'https://your-domain.com/api'
+export const PROD_API_BASE_URL = 'https://backend.zhongtang-group.com/api'

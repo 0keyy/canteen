@@ -212,10 +212,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     c: $options.displayBanners.length > 0,
     d: common_vendor.s($options.heroPaddingStyle),
     e: common_assets._imports_0,
-    f: common_vendor.o(($event) => $options.selectMode(1), "6f"),
+    f: common_vendor.o(($event) => $options.selectMode(1)),
     g: common_assets._imports_1,
     h: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
-    i: common_vendor.o(($event) => $options.selectMode(3), "b9"),
+    i: common_vendor.o(($event) => $options.selectMode(3)),
     j: common_vendor.f($data.shortcuts, (item, k0, i0) => {
       return {
         a: common_vendor.n(item.iconClass),
@@ -225,7 +225,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: common_vendor.o(($event) => $options.onShortcutTap(item), item.name)
       };
     }),
-    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "30"),
+    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args)),
     l: $options.homeRecommendDishes.length
   }, $options.homeRecommendDishes.length ? {
     m: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {

@@ -90,10 +90,10 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
-    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "b4"),
+    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
     b: common_vendor.t($data.userScore),
     c: common_assets._imports_0$1,
-    d: common_vendor.o((...args) => $options.goDrawPage && $options.goDrawPage(...args), "36"),
+    d: common_vendor.o((...args) => $options.goDrawPage && $options.goDrawPage(...args)),
     e: common_vendor.f($data.goodsList, (goods, k0, i0) => {
       return common_vendor.e({
         a: goods.img

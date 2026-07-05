@@ -36,8 +36,9 @@ public class GlobalException {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
-        log.error("系统异常 {}", e.getMessage());
-        return AjaxResult.failed(HttpEnum.SYSTEM_ERROR.getCode(), e.getMessage());
+        log.error("系统异常", e);
+        String msg = GlobalConfig.debug ? e.getMessage() : HttpEnum.SYSTEM_ERROR.getMsg();
+        return AjaxResult.failed(HttpEnum.SYSTEM_ERROR.getCode(), msg);
     }
 
     /**

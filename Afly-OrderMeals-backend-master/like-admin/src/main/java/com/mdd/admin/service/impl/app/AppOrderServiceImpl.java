@@ -27,6 +27,7 @@ import com.mdd.common.mapper.coupon.UserCouponMapper;
 import com.mdd.common.util.TimeUtils;
 import com.mdd.common.util.UrlUtils;
 import com.mdd.admin.enums.app.DiningModeEnum;
+import com.mdd.admin.service.MenuCatalogService;
 import com.mdd.admin.service.app.IAppOrderService;
 import com.mdd.admin.service.app.IAppCouponService;
 import com.mdd.admin.util.AdminNotifyUtils;
@@ -65,6 +66,8 @@ public class AppOrderServiceImpl implements IAppOrderService {
     private IAppCouponService appCouponService;
     @Resource
     private UserCouponMapper userCouponMapper;
+    @Resource
+    private MenuCatalogService menuCatalogService;
 
     @Override
     public ShopVo shop(Integer aid) {
@@ -81,21 +84,25 @@ public class AppOrderServiceImpl implements IAppOrderService {
 
     @Override
     public List<GoodsVo> menu(Integer aid) {
-        List<GoodsVo> goodsVos = new ArrayList<>();
         List<ArticleCategory> categories = articleCategoryMapper.selectList(
                 new QueryWrapper<ArticleCategory>().eq("aid", aid).eq("is_delete", 0).orderByAsc("sort"));
+        Map<Integer, List<Article>> articlesByCategory = menuCatalogService.loadArticlesByCategory(aid, true, false);
+
+        List<GoodsVo> goodsVos = new ArrayList<>();
         for (ArticleCategory category : categories) {
-            List<FoodVo> foods = articleMapper.selectJoinList(FoodVo.class, new MPJQueryWrapper<Article>()
-                    .select("t.id as id, t.title as title, t.intro as intro, t.summary as price, t.image as image")
-                    .eq("t.aid", aid)
-                    .eq("t.cid", category.getId())
-                    .eq("t.is_delete", 0)
-                    .orderByAsc("t.sort"));
-            if (foods.isEmpty()) {
+            List<Article> articles = articlesByCategory.get(category.getId());
+            if (articles == null || articles.isEmpty()) {
                 continue;
             }
-            for (FoodVo food : foods) {
-                food.setImage(UrlUtils.toAbsoluteUrl(food.getImage()));
+            List<FoodVo> foods = new ArrayList<>(articles.size());
+            for (Article article : articles) {
+                FoodVo food = new FoodVo();
+                food.setId(article.getId());
+                food.setTitle(article.getTitle());
+                food.setIntro(article.getIntro());
+                food.setPrice(article.getSummary());
+                food.setImage(UrlUtils.toAbsoluteUrl(article.getImage()));
+                foods.add(food);
             }
             GoodsVo goodsVo = new GoodsVo();
             goodsVo.setName(category.getName());
@@ -358,17 +365,32 @@ public class AppOrderServiceImpl implements IAppOrderService {
     @Transactional
     public void cancel(Integer orderId, Integer userId, String reason) {
         Orders orders = getOwnedOrder(orderId, userId);
-        if (orders.getStatus() == 2) {
+        if (orders.getStatus() != null && orders.getStatus() == 3) {
+            return;
+        }
+        if (orders.getStatus() != null && orders.getStatus() == 2) {
             throw new BaseException(500, "订单已完成，无法取消");
         }
-        if (orders.getPayStatus() != null && orders.getPayStatus() == 1 && orders.getStatus() == 1) {
+        if (orders.getPayStatus() != null && orders.getPayStatus() == 1
+                && orders.getStatus() != null && orders.getStatus() == 1) {
             throw new BaseException(500, "订单制作中，无法取消");
         }
+        if (!isPendingPay(orders)) {
+            throw new BaseException(500, "仅待支付订单可取消");
+        }
+
+        appCouponService.restoreForOrderCancel(orderId, userId);
+
         orders.setStatus(3);
         orders.setPayStatus(4);
         orders.setCancelReason(reason);
         orders.setCancelTime(TimeUtils.timestamp());
         ordersMapper.updateById(orders);
+    }
+
+    private boolean isPendingPay(Orders orders) {
+        return (orders.getPayStatus() != null && orders.getPayStatus() == 0)
+                || (orders.getStatus() != null && orders.getStatus() == 4);
     }
 
     private Orders getOwnedOrder(Integer orderId, Integer userId) {

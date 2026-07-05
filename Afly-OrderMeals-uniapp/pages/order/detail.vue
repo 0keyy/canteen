@@ -85,18 +85,18 @@
 
     <!-- 底部操作栏 -->
     <view class="detail-page__footer safe-area-bottom">
-      <view class="detail-page__submit-bar" v-if="order.payStatus === 0 || order.status === 4">
+      <view class="detail-page__submit-bar" v-if="isPendingPay">
         <view class="detail-page__submit-info">
           <text class="detail-page__submit-label">合计:</text>
           <text class="detail-page__submit-price">¥{{ order.amount }}</text>
         </view>
-        <view class="detail-page__submit-btn" @click="payNow">
-          <text class="detail-page__submit-btn-text">去支付</text>
-        </view>
-      </view>
-      <view class="detail-page__cancel-bar" v-if="order.status === 1">
-        <view class="detail-page__cancel-btn" @click="cancelOrder">
-          <text class="detail-page__cancel-btn-text">取消订单</text>
+        <view class="detail-page__submit-actions">
+          <view class="detail-page__cancel-btn detail-page__cancel-btn--inline" @click="cancelOrder">
+            <text class="detail-page__cancel-btn-text">取消订单</text>
+          </view>
+          <view class="detail-page__submit-btn" @click="payNow">
+            <text class="detail-page__submit-btn-text">去支付</text>
+          </view>
         </view>
       </view>
     </view>
@@ -137,6 +137,9 @@ export default {
   computed: {
     isCalled() {
       return this.order && Number(this.order.calledTime) > 0
+    },
+    isPendingPay() {
+      return this.order && (this.order.payStatus === 0 || this.order.status === 4)
     },
     statusText() {
       if (!this.order) return ''
@@ -187,8 +190,18 @@ export default {
       }
     },
     async cancelOrder() {
-      await orderApi.cancel(this.orderId, '用户取消')
-      this.loadDetail()
+      const { confirm } = await uni.showModal({
+        title: '取消订单',
+        content: '确定取消该待支付订单吗？已使用的优惠券将退还至您的账户。'
+      })
+      if (!confirm) return
+      try {
+        await orderApi.cancel(this.orderId, '用户取消')
+        uni.showToast({ title: '订单已取消', icon: 'success' })
+        this.loadDetail()
+      } catch (e) {
+        uni.showToast({ title: e.message || e, icon: 'none' })
+      }
     },
     onPayMethodChange(channel) {
       this.payChannel = channel
@@ -456,6 +469,14 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16rpx;
+  }
+
+  &__submit-actions {
+    display: flex;
+    align-items: center;
+    gap: 16rpx;
+    flex-shrink: 0;
   }
 
   &__submit-info {
@@ -504,6 +525,10 @@ export default {
     border-radius: 12rpx;
     border: 1rpx solid #E8E8E8;
     background: #FFFFFF;
+
+    &--inline {
+      padding: 22rpx 32rpx;
+    }
 
     &:active {
       opacity: 0.8;

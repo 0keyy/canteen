@@ -113,7 +113,7 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: common_assets._imports_0$10,
-    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "0a"),
+    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
     c: common_assets._imports_1$2,
     d: common_vendor.f($data.prizeList.slice(0, 3), (item, idx, i0) => {
       return {
@@ -132,7 +132,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     g: $data.activeIdx === 3 ? 1 : "",
     h: common_vendor.t($data.isRunning ? "抽奖中" : "抽"),
-    i: common_vendor.o((...args) => $options.handleDraw && $options.handleDraw(...args), "0e"),
+    i: common_vendor.o((...args) => $options.handleDraw && $options.handleDraw(...args)),
     j: $data.isRunning ? 1 : "",
     k: common_vendor.f($data.prizeList.slice(4, 5), (item, idx, i0) => {
       return {

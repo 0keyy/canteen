@@ -14,12 +14,14 @@ function buildUrl(url, params) {
 export function request(options) {
   const token = uni.getStorageSync('token')
   const finalUrl = options.params ? buildUrl(options.url, options.params) : options.url
+  const timeout = options.timeout || 30000
 
   return new Promise((resolve, reject) => {
     uni.request({
       url: BASE_URL + finalUrl,
       method: options.method || 'GET',
       data: options.data || {},
+      timeout,
       header: {
         'Content-Type': 'application/json',
         'like-uniapp': token || ''

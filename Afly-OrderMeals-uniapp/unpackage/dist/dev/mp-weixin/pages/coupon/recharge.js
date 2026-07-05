@@ -82,8 +82,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $data.selectedAmount = item, index)
       };
     }),
-    d: common_vendor.o((...args) => $options.onRecharge && $options.onRecharge(...args), "7b"),
-    e: common_vendor.o((...args) => $options.goRecord && $options.goRecord(...args), "f9")
+    d: common_vendor.o((...args) => $options.onRecharge && $options.onRecharge(...args)),
+    e: common_vendor.o((...args) => $options.goRecord && $options.goRecord(...args))
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-c45a7485"]]);
