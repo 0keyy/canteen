@@ -11,11 +11,13 @@ function buildUrl(url, params) {
 function request(options) {
   const token = common_vendor.index.getStorageSync("token");
   const finalUrl = options.params ? buildUrl(options.url, options.params) : options.url;
+  const timeout = options.timeout || 3e4;
   return new Promise((resolve, reject) => {
     common_vendor.index.request({
       url: utils_config.BASE_URL + finalUrl,
       method: options.method || "GET",
       data: options.data || {},
+      timeout,
       header: {
         "Content-Type": "application/json",
         "like-uniapp": token || ""

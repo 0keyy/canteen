@@ -18,4 +18,7 @@ public interface IAppCouponService {
     CouponApplicableVo bestForOrder(Integer orderId, Integer userId);
 
     String verifyCode(Integer userCouponId, Integer userId);
+
+    /** 取消待支付订单时退还已锁定的优惠券 */
+    void restoreForOrderCancel(Integer orderId, Integer userId);
 }

@@ -224,6 +224,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16rpx;
+}
+.detail-page__submit-actions.data-v-6b23c96c {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex-shrink: 0;
 }
 .detail-page__submit-info.data-v-6b23c96c {
   display: flex;
@@ -264,6 +271,9 @@
   border-radius: 12rpx;
   border: 1rpx solid #E8E8E8;
   background: #FFFFFF;
+}
+.detail-page__cancel-btn--inline.data-v-6b23c96c {
+  padding: 22rpx 32rpx;
 }
 .detail-page__cancel-btn.data-v-6b23c96c:active {
   opacity: 0.8;
