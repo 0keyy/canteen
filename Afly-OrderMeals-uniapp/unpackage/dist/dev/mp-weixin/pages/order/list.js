@@ -1,146 +1,220 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
-const utils_config = require("../../utils/config.js");
-const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
-const PageLoading = () => "../../components/page-loading/page-loading.js";
+const TABS = [
+  { key: "all", name: "全部" },
+  { key: "paying", name: "待支付" },
+  { key: "shipping", name: "待发货" },
+  { key: "delivering", name: "待收货" },
+  { key: "refund", name: "退款/售后" }
+];
 const _sfc_main = {
-  components: { PageLoading },
-  mixins: [mixins_tabbarPage.tabbarPageMixin],
   data() {
     return {
-      list: [],
-      pendingTotal: 0,
-      pageLoading: false,
-      pageLoadingTip: "加载中..."
+      tabs: TABS,
+      activeTab: 0,
+      allList: [],
+      navHeight: 0,
+      statusBarHeight: 0
     };
   },
-  onShow() {
-    this.setupTabbar(2);
+  computed: {
+    navbarStyle() {
+      return `padding-top: ${this.statusBarHeight}px; height: ${44 + this.statusBarHeight}px;`;
+    },
+    currentList() {
+      if (this.activeTab === 0)
+        return this.allList;
+      const key = TABS[this.activeTab].key;
+      return this.allList.filter((o) => o.statusKey === key);
+    }
+  },
+  onLoad(options) {
+    const sys = common_vendor.index.getSystemInfoSync();
+    this.statusBarHeight = sys.statusBarHeight || 20;
+    if (options && options.tab !== void 0) {
+      const tabIdx = parseInt(options.tab);
+      if (!isNaN(tabIdx) && tabIdx >= 0 && tabIdx < TABS.length) {
+        this.activeTab = tabIdx;
+      }
+    }
     this.loadList();
-    this.loadPendingCart();
+  },
+  onShow() {
+    this.loadList();
   },
   methods: {
-    async loadPendingCart() {
-      try {
-        const has = await api_index.orderApi.cartHas(utils_config.DEFAULT_SHOP_ID);
-        if (!(has == null ? void 0 : has.oid) || !Array.isArray(has.dish) || has.dish.length === 0) {
-          this.pendingTotal = 0;
-          return;
-        }
-        let total = 0;
-        has.dish.forEach((item) => {
-          total += Number(item.price || 0) * (Number(item.count) || 0);
-        });
-        this.pendingTotal = total;
-      } catch (e) {
-        this.pendingTotal = 0;
-      }
-    },
-    modeText(mode) {
-      return { 1: "堂食", 3: "外卖" }[mode] || "订单";
-    },
-    statusText(item) {
-      if (item.payStatus === 0 || item.status === 4)
-        return "待支付";
-      if (item.status === 1 && Number(item.calledTime) > 0)
-        return "请取餐";
-      if (item.status === 1)
-        return "制作中";
-      if (item.status === 2)
-        return "已完成";
-      if (item.status === 3)
-        return "已取消";
-      return "未知";
-    },
-    orderTitle(item) {
-      return `${this.modeText(item.diningMode)}订单`;
-    },
     async loadList() {
       try {
-        this.list = await api_index.orderApi.list();
+        const data = await api_index.orderApi.list();
+        let list = [];
+        if (Array.isArray(data)) {
+          list = data;
+        } else if (data && Array.isArray(data.list)) {
+          list = data.list;
+        } else if (data && Array.isArray(data.data)) {
+          list = data.data;
+        }
+        if (list.length > 0) {
+          this.allList = list.map((item) => this.normalizeOrder(item));
+        } else {
+          this.allList = this.getMockList();
+        }
       } catch (e) {
-        this.list = [];
+        this.allList = this.getMockList();
+      }
+    },
+    normalizeOrder(item) {
+      const statusInfo = this.getStatusInfo(item);
+      let dishes = [];
+      if (Array.isArray(item.dishes)) {
+        dishes = item.dishes;
+      } else if (item.dish) {
+        dishes = [item.dish];
+      } else if (Array.isArray(item.goodsList)) {
+        dishes = item.goodsList;
+      } else if (Array.isArray(item.orderDishes)) {
+        dishes = item.orderDishes;
+      }
+      const dishList = dishes.length > 0 ? dishes.slice(0, 2).map((d) => ({
+        id: d.id || d.dishId || d.goodsId,
+        name: d.name || d.dishName || d.goodsName || "",
+        image: d.image || d.img || d.cover || d.goodsImage || d.dishImage || "",
+        price: d.price || d.dishPrice || d.goodsPrice || 0,
+        quantity: d.quantity || d.count || d.dishQuantity || d.num || 1
+      })) : [];
+      if (dishList.length === 0) {
+        const modeName = item.diningMode === 3 ? "外卖" : item.diningMode === 1 ? "堂食" : "订单";
+        dishList.push({
+          id: item.id,
+          name: item.dishName || `${modeName}订单`,
+          image: item.image || "",
+          price: item.amount || 0,
+          quantity: 1
+        });
+      }
+      return {
+        id: item.id || item.orderId || item.oid,
+        createTime: item.createTime || item.time || item.orderTime || "",
+        amount: item.amount || item.totalAmount || item.totalPrice || 0,
+        statusKey: statusInfo.key,
+        statusText: statusInfo.text,
+        dishes: dishList
+      };
+    },
+    getStatusInfo(item) {
+      if (item.payStatus === 0 || item.status === 4) {
+        return { key: "paying", text: "待支付" };
+      }
+      if (item.status === 1 && item.shippingStatus === 0) {
+        return { key: "shipping", text: "待发货" };
+      }
+      if (item.status === 1 && item.shippingStatus === 1) {
+        return { key: "delivering", text: "待收货" };
+      }
+      if (item.status === 2) {
+        return { key: "completed", text: "已完成" };
+      }
+      if (item.status === 3) {
+        return { key: "refund", text: "已退款" };
+      }
+      if (item.status === 5) {
+        return { key: "refund", text: "退款中" };
+      }
+      return { key: "completed", text: "已完成" };
+    },
+    getMockList() {
+      return [
+        {
+          id: 1,
+          createTime: "2026-06-01 18:11:31",
+          amount: 3,
+          statusKey: "completed",
+          statusText: "已完成",
+          dishes: [
+            { id: 1, name: "可口可乐", image: "/static/首页广告.png", price: "3", quantity: 1 }
+          ]
+        },
+        {
+          id: 2,
+          createTime: "2026-06-01 18:11:31",
+          amount: 15,
+          statusKey: "delivering",
+          statusText: "待收货",
+          dishes: [
+            { id: 2, name: "红烧牛肉面", image: "/static/首页广告.png", price: "15", quantity: 1 }
+          ]
+        }
+      ];
+    },
+    switchTab(idx) {
+      this.activeTab = idx;
+    },
+    goBack() {
+      const pages = getCurrentPages();
+      if (pages.length > 1) {
+        common_vendor.index.navigateBack();
+      } else {
+        common_vendor.index.switchTab({ url: "/pages/mine/index" });
       }
     },
     goDetail(orderId) {
-      this.goWithLoading(`/pages/order/detail?orderId=${orderId}`, "navigateTo");
+      common_vendor.index.navigateTo({ url: `/pages/order/detail?orderId=${orderId}` });
     },
-    goMenu() {
-      this.goWithLoading("/pages/menu/index", "switchTab");
+    reorder(order) {
+      common_vendor.index.switchTab({ url: "/pages/menu/index" });
     },
-    reorder() {
-      this.goWithLoading("/pages/menu/index", "switchTab");
-    },
-    goWithLoading(url, type = "navigateTo", tip = "加载中...") {
-      this.pageLoadingTip = tip;
-      this.pageLoading = true;
-      setTimeout(() => {
-        if (type === "switchTab") {
-          common_vendor.index.switchTab({ url });
-        } else if (type === "reLaunch") {
-          common_vendor.index.reLaunch({ url });
-        } else if (type === "redirectTo") {
-          common_vendor.index.redirectTo({ url });
-        } else if (type === "navigateBack") {
-          common_vendor.index.navigateBack();
-        } else {
-          common_vendor.index.navigateTo({ url });
-        }
-        setTimeout(() => {
-          this.pageLoading = false;
-        }, 500);
-      }, 100);
+    confirmReceive(order) {
+      common_vendor.index.showToast({ title: "确认收货功能开发中", icon: "none" });
     }
   }
 };
-if (!Array) {
-  const _easycom_page_loading2 = common_vendor.resolveComponent("page-loading");
-  _easycom_page_loading2();
-}
-const _easycom_page_loading = () => "../../components/page-loading/page-loading.js";
-if (!Math) {
-  _easycom_page_loading();
-}
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: $data.pendingTotal > 0
-  }, $data.pendingTotal > 0 ? {
-    b: common_vendor.t($data.pendingTotal.toFixed(2)),
-    c: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "27")
-  } : {}, {
-    d: $data.list.length > 0
-  }, $data.list.length > 0 ? {
-    e: common_vendor.f($data.list, (item, k0, i0) => {
-      return {
-        a: common_vendor.t($options.orderTitle(item)),
-        b: common_vendor.t($options.statusText(item)),
-        c: item.payStatus === 1 ? 1 : "",
-        d: item.status === 3 ? 1 : "",
-        e: common_vendor.t(item.createTime),
-        f: common_vendor.t(item.id),
-        g: common_vendor.t(item.amount || "0.00"),
-        h: common_vendor.o(($event) => $options.reorder(item), item.id),
-        i: item.id,
-        j: common_vendor.o(($event) => $options.goDetail(item.id), item.id)
-      };
-    })
-  } : {}, {
-    f: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
-      return {
-        a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
-        b: common_vendor.t(item.name),
-        c: _ctx.tabbarSelected === index ? _ctx.tabbarSelectedColor : _ctx.tabbarDefaultColor,
-        d: index,
-        e: _ctx.tabbarSelected === index ? 1 : "",
-        f: common_vendor.o(($event) => _ctx.switchTabbar(item, index), index)
-      };
+    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "12"),
+    b: common_vendor.s($options.navbarStyle),
+    c: common_vendor.f($data.tabs, (tab, idx, i0) => {
+      return common_vendor.e({
+        a: common_vendor.t(tab.name),
+        b: $data.activeTab === idx
+      }, $data.activeTab === idx ? {} : {}, {
+        c: tab.key,
+        d: $data.activeTab === idx ? 1 : "",
+        e: common_vendor.o(($event) => $options.switchTab(idx), tab.key)
+      });
     }),
-    g: common_vendor.p({
-      visible: $data.pageLoading,
-      tip: $data.pageLoadingTip
+    d: $options.currentList.length > 0
+  }, $options.currentList.length > 0 ? {
+    e: common_vendor.f($options.currentList, (order, k0, i0) => {
+      return common_vendor.e({
+        a: common_vendor.f(order.dishes, (dish, dIdx, i1) => {
+          return common_vendor.e({
+            a: dish.image,
+            b: common_vendor.t(dish.name),
+            c: common_vendor.t(dish.quantity),
+            d: common_vendor.t(dish.price)
+          }, order.statusKey === "completed" ? {
+            e: common_vendor.o(($event) => $options.reorder(order), dIdx)
+          } : order.statusKey === "shipping" ? {
+            f: common_vendor.o(($event) => $options.confirmReceive(order), dIdx)
+          } : {}, {
+            g: dIdx
+          });
+        }),
+        b: common_vendor.t(order.createTime),
+        c: common_vendor.t(order.statusText),
+        d: common_vendor.n(`order-item__dish-status--${order.statusKey}`),
+        e: order.statusKey === "completed",
+        f: order.statusKey === "shipping",
+        g: order.dishes.length > 1
+      }, order.dishes.length > 1 ? {
+        h: common_vendor.o(($event) => $options.goDetail(order.id), order.id)
+      } : {}, {
+        i: order.id,
+        j: common_vendor.o(($event) => $options.goDetail(order.id), order.id)
+      });
     })
-  });
+  } : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-456ecf67"]]);
 wx.createPage(MiniProgramPage);

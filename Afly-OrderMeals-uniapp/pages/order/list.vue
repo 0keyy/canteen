@@ -1,249 +1,352 @@
 <template>
   <view class="orders-page">
-    <scroll-view class="orders-page__content" scroll-y :show-scrollbar="false">
-      <view class="orders-page__header-card">
-        <text class="orders-page__title">我的订单</text>
-
-        <view v-if="pendingTotal > 0" class="orders-page__pending">
-          <text class="orders-page__pending-title">待提交订单</text>
-          <text class="orders-page__pending-desc">已选菜品合计 ¥ {{ pendingTotal.toFixed(2) }}，可继续确认取餐方式。</text>
-          <view class="orders-page__pending-btn" @tap="goMenu">
-            <text class="orders-page__pending-btn-text">去提交</text>
-            <text class="orders-page__pending-arrow">›</text>
-          </view>
-        </view>
+    <!-- 顶部导航 -->
+    <view class="orders-page__navbar" :style="navbarStyle">
+      <view class="orders-page__navbar-left" @tap="goBack">
+        <text class="orders-page__navbar-back">‹</text>
       </view>
+      <view class="orders-page__navbar-title">
+        <!-- <text class="orders-page__navbar-title-text">我的订单</text> -->
+      </view>
+      <view class="orders-page__navbar-right">
+        <text class="orders-page__navbar-search">⌕</text>
+      </view>
+    </view>
 
-      <view v-if="list.length > 0" class="orders-page__list">
-        <view v-for="item in list" :key="item.id" class="order-card" @click="goDetail(item.id)">
-          <view class="order-card__icon-wrap">
-            <view class="order-card__icon"></view>
-          </view>
-          <view class="order-card__body">
-            <view class="order-card__top">
-              <text class="order-card__title">{{ orderTitle(item) }}</text>
-              <text
-                class="order-card__status"
-                :class="{
-                  'order-card__status--paid': item.payStatus === 1,
-                  'order-card__status--cancelled': item.status === 3
-                }"
-              >{{ statusText(item) }}</text>
+    <!-- Tabs -->
+    <view class="orders-page__tabs">
+      <view
+        v-for="(tab, idx) in tabs"
+        :key="tab.key"
+        class="orders-page__tab-item"
+        :class="{ 'orders-page__tab-item--active': activeTab === idx }"
+        @tap="switchTab(idx)"
+      >
+        <text class="orders-page__tab-text">{{ tab.name }}</text>
+        <view v-if="activeTab === idx" class="orders-page__tab-line"></view>
+      </view>
+    </view>
+
+    <!-- 列表内容 -->
+    <scroll-view class="orders-page__content" scroll-y :show-scrollbar="false">
+      <view v-if="currentList.length > 0" class="orders-page__list">
+        <view v-for="order in currentList" :key="order.id" class="order-item" @tap="goDetail(order.id)">
+          <view v-for="(dish, dIdx) in order.dishes" :key="dIdx" class="order-item__dish">
+            <image class="order-item__dish-img" :src="dish.image" mode="aspectFill" />
+            <view class="order-item__dish-info">
+              <text class="order-item__dish-name">{{ dish.name }}</text>
+              <text class="order-item__dish-time">{{ order.createTime }}</text>
             </view>
-            <text class="order-card__meta">{{ item.createTime }} · #{{ item.id }}</text>
-            <view class="order-card__bottom">
-              <text class="order-card__amount">¥{{ item.amount || '0.00' }}</text>
-              <view class="order-card__reorder" @click.stop="reorder(item)">
-                <text class="order-card__reorder-icon">↻</text>
-                <text class="order-card__reorder-text">再来一单</text>
+            <view class="order-item__dish-right">
+              <text class="order-item__dish-status" :class="`order-item__dish-status--${order.statusKey}`">{{ order.statusText }}</text>
+              <text class="order-item__dish-price">共{{ dish.quantity }}份 ¥{{ dish.price }}</text>
+              <view v-if="order.statusKey === 'completed'" class="order-item__btn order-item__btn--primary" @tap.stop="reorder(order)">
+                <text class="order-item__btn-text">再来一单</text>
+              </view>
+              <view v-else-if="order.statusKey === 'shipping'" class="order-item__btn order-item__btn--primary" @tap.stop="confirmReceive(order)">
+                <text class="order-item__btn-text">再来一单</text>
               </view>
             </view>
+          </view>
+          <view v-if="order.dishes.length > 1" class="order-item__more" @tap.stop="goDetail(order.id)">
+            <text class="order-item__more-text">更多</text>
           </view>
         </view>
       </view>
 
       <view class="orders-page__empty" v-else>
-        <view class="orders-page__empty-icon">
-          <view class="orders-page__empty-icon-inner"></view>
-        </view>
-        <text class="orders-page__empty-title">暂无订单</text>
-        <text class="orders-page__empty-desc">下单后可在此查看订单状态</text>
+        <text class="orders-page__empty-text">快去下单吧</text>
       </view>
 
       <view class="orders-page__bottom-space"></view>
     </scroll-view>
-
-    <view class="app-tab-bar">
-      <view
-        v-for="(item, index) in tabbarList"
-        :key="index"
-        class="app-tab-item"
-        :class="{ 'app-tab-item--active': tabbarSelected === index }"
-        @tap.stop="switchTabbar(item, index)"
-      >
-        <view class="app-tab-icon-wrap">
-          <image
-            class="app-tab-icon"
-            :src="tabbarSelected === index ? item.selected : item.unselected"
-            mode="aspectFit"
-          />
-        </view>
-        <text
-          class="app-tab-text"
-          :style="{ color: tabbarSelected === index ? tabbarSelectedColor : tabbarDefaultColor }"
-        >
-          {{ item.name }}
-        </text>
-      </view>
-    </view>
-    <page-loading :visible="pageLoading" :tip="pageLoadingTip"></page-loading>
   </view>
 </template>
 
 <script>
 import { orderApi } from '../../api/index'
-import { DEFAULT_SHOP_ID } from '../../utils/config'
-import tabbarPageMixin from '../../mixins/tabbar-page'
-import PageLoading from '../../components/page-loading/page-loading.vue'
+
+const TABS = [
+  { key: 'all', name: '全部' },
+  { key: 'paying', name: '待支付' },
+  { key: 'shipping', name: '待发货' },
+  { key: 'delivering', name: '待收货' },
+  { key: 'refund', name: '退款/售后' }
+]
 
 export default {
-  components: { PageLoading },
-  mixins: [tabbarPageMixin],
   data() {
     return {
-      list: [],
-      pendingTotal: 0,
-      pageLoading: false,
-      pageLoadingTip: '加载中...'
+      tabs: TABS,
+      activeTab: 0,
+      allList: [],
+      navHeight: 0,
+      statusBarHeight: 0
     }
   },
-  onShow() {
-    this.setupTabbar(2)
+  computed: {
+    navbarStyle() {
+      return `padding-top: ${this.statusBarHeight}px; height: ${44 + this.statusBarHeight}px;`
+    },
+    currentList() {
+      if (this.activeTab === 0) return this.allList
+      const key = TABS[this.activeTab].key
+      return this.allList.filter(o => o.statusKey === key)
+    }
+  },
+  onLoad(options) {
+    const sys = uni.getSystemInfoSync()
+    this.statusBarHeight = sys.statusBarHeight || 20
+    if (options && options.tab !== undefined) {
+      const tabIdx = parseInt(options.tab)
+      if (!isNaN(tabIdx) && tabIdx >= 0 && tabIdx < TABS.length) {
+        this.activeTab = tabIdx
+      }
+    }
     this.loadList()
-    this.loadPendingCart()
+  },
+  onShow() {
+    this.loadList()
   },
   methods: {
-    async loadPendingCart() {
-      try {
-        const has = await orderApi.cartHas(DEFAULT_SHOP_ID)
-        if (!has?.oid || !Array.isArray(has.dish) || has.dish.length === 0) {
-          this.pendingTotal = 0
-          return
-        }
-        let total = 0
-        has.dish.forEach((item) => {
-          total += Number(item.price || 0) * (Number(item.count) || 0)
-        })
-        this.pendingTotal = total
-      } catch (e) {
-        this.pendingTotal = 0
-      }
-    },
-    modeText(mode) {
-      return { 1: '堂食', 3: '外卖' }[mode] || '订单'
-    },
-    statusText(item) {
-      if (item.payStatus === 0 || item.status === 4) return '待支付'
-      if (item.status === 1 && Number(item.calledTime) > 0) return '请取餐'
-      if (item.status === 1) return '制作中'
-      if (item.status === 2) return '已完成'
-      if (item.status === 3) return '已取消'
-      return '未知'
-    },
-    orderTitle(item) {
-      return `${this.modeText(item.diningMode)}订单`
-    },
     async loadList() {
       try {
-        this.list = await orderApi.list()
+        const data = await orderApi.list()
+        let list = []
+        if (Array.isArray(data)) {
+          list = data
+        } else if (data && Array.isArray(data.list)) {
+          list = data.list
+        } else if (data && Array.isArray(data.data)) {
+          list = data.data
+        }
+        if (list.length > 0) {
+          this.allList = list.map(item => this.normalizeOrder(item))
+        } else {
+          this.allList = this.getMockList()
+        }
       } catch (e) {
-        this.list = []
+        this.allList = this.getMockList()
+      }
+    },
+    normalizeOrder(item) {
+      const statusInfo = this.getStatusInfo(item)
+      let dishes = []
+      if (Array.isArray(item.dishes)) {
+        dishes = item.dishes
+      } else if (item.dish) {
+        dishes = [item.dish]
+      } else if (Array.isArray(item.goodsList)) {
+        dishes = item.goodsList
+      } else if (Array.isArray(item.orderDishes)) {
+        dishes = item.orderDishes
+      }
+
+      const dishList = dishes.length > 0 ? dishes.slice(0, 2).map(d => ({
+        id: d.id || d.dishId || d.goodsId,
+        name: d.name || d.dishName || d.goodsName || '',
+        image: d.image || d.img || d.cover || d.goodsImage || d.dishImage || '',
+        price: d.price || d.dishPrice || d.goodsPrice || 0,
+        quantity: d.quantity || d.count || d.dishQuantity || d.num || 1
+      })) : []
+
+      if (dishList.length === 0) {
+        const modeName = item.diningMode === 3 ? '外卖' : (item.diningMode === 1 ? '堂食' : '订单')
+        dishList.push({
+          id: item.id,
+          name: item.dishName || `${modeName}订单`,
+          image: item.image || '',
+          price: item.amount || 0,
+          quantity: 1
+        })
+      }
+
+      return {
+        id: item.id || item.orderId || item.oid,
+        createTime: item.createTime || item.time || item.orderTime || '',
+        amount: item.amount || item.totalAmount || item.totalPrice || 0,
+        statusKey: statusInfo.key,
+        statusText: statusInfo.text,
+        dishes: dishList
+      }
+    },
+    getStatusInfo(item) {
+      if (item.payStatus === 0 || item.status === 4) {
+        return { key: 'paying', text: '待支付' }
+      }
+      if (item.status === 1 && item.shippingStatus === 0) {
+        return { key: 'shipping', text: '待发货' }
+      }
+      if (item.status === 1 && item.shippingStatus === 1) {
+        return { key: 'delivering', text: '待收货' }
+      }
+      if (item.status === 2) {
+        return { key: 'completed', text: '已完成' }
+      }
+      if (item.status === 3) {
+        return { key: 'refund', text: '已退款' }
+      }
+      if (item.status === 5) {
+        return { key: 'refund', text: '退款中' }
+      }
+      return { key: 'completed', text: '已完成' }
+    },
+    getMockList() {
+      return [
+        {
+          id: 1,
+          createTime: '2026-06-01 18:11:31',
+          amount: 3,
+          statusKey: 'completed',
+          statusText: '已完成',
+          dishes: [
+            { id: 1, name: '可口可乐', image: '/static/首页广告.png', price: '3', quantity: 1 }
+          ]
+        },
+        {
+          id: 2,
+          createTime: '2026-06-01 18:11:31',
+          amount: 15,
+          statusKey: 'delivering',
+          statusText: '待收货',
+          dishes: [
+            { id: 2, name: '红烧牛肉面', image: '/static/首页广告.png', price: '15', quantity: 1 }
+          ]
+        }
+      ]
+    },
+    switchTab(idx) {
+      this.activeTab = idx
+    },
+    goBack() {
+      const pages = getCurrentPages()
+      if (pages.length > 1) {
+        uni.navigateBack()
+      } else {
+        uni.switchTab({ url: '/pages/mine/index' })
       }
     },
     goDetail(orderId) {
-      this.goWithLoading(`/pages/order/detail?orderId=${orderId}`, 'navigateTo')
+      uni.navigateTo({ url: `/pages/order/detail?orderId=${orderId}` })
     },
-    goMenu() {
-      this.goWithLoading('/pages/menu/index', 'switchTab')
+    reorder(order) {
+      uni.switchTab({ url: '/pages/menu/index' })
     },
-    reorder() {
-      this.goWithLoading('/pages/menu/index', 'switchTab')
-    },
-    goWithLoading(url, type = 'navigateTo', tip = '加载中...') {
-      this.pageLoadingTip = tip
-      this.pageLoading = true
-      setTimeout(() => {
-        if (type === 'switchTab') { uni.switchTab({ url }) }
-        else if (type === 'reLaunch') { uni.reLaunch({ url }) }
-        else if (type === 'redirectTo') { uni.redirectTo({ url }) }
-        else if (type === 'navigateBack') { uni.navigateBack() }
-        else { uni.navigateTo({ url }) }
-        setTimeout(() => { this.pageLoading = false }, 500)
-      }, 100)
+    confirmReceive(order) {
+      uni.showToast({ title: '确认收货功能开发中', icon: 'none' })
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+$brand-primary: #b31212;
+$text-primary: #333333;
+$text-secondary: #494949;
+$text-tertiary: #CCCCCC;
+$bg-gray: #e9e9e9;
+$bg-white: #FFFFFF;
+$border-light: #EEEEEE;
+
 .orders-page {
   display: flex;
   flex-direction: column;
   height: 100vh;
   background: $bg-gray;
 
-  &__content {
-    flex: 1;
-    height: 0;
-    padding: 24rpx;
-    box-sizing: border-box;
-    /* ========== 新增控制整体上下偏移的代码 ========== */
-    margin-top: 80rpx; 
-    /* 调整说明：40rpx是下移距离，数值越大页面整体越往下，改成0就恢复原位 */
-  }
-
-  &__header-card {
-    background: $bg-surface;
-    border-radius: $radius-card;
-    padding: 24rpx;
-    box-shadow: $shadow-sm;
-  }
-
-  &__title {
-    display: block;
-    margin-top: 4rpx;
-    font-size: 40rpx;
-    font-weight: 900;
-    color: $text-primary;
-  }
-
-  &__pending {
-    margin-top: 24rpx;
-    padding: 24rpx;
-    border-radius: $radius-card;
-    background: linear-gradient(135deg, $brand-primary 0%, $brand-orange-light 100%);
-  }
-
-  &__pending-title {
-    display: block;
-    font-size: 32rpx;
-    font-weight: 900;
-    color: $text-white;
-  }
-
-  &__pending-desc {
-    display: block;
-    margin-top: 8rpx;
-    font-size: 22rpx;
-    color: rgba(255, 252, 248, 0.9);
-    line-height: 1.5;
-  }
-
-  &__pending-btn {
-    display: inline-flex;
+  &__navbar {
+    display: flex;
     align-items: center;
-    gap: 4rpx;
-    margin-top: 16rpx;
-    padding: 0 32rpx;
+    justify-content: space-between;
+    padding: 0 24rpx;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  &__navbar-left,
+  &__navbar-right {
+    width: 64rpx;
     height: 64rpx;
-    background: $bg-surface;
-    border-radius: 999rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  &__pending-btn-text {
-    font-size: 24rpx;
-    font-weight: 600;
+  &__navbar-back {
+    font-size: 64rpx;
     color: $text-primary;
+    line-height: 1;
+    font-weight: 300;
   }
 
-  &__pending-arrow {
-    font-size: 28rpx;
+  &__navbar-search {
+    font-size: 36rpx;
     color: $text-primary;
     line-height: 1;
   }
 
+  &__navbar-title {
+    flex: 1;
+    text-align: center;
+  }
+
+  &__navbar-title-text {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  &__tabs {
+    display: flex;
+    align-items: center;
+    padding: 0 12rpx;
+    flex-shrink: 0;
+    border-bottom: 1rpx solid $border-light;
+  }
+
+  &__tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24rpx 0 20rpx;
+    position: relative;
+	font-weight: 700;
+	
+  }
+
+  &__tab-text {
+    font-size: 28rpx;
+    color: $text-secondary;
+    line-height: 90rpx;
+  }
+
+  &__tab-item--active &__tab-text {
+    font-weight: 700;
+	color: $brand-primary;
+  }
+
+  // &__tab-line {
+  //   position: absolute;
+  //   bottom: 8rpx;
+  //   width: 40rpx;
+  //   height: 6rpx;
+  //   background: $brand-primary;
+  //   border-radius: 3rpx;
+  // }
+
+  &__content {
+    flex: 1;
+    height: 0;
+    padding: 24rpx;
+	width: 95vw;
+    // box-sizing: border-box;
+	background: $bg-white;
+	border-radius: 8rpx;
+	margin: 0 auto;
+  }
+
   &__list {
-    margin-top: 24rpx;
     display: flex;
     flex-direction: column;
     gap: 20rpx;
@@ -251,171 +354,133 @@ export default {
 
   &__empty {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 120rpx 0 80rpx;
-  }
-
-  &__empty-icon {
-    width: 160rpx;
-    height: 160rpx;
-    background: $bg-surface;
-    border-radius: 80rpx;
-    display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 32rpx;
-    box-shadow: $shadow-sm;
+    padding: 120rpx 0;
   }
 
-  &__empty-icon-inner {
-    width: 48rpx;
-    height: 56rpx;
-    border: 4rpx solid $text-tertiary;
-    border-radius: 6rpx;
-
-    &::before {
-      content: '';
-      display: block;
-      margin: 12rpx auto 0;
-      width: 28rpx;
-      height: 4rpx;
-      background: $text-tertiary;
-      box-shadow: 0 10rpx 0 $text-tertiary, 0 20rpx 0 $text-tertiary;
-    }
-  }
-
-  &__empty-title {
-    font-size: 30rpx;
+  &__empty-text {
+    font-size: 26rpx;
     color: $text-secondary;
-    margin-bottom: 12rpx;
   }
-
-  &__empty-desc {
-    font-size: 24rpx;
-    color: $text-tertiary;
-  }
-
 
   &__bottom-space {
-    height: $tabbar-height;
+    height: 60rpx;
   }
 }
 
-.order-card {
-  display: flex;
-  gap: 24rpx;
-  background: $bg-surface;
-  border-radius: $radius-card;
+.order-item {
+  background: $bg-white;
+  border-radius: 16rpx;
   padding: 24rpx;
-  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
 
-  &:active {
-    opacity: 0.92;
-  }
-
-  &__icon-wrap {
-    width: 80rpx;
-    height: 80rpx;
-    flex-shrink: 0;
+  &__dish {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(177, 10, 15, 0.1);
-    border-radius: $radius-card;
+    align-items: flex-start;
+    gap: 20rpx;
   }
 
-  &__icon {
-    width: 36rpx;
-    height: 44rpx;
-    border: 3rpx solid $brand-primary;
-    border-radius: 4rpx;
-
-    &::before {
-      content: '';
-      display: block;
-      margin: 8rpx auto 0;
-      width: 22rpx;
-      height: 3rpx;
-      background: $brand-primary;
-      box-shadow: 0 8rpx 0 $brand-primary, 0 16rpx 0 $brand-primary;
-    }
+  &__dish-img {
+    width: 140rpx;
+    height: 140rpx;
+    border-radius: 12rpx;
+    flex-shrink: 0;
+    background: #F0F0F0;
   }
 
-  &__body {
+  &__dish-info {
     flex: 1;
     min-width: 0;
-  }
-
-  &__top {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
     gap: 12rpx;
+    padding-top: 4rpx;
   }
 
-  &__title {
-    flex: 1;
-    font-size: 30rpx;
-    font-weight: 900;
+  &__dish-name {
+    font-size: 28rpx;
+    font-weight: 600;
     color: $text-primary;
+    line-height: 1.3;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 
-  &__status {
+  &__dish-time {
     font-size: 22rpx;
+    color: $text-secondary;
+  }
+
+  &__dish-right {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8rpx;
+    padding-top: 4rpx;
+  }
+
+  &__dish-status {
+    font-size: 26rpx;
     font-weight: 600;
     color: $brand-primary;
-    flex-shrink: 0;
 
-    &--paid {
-      color: #4CAF50;
+    &--completed {
+      color: $text-secondary;
     }
 
-    &--cancelled {
+    &--paying {
+      color: $brand-primary;
+    }
+
+    &--shipping {
+      color: #FF9800;
+    }
+
+    &--delivering {
+      color: #FF9800;
+    }
+
+    &--refund {
       color: $text-tertiary;
     }
   }
 
-  &__meta {
-    display: block;
-    margin-top: 8rpx;
-    font-size: 22rpx;
+  &__dish-price {
+    font-size: 24rpx;
     color: $text-secondary;
   }
 
-  &__bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 16rpx;
-  }
-
-  &__amount {
-    font-size: 32rpx;
-    font-weight: 900;
-    color: $text-primary;
-  }
-
-  &__reorder {
-    display: flex;
-    align-items: center;
-    gap: 6rpx;
-    padding: 8rpx 24rpx;
-    border: 1rpx solid $border-light;
+  &__btn {
+    padding: 10rpx 28rpx;
     border-radius: 999rpx;
+    margin-top: 4rpx;
+
+    &--primary {
+      background: $brand-primary;
+    }
   }
 
-  &__reorder-icon {
+  &__btn-text {
     font-size: 22rpx;
-    color: $text-secondary;
+    color: #FFFFFF;
+    font-weight: 500;
   }
 
-  &__reorder-text {
-    font-size: 22rpx;
-    font-weight: 600;
+  &__more {
+    padding-top: 8rpx;
+    border-top: 1rpx solid $border-light;
+    text-align: center;
+  }
+
+  &__more-text {
+    font-size: 24rpx;
     color: $text-secondary;
   }
 }

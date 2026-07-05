@@ -2,7 +2,6 @@
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const api_integral = require("../../api/integral.js");
-const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   data() {
     return {
@@ -92,9 +91,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "b4"),
     b: common_vendor.t($data.userScore),
-    c: common_assets._imports_0$1,
-    d: common_vendor.o((...args) => $options.goDrawPage && $options.goDrawPage(...args), "36"),
-    e: common_vendor.f($data.goodsList, (goods, k0, i0) => {
+    c: common_vendor.o((...args) => $options.goDrawPage && $options.goDrawPage(...args), "36"),
+    d: common_vendor.f($data.goodsList, (goods, k0, i0) => {
       return common_vendor.e({
         a: goods.img
       }, goods.img ? {

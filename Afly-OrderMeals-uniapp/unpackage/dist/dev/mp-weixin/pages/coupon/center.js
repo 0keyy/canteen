@@ -1,7 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
-const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   data() {
     return {
@@ -47,10 +46,9 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_assets._imports_0$7,
-    b: $data.loading
+    a: $data.loading
   }, $data.loading ? {} : $data.coupons.length === 0 ? {} : {
-    d: common_vendor.f($data.coupons, (coupon, k0, i0) => {
+    c: common_vendor.f($data.coupons, (coupon, k0, i0) => {
       return common_vendor.e({
         a: common_vendor.t(coupon.discountAmount),
         b: coupon.type === 2 && coupon.minAmount > 0
@@ -82,7 +80,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       });
     })
   }, {
-    c: $data.coupons.length === 0
+    b: $data.coupons.length === 0
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-31f84e9e"]]);

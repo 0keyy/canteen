@@ -1,7 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_integral = require("../../api/integral.js");
-const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   data() {
     return {
@@ -112,37 +111,35 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
-    a: common_assets._imports_0$10,
-    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "0a"),
-    c: common_assets._imports_1$2,
-    d: common_vendor.f($data.prizeList.slice(0, 3), (item, idx, i0) => {
+    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "0a"),
+    b: common_vendor.f($data.prizeList.slice(0, 3), (item, idx, i0) => {
       return {
         a: common_vendor.t(item.numText),
         b: common_vendor.t(item.descText),
         c: item.id || idx
       };
     }),
-    e: $data.activeIdx === 0 ? 1 : "",
-    f: common_vendor.f($data.prizeList.slice(3, 4), (item, idx, i0) => {
+    c: $data.activeIdx === 0 ? 1 : "",
+    d: common_vendor.f($data.prizeList.slice(3, 4), (item, idx, i0) => {
       return {
         a: common_vendor.t(item.numText),
         b: common_vendor.t(item.descText),
         c: item.id || idx
       };
     }),
-    g: $data.activeIdx === 3 ? 1 : "",
-    h: common_vendor.t($data.isRunning ? "抽奖中" : "抽"),
-    i: common_vendor.o((...args) => $options.handleDraw && $options.handleDraw(...args), "0e"),
-    j: $data.isRunning ? 1 : "",
-    k: common_vendor.f($data.prizeList.slice(4, 5), (item, idx, i0) => {
+    e: $data.activeIdx === 3 ? 1 : "",
+    f: common_vendor.t($data.isRunning ? "抽奖中" : "抽"),
+    g: common_vendor.o((...args) => $options.handleDraw && $options.handleDraw(...args), "0e"),
+    h: $data.isRunning ? 1 : "",
+    i: common_vendor.f($data.prizeList.slice(4, 5), (item, idx, i0) => {
       return {
         a: common_vendor.t(item.numText),
         b: common_vendor.t(item.descText),
         c: item.id || idx
       };
     }),
-    l: $data.activeIdx === 4 ? 1 : "",
-    m: common_vendor.f($data.prizeList.slice(5, 8), (item, idx, i0) => {
+    j: $data.activeIdx === 4 ? 1 : "",
+    k: common_vendor.f($data.prizeList.slice(5, 8), (item, idx, i0) => {
       return {
         a: common_vendor.t(item.numText),
         b: common_vendor.t(item.descText),

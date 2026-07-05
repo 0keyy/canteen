@@ -97,6 +97,16 @@
   color: #ededed;
   font-weight: 700;
 }
+.recharge-page__custom-input.data-v-c45a7485 {
+  width: 100%;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+.recharge-page__amount-item--custom.data-v-c45a7485 {
+  position: relative;
+}
 .recharge-page__bottom-space.data-v-c45a7485 {
   height: 40rpx;
 }

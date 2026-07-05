@@ -5,7 +5,6 @@ const utils_config = require("../../utils/config.js");
 const utils_image = require("../../utils/image.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
 const utils_navbar = require("../../utils/navbar.js");
-const common_assets = require("../../common/assets.js");
 const PageLoading = () => "../../components/page-loading/page-loading.js";
 const MenuCategorySidebar = () => "../../components/menu-category-sidebar/menu-category-sidebar.js";
 const _sfc_main = {
@@ -461,24 +460,23 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     d: $options.displayBanners.length > 1
   } : {}, {
     e: common_vendor.t($options.shopName),
-    f: common_assets._imports_0$2,
-    g: common_vendor.t($data.diningMode === 3 ? "外卖" : "堂食"),
-    h: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "e2"),
-    i: common_vendor.s($options.headerPaddingStyle),
-    j: common_vendor.p({
+    f: common_vendor.t($data.diningMode === 3 ? "外卖" : "堂食"),
+    g: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "e2"),
+    h: common_vendor.s($options.headerPaddingStyle),
+    i: common_vendor.p({
       visible: $data.pageLoading,
       tip: $data.pageLoadingTip
     }),
-    k: $data.loading
+    j: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    m: common_vendor.o($options.selectCategory, "5c"),
-    n: common_vendor.p({
+    l: common_vendor.o($options.selectCategory, "5c"),
+    m: common_vendor.p({
       menu: $data.menu,
       ["active-index"]: $data.activeIndex,
       ["cart-map"]: $data.cartMap
     }),
-    o: common_vendor.t($options.currentCategoryName),
-    p: common_vendor.f($options.currentFoods, (food, idx, i0) => {
+    n: common_vendor.t($options.currentCategoryName),
+    o: common_vendor.f($options.currentFoods, (food, idx, i0) => {
       return common_vendor.e({
         a: food.image,
         b: $options.foodTag(idx)
@@ -504,20 +502,19 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         n: food.id
       });
     }),
-    q: $data.cartBusy || !$data.cartReady ? 1 : "",
-    r: $options.currentFoods.length === 0
+    p: $data.cartBusy || !$data.cartReady ? 1 : "",
+    q: $options.currentFoods.length === 0
   }, $options.currentFoods.length === 0 ? {} : {}), {
-    l: $data.menu.length === 0,
-    s: common_assets._imports_0$1,
-    t: $options.cartItemCount > 0
+    k: $data.menu.length === 0,
+    r: $options.cartItemCount > 0
   }, $options.cartItemCount > 0 ? {
-    v: common_vendor.t($options.cartItemCount)
+    s: common_vendor.t($options.cartItemCount)
   } : {}, {
-    w: common_vendor.t($options.cartSummary),
-    x: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    y: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    z: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "0a"),
-    A: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    t: common_vendor.t($options.cartSummary),
+    v: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
+    w: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
+    x: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "0a"),
+    y: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),

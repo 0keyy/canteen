@@ -5,7 +5,6 @@ const utils_config = require("../../utils/config.js");
 const utils_image = require("../../utils/image.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
 const utils_navbar = require("../../utils/navbar.js");
-const common_assets = require("../../common/assets.js");
 const PageLoading = () => "../../components/page-loading/page-loading.js";
 const _sfc_main = {
   mixins: [mixins_tabbarPage.tabbarPageMixin],
@@ -211,12 +210,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: $options.displayBanners.length > 1,
     c: $options.displayBanners.length > 0,
     d: common_vendor.s($options.heroPaddingStyle),
-    e: common_assets._imports_0,
-    f: common_vendor.o(($event) => $options.selectMode(1), "6f"),
-    g: common_assets._imports_1,
-    h: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
-    i: common_vendor.o(($event) => $options.selectMode(3), "b9"),
-    j: common_vendor.f($data.shortcuts, (item, k0, i0) => {
+    e: common_vendor.o(($event) => $options.selectMode(1), "6f"),
+    f: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
+    g: common_vendor.o(($event) => $options.selectMode(3), "b9"),
+    h: common_vendor.f($data.shortcuts, (item, k0, i0) => {
       return {
         a: common_vendor.n(item.iconClass),
         b: common_vendor.t(item.name),
@@ -225,10 +222,10 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: common_vendor.o(($event) => $options.onShortcutTap(item), item.name)
       };
     }),
-    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "30"),
-    l: $options.homeRecommendDishes.length
+    i: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "30"),
+    j: $options.homeRecommendDishes.length
   }, $options.homeRecommendDishes.length ? {
-    m: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
+    k: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {
       return common_vendor.e({
         a: dish.image,
         b: dish.badge
@@ -244,13 +241,13 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       });
     })
   } : {}, {
-    n: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
+    l: !$data.recommendLoading && $options.homeRecommendDishes.length === 0
   }, !$data.recommendLoading && $options.homeRecommendDishes.length === 0 ? {} : {}, {
-    o: common_vendor.p({
+    m: common_vendor.p({
       visible: $data.pageLoading,
       tip: $data.pageLoadingTip
     }),
-    p: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    n: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),

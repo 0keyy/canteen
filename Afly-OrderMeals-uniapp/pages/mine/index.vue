@@ -48,7 +48,7 @@
         <view class="profile-page__card">
           <view class="profile-page__card-header">
             <text class="profile-page__card-title">我的订单</text>
-            <text class="profile-page__card-more" @tap="goOrderList">全部</text>
+            <text class="profile-page__card-more" @tap="goOrderList">全部{{ '>' }}</text>
           </view>
           <view class="profile-page__grid">
             <view
@@ -136,6 +136,50 @@
       </view>
     </view>
 
+    <!-- 充值中心面板 -->
+    <view class="profile-page__recharge-mask" v-if="showRechargePicker" @tap="showRechargePicker = false">
+      <view class="profile-page__recharge-picker" @tap.stop>
+        <view class="profile-page__recharge-header">
+          <text class="profile-page__recharge-title">充值中心</text>
+          <text class="profile-page__recharge-close" @tap="showRechargePicker = false">✕</text>
+        </view>
+        <view class="profile-page__recharge-balance">
+          <text class="profile-page__recharge-balance-label">我的余额</text>
+          <text class="profile-page__recharge-balance-value">¥{{ balance }}</text>
+        </view>
+        <view class="profile-page__recharge-grid">
+          <view
+            v-for="(item, index) in rechargeAmounts"
+            :key="index"
+            class="profile-page__recharge-item"
+            :class="{ 'profile-page__recharge-item--active': !rechargeIsCustom && rechargeSelected === item }"
+            @tap="selectRechargePreset(item)"
+          >
+            <text class="profile-page__recharge-amount-text">{{ item }}元</text>
+          </view>
+          <view
+            class="profile-page__recharge-item profile-page__recharge-item--custom"
+            :class="{ 'profile-page__recharge-item--active': rechargeIsCustom }"
+            @tap="selectRechargeCustom"
+          >
+            <input
+              v-if="rechargeIsCustom"
+              class="profile-page__recharge-custom-input"
+              type="digit"
+              v-model="rechargeCustomAmount"
+              placeholder="金额"
+              :focus="rechargeIsCustom"
+              @blur="onRechargeCustomBlur"
+            />
+            <text v-else class="profile-page__recharge-amount-text">自定义</text>
+          </view>
+        </view>
+        <view class="profile-page__recharge-btn" @tap="doRecharge">
+          <text class="profile-page__recharge-btn-text">充值</text>
+        </view>
+      </view>
+    </view>
+
     <view class="app-tab-bar">
       <view
         v-for="(item, index) in tabbarList"
@@ -163,7 +207,7 @@
 </template>
 
 <script>
-import { authApi, couponApi, serviceApi } from '../../api/index'
+import { authApi, couponApi, serviceApi, walletApi, payApi } from '../../api/index'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getNavMetrics } from '../../utils/navbar'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
@@ -204,7 +248,12 @@ export default {
       avatarKey: '',
       showAvatarPicker: false,
       showServicePicker: false,
-      servicePhones: [{ phone: '400-800-1234', name: '客服热线' }]
+      servicePhones: [{ phone: '400-800-1234', name: '客服热线' }],
+      showRechargePicker: false,
+      rechargeAmounts: [10, 20, 50, 100, 200, 500],
+      rechargeSelected: 10,
+      rechargeIsCustom: false,
+      rechargeCustomAmount: ''
     }
   },
   computed: {
@@ -257,8 +306,24 @@ export default {
       }
     },
     onActionTap(item) {
+      if (item.title === '待支付') {
+        uni.navigateTo({ url: '/pages/order/list?tab=1' })
+        return
+      }
+      if (item.title === '待发货') {
+        uni.navigateTo({ url: '/pages/order/list?tab=2' })
+        return
+      }
+      if (item.title === '待收货') {
+        uni.navigateTo({ url: '/pages/order/list?tab=3' })
+        return
+      }
+      if (item.title === '退款售后') {
+        uni.navigateTo({ url: '/pages/order/list?tab=4' })
+        return
+      }
       if (item.title === '我的订单') {
-        uni.switchTab({ url: '/pages/order/list' })
+        uni.navigateTo({ url: '/pages/order/list' })
         return
       }
       if (item.title === '地址管理') {
@@ -277,12 +342,16 @@ export default {
         uni.navigateTo({ url: '/pages/mine/company-auth' })
         return
       }
-      if (item.title === '优惠券包') {
+      if (item.title === '优惠券包' || item.title === '红包卡券') {
         uni.navigateTo({ url: '/pages/coupon/wallet' })
         return
       }
       if (item.title === '充值中心') {
         uni.navigateTo({ url: '/pages/coupon/recharge' })
+        return
+      }
+      if (item.title === '签到中心') {
+        uni.navigateTo({ url: '/pages/signin/index' })
         return
       }
       if (item.title === '积分商城') {
@@ -339,6 +408,64 @@ export default {
       this.avatarKey = key
       uni.setStorageSync('avatarKey', key)
       this.showAvatarPicker = false
+    },
+    selectRechargePreset(amount) {
+      this.rechargeIsCustom = false
+      this.rechargeSelected = amount
+    },
+    selectRechargeCustom() {
+      this.rechargeIsCustom = true
+    },
+    onRechargeCustomBlur() {
+      if (!this.rechargeCustomAmount || parseFloat(this.rechargeCustomAmount) <= 0) {
+        this.rechargeIsCustom = false
+        this.rechargeCustomAmount = ''
+      }
+    },
+    getRechargeAmount() {
+      if (this.rechargeIsCustom) {
+        const n = parseFloat(this.rechargeCustomAmount)
+        return (!isNaN(n) && n > 0) ? n : 0
+      }
+      return this.rechargeSelected
+    },
+    async doRecharge() {
+      const amount = this.getRechargeAmount()
+      if (!amount || amount <= 0) {
+        uni.showToast({ title: '请选择或输入充值金额', icon: 'none' })
+        return
+      }
+      try {
+        uni.showLoading({ title: '充值中...' })
+        const res = await walletApi.rechargeCreate(amount)
+        if (res && res.outTradeNo) {
+          const payInfo = await payApi.create({
+            outTradeNo: res.outTradeNo,
+            payChannel: 'balance',
+            payScene: 'mp'
+          })
+          if (payInfo.completed) {
+            uni.showToast({ title: '充值成功', icon: 'success' })
+            this.showRechargePicker = false
+            this.loadProfile()
+            return
+          }
+          if (payInfo.mockPay) {
+            await payApi.mockSuccess(payInfo.outTradeNo)
+            uni.showToast({ title: '充值成功', icon: 'success' })
+            this.showRechargePicker = false
+            this.loadProfile()
+            return
+          }
+          uni.showToast({ title: '充值成功', icon: 'success' })
+          this.showRechargePicker = false
+          this.loadProfile()
+        }
+      } catch (e) {
+        uni.showToast({ title: e.message || e || '充值失败', icon: 'none' })
+      } finally {
+        uni.hideLoading()
+      }
     },
     async logout() {
       try {
@@ -602,6 +729,138 @@ export default {
     padding: 20rpx 0 0;
     border-top: 1rpx solid #F0F0F0;
     margin-top: 12rpx;
+  }
+
+  /* 充值中心面板 */
+  &__recharge-mask {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  &__recharge-picker {
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 32rpx 32rpx 0 0;
+    padding: 32rpx;
+    box-sizing: border-box;
+    animation: slideUp 0.3s ease;
+  }
+
+  &__recharge-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32rpx;
+  }
+
+  &__recharge-title {
+    font-size: 32rpx;
+    font-weight: 700;
+    color: #333333;
+  }
+
+  &__recharge-close {
+    font-size: 32rpx;
+    color: #999999;
+    padding: 8rpx;
+  }
+
+  &__recharge-balance {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24rpx 0 32rpx;
+    border-bottom: 1rpx solid #F0F0F0;
+    margin-bottom: 32rpx;
+  }
+
+  &__recharge-balance-label {
+    font-size: 24rpx;
+    color: #999999;
+    margin-bottom: 8rpx;
+  }
+
+  &__recharge-balance-value {
+    font-size: 48rpx;
+    font-weight: 700;
+    color: #D00000;
+  }
+
+  &__recharge-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20rpx;
+  }
+
+  &__recharge-item {
+    width: calc((100% - 40rpx) / 3);
+    height: 100rpx;
+    border-radius: 12rpx;
+    background: #F5F5F5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2rpx solid transparent;
+    box-sizing: border-box;
+
+    &--active {
+      background: #D00000;
+      border-color: #D00000;
+    }
+
+    &--custom {
+      position: relative;
+    }
+  }
+
+  &__recharge-amount-text {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #666666;
+  }
+
+  &__recharge-item--active &__recharge-amount-text {
+    color: #FFFFFF;
+  }
+
+  &__recharge-custom-input {
+    width: 100%;
+    text-align: center;
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #FFFFFF;
+  }
+
+  &__recharge-btn {
+    margin-top: 40rpx;
+    height: 88rpx;
+    border-radius: 44rpx;
+    background: linear-gradient(135deg, #D00000 0%, #A01731 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:active {
+      opacity: 0.9;
+    }
+  }
+
+  &__recharge-btn-text {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #FFFFFF;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
   }
 
   &__user-info {
