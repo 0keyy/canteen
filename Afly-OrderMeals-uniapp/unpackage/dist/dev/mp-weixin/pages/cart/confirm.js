@@ -2,7 +2,6 @@
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const utils_pay_index = require("../../utils/pay/index.js");
-const common_assets = require("../../common/assets.js");
 const utils_pay_channels = require("../../utils/pay/channels.js");
 const PayMethodPicker = () => "../../components/pay-method-picker/pay-method-picker.js";
 const PageLoading = () => "../../components/page-loading/page-loading.js";
@@ -161,21 +160,20 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $data.order
   }, $data.order ? common_vendor.e({
-    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
-    c: common_assets._imports_0$3,
-    d: $data.diningMode === 3
+    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "fb"),
+    c: $data.diningMode === 3
   }, $data.diningMode === 3 ? common_vendor.e({
-    e: $options.addressInfo
+    d: $options.addressInfo
   }, $options.addressInfo ? {
-    f: common_vendor.t($options.addressInfo)
+    e: common_vendor.t($options.addressInfo)
   } : {}, {
-    g: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args))
+    f: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args), "49")
   }) : {}, {
-    h: $data.diningMode === 1
+    g: $data.diningMode === 1
   }, $data.diningMode === 1 ? {} : {}, {
-    i: $data.diningMode === 3
+    h: $data.diningMode === 3
   }, $data.diningMode === 3 ? {} : {}, {
-    j: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
+    i: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
       return {
         a: dish.image || "/static/placeholder.png",
         b: common_vendor.t(dish.dishName),
@@ -184,35 +182,35 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: dish.id
       };
     }),
-    k: common_vendor.t($options.totalAmount),
-    l: $data.couponDiscount > 0
+    j: common_vendor.t($options.totalAmount),
+    k: $data.couponDiscount > 0
   }, $data.couponDiscount > 0 ? {
-    m: common_vendor.t($data.couponDiscount.toFixed(2))
+    l: common_vendor.t($data.couponDiscount.toFixed(2))
   } : {}, {
-    n: common_vendor.t($options.finalAmount),
-    o: common_vendor.t($options.payChannelText),
-    p: common_vendor.o(($event) => $data.showPayPicker = true),
-    q: $data.remark,
-    r: common_vendor.o(($event) => $data.remark = $event.detail.value),
-    s: common_vendor.t($options.finalAmount),
-    t: common_vendor.t($data.loading ? "提交中..." : "去支付"),
-    v: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args)),
-    w: $data.loading ? 1 : "",
-    x: $data.showPayPicker
+    m: common_vendor.t($options.finalAmount),
+    n: common_vendor.t($options.payChannelText),
+    o: common_vendor.o(($event) => $data.showPayPicker = true, "65"),
+    p: $data.remark,
+    q: common_vendor.o(($event) => $data.remark = $event.detail.value, "76"),
+    r: common_vendor.t($options.finalAmount),
+    s: common_vendor.t($data.loading ? "提交中..." : "去支付"),
+    t: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "fa"),
+    v: $data.loading ? 1 : "",
+    w: $data.showPayPicker
   }, $data.showPayPicker ? {
-    y: common_vendor.o($options.onPayMethodChange),
-    z: common_vendor.o($options.onPayMethodsLoaded),
-    A: common_vendor.o(($event) => $data.payChannel = $event),
-    B: common_vendor.p({
+    x: common_vendor.o($options.onPayMethodChange, "a5"),
+    y: common_vendor.o($options.onPayMethodsLoaded, "32"),
+    z: common_vendor.o(($event) => $data.payChannel = $event, "72"),
+    A: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    C: common_vendor.o(($event) => $data.showPayPicker = false),
-    D: common_vendor.o(() => {
-    }),
-    E: common_vendor.o(($event) => $data.showPayPicker = false)
+    B: common_vendor.o(($event) => $data.showPayPicker = false, "63"),
+    C: common_vendor.o(() => {
+    }, "2d"),
+    D: common_vendor.o(($event) => $data.showPayPicker = false, "79")
   } : {}, {
-    F: common_vendor.p({
+    E: common_vendor.p({
       visible: $data.pageLoading,
       tip: $data.pageLoadingTip
     })

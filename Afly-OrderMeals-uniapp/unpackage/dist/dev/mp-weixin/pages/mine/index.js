@@ -4,7 +4,6 @@ const api_index = require("../../api/index.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
 const utils_navbar = require("../../utils/navbar.js");
 const utils_image = require("../../utils/image.js");
-const common_assets = require("../../common/assets.js");
 const PRIMARY_ACTIONS = [
   { title: "待支付", icon: "orders" },
   { title: "待发货", icon: "address" },
@@ -39,7 +38,12 @@ const _sfc_main = {
       avatarKey: "",
       showAvatarPicker: false,
       showServicePicker: false,
-      servicePhones: [{ phone: "400-800-1234", name: "客服热线" }]
+      servicePhones: [{ phone: "400-800-1234", name: "客服热线" }],
+      showRechargePicker: false,
+      rechargeAmounts: [10, 20, 50, 100, 200, 500],
+      rechargeSelected: 10,
+      rechargeIsCustom: false,
+      rechargeCustomAmount: ""
     };
   },
   computed: {
@@ -88,8 +92,24 @@ const _sfc_main = {
       }
     },
     onActionTap(item) {
+      if (item.title === "待支付") {
+        common_vendor.index.navigateTo({ url: "/pages/order/list?tab=1" });
+        return;
+      }
+      if (item.title === "待发货") {
+        common_vendor.index.navigateTo({ url: "/pages/order/list?tab=2" });
+        return;
+      }
+      if (item.title === "待收货") {
+        common_vendor.index.navigateTo({ url: "/pages/order/list?tab=3" });
+        return;
+      }
+      if (item.title === "退款售后") {
+        common_vendor.index.navigateTo({ url: "/pages/order/list?tab=4" });
+        return;
+      }
       if (item.title === "我的订单") {
-        common_vendor.index.switchTab({ url: "/pages/order/list" });
+        common_vendor.index.navigateTo({ url: "/pages/order/list" });
         return;
       }
       if (item.title === "地址管理") {
@@ -108,12 +128,16 @@ const _sfc_main = {
         common_vendor.index.navigateTo({ url: "/pages/mine/company-auth" });
         return;
       }
-      if (item.title === "优惠券包") {
+      if (item.title === "优惠券包" || item.title === "红包卡券") {
         common_vendor.index.navigateTo({ url: "/pages/coupon/wallet" });
         return;
       }
       if (item.title === "充值中心") {
         common_vendor.index.navigateTo({ url: "/pages/coupon/recharge" });
+        return;
+      }
+      if (item.title === "签到中心") {
+        common_vendor.index.navigateTo({ url: "/pages/signin/index" });
         return;
       }
       if (item.title === "积分商城") {
@@ -174,6 +198,64 @@ const _sfc_main = {
       common_vendor.index.setStorageSync("avatarKey", key);
       this.showAvatarPicker = false;
     },
+    selectRechargePreset(amount) {
+      this.rechargeIsCustom = false;
+      this.rechargeSelected = amount;
+    },
+    selectRechargeCustom() {
+      this.rechargeIsCustom = true;
+    },
+    onRechargeCustomBlur() {
+      if (!this.rechargeCustomAmount || parseFloat(this.rechargeCustomAmount) <= 0) {
+        this.rechargeIsCustom = false;
+        this.rechargeCustomAmount = "";
+      }
+    },
+    getRechargeAmount() {
+      if (this.rechargeIsCustom) {
+        const n = parseFloat(this.rechargeCustomAmount);
+        return !isNaN(n) && n > 0 ? n : 0;
+      }
+      return this.rechargeSelected;
+    },
+    async doRecharge() {
+      const amount = this.getRechargeAmount();
+      if (!amount || amount <= 0) {
+        common_vendor.index.showToast({ title: "请选择或输入充值金额", icon: "none" });
+        return;
+      }
+      try {
+        common_vendor.index.showLoading({ title: "充值中..." });
+        const res = await api_index.walletApi.rechargeCreate(amount);
+        if (res && res.outTradeNo) {
+          const payInfo = await api_index.payApi.create({
+            outTradeNo: res.outTradeNo,
+            payChannel: "balance",
+            payScene: "mp"
+          });
+          if (payInfo.completed) {
+            common_vendor.index.showToast({ title: "充值成功", icon: "success" });
+            this.showRechargePicker = false;
+            this.loadProfile();
+            return;
+          }
+          if (payInfo.mockPay) {
+            await api_index.payApi.mockSuccess(payInfo.outTradeNo);
+            common_vendor.index.showToast({ title: "充值成功", icon: "success" });
+            this.showRechargePicker = false;
+            this.loadProfile();
+            return;
+          }
+          common_vendor.index.showToast({ title: "充值成功", icon: "success" });
+          this.showRechargePicker = false;
+          this.loadProfile();
+        }
+      } catch (e) {
+        common_vendor.index.showToast({ title: e.message || e || "充值失败", icon: "none" });
+      } finally {
+        common_vendor.index.hideLoading();
+      }
+    },
     async logout() {
       try {
         await api_index.authApi.logout();
@@ -188,23 +270,23 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $data.staticImgPrefix + "/白logo.png",
     b: $options.avatarSrc,
-    c: common_vendor.o(($event) => $data.showAvatarPicker = true),
+    c: common_vendor.o(($event) => $data.showAvatarPicker = true, "65"),
     d: common_vendor.t($data.nickname || "未登录用户"),
     e: $data.companyVerified
   }, $data.companyVerified ? {} : {}, {
-    f: common_vendor.o((...args) => $options.goProfile && $options.goProfile(...args)),
+    f: common_vendor.o((...args) => $options.goProfile && $options.goProfile(...args), "0c"),
     g: common_vendor.t($data.mobile || "请登录后查看"),
     h: $data.companyVerified && $data.companyDeptName
   }, $data.companyVerified && $data.companyDeptName ? {
     i: common_vendor.t($data.companyDeptName)
   } : {}, {
-    j: common_assets._imports_0$5,
-    k: common_vendor.o((...args) => $options.goMemberCode && $options.goMemberCode(...args)),
-    l: common_vendor.t($data.balance),
-    m: common_vendor.t($data.pointCount),
-    n: common_vendor.t($data.couponCount),
-    o: common_vendor.s($options.heroPaddingStyle),
-    p: common_vendor.o((...args) => $options.goOrderList && $options.goOrderList(...args)),
+    j: common_vendor.o((...args) => $options.goMemberCode && $options.goMemberCode(...args), "70"),
+    k: common_vendor.t($data.balance),
+    l: common_vendor.t($data.pointCount),
+    m: common_vendor.t($data.couponCount),
+    n: common_vendor.s($options.heroPaddingStyle),
+    o: common_vendor.t(">"),
+    p: common_vendor.o((...args) => $options.goOrderList && $options.goOrderList(...args), "a4"),
     q: common_vendor.f($data.primaryActions, (item, k0, i0) => {
       return {
         a: common_vendor.n(`profile-page__action-icon--${item.icon}`),
@@ -230,14 +312,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.showAvatarPicker ? {
     t: $data.staticImgPrefix + "/1.png",
     v: $data.avatarKey === "1" ? 1 : "",
-    w: common_vendor.o(($event) => $options.selectAvatar("1")),
+    w: common_vendor.o(($event) => $options.selectAvatar("1"), "8a"),
     x: $data.staticImgPrefix + "/2.png",
     y: $data.avatarKey === "2" ? 1 : "",
-    z: common_vendor.o(($event) => $options.selectAvatar("2")),
-    A: common_vendor.o(($event) => $data.showAvatarPicker = false),
+    z: common_vendor.o(($event) => $options.selectAvatar("2"), "ba"),
+    A: common_vendor.o(($event) => $data.showAvatarPicker = false, "f7"),
     B: common_vendor.o(() => {
-    }),
-    C: common_vendor.o(($event) => $data.showAvatarPicker = false)
+    }, "3a"),
+    C: common_vendor.o(($event) => $data.showAvatarPicker = false, "27")
   } : {}, {
     D: $data.showServicePicker
   }, $data.showServicePicker ? {
@@ -249,12 +331,38 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.makeCall(item.phone), index)
       };
     }),
-    F: common_vendor.o(($event) => $data.showServicePicker = false),
+    F: common_vendor.o(($event) => $data.showServicePicker = false, "d7"),
     G: common_vendor.o(() => {
-    }),
-    H: common_vendor.o(($event) => $data.showServicePicker = false)
+    }, "b8"),
+    H: common_vendor.o(($event) => $data.showServicePicker = false, "a9")
   } : {}, {
-    I: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    I: $data.showRechargePicker
+  }, $data.showRechargePicker ? common_vendor.e({
+    J: common_vendor.o(($event) => $data.showRechargePicker = false, "49"),
+    K: common_vendor.t($data.balance),
+    L: common_vendor.f($data.rechargeAmounts, (item, index, i0) => {
+      return {
+        a: common_vendor.t(item),
+        b: index,
+        c: !$data.rechargeIsCustom && $data.rechargeSelected === item ? 1 : "",
+        d: common_vendor.o(($event) => $options.selectRechargePreset(item), index)
+      };
+    }),
+    M: $data.rechargeIsCustom
+  }, $data.rechargeIsCustom ? {
+    N: $data.rechargeIsCustom,
+    O: common_vendor.o((...args) => $options.onRechargeCustomBlur && $options.onRechargeCustomBlur(...args), "e8"),
+    P: $data.rechargeCustomAmount,
+    Q: common_vendor.o(($event) => $data.rechargeCustomAmount = $event.detail.value, "73")
+  } : {}, {
+    R: $data.rechargeIsCustom ? 1 : "",
+    S: common_vendor.o((...args) => $options.selectRechargeCustom && $options.selectRechargeCustom(...args), "02"),
+    T: common_vendor.o((...args) => $options.doRecharge && $options.doRecharge(...args), "91"),
+    U: common_vendor.o(() => {
+    }, "d4"),
+    V: common_vendor.o(($event) => $data.showRechargePicker = false, "78")
+  }) : {}, {
+    W: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),

@@ -96,7 +96,7 @@ const _sfc_main = {
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
     a: $data.loading,
-    b: common_vendor.o((...args) => $options.handleWxLogin && $options.handleWxLogin(...args))
+    b: common_vendor.o((...args) => $options.handleWxLogin && $options.handleWxLogin(...args), "19")
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-d08ef7d4"]]);

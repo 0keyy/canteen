@@ -20,10 +20,27 @@
             v-for="(item, index) in amountOptions"
             :key="index"
             class="recharge-page__amount-item"
-            :class="{ 'recharge-page__amount-item--active': selectedAmount === item }"
-            @tap="selectedAmount = item"
+            :class="{ 'recharge-page__amount-item--active': !isCustom && selectedAmount === item }"
+            @tap="selectPreset(item)"
           >
             <text class="recharge-page__amount-text">{{ item }}元</text>
+          </view>
+          <!-- 自定义金额 -->
+          <view
+            class="recharge-page__amount-item recharge-page__amount-item--custom"
+            :class="{ 'recharge-page__amount-item--active': isCustom }"
+            @tap="selectCustom"
+          >
+            <input
+              v-if="isCustom"
+              class="recharge-page__custom-input"
+              type="digit"
+              v-model="customAmount"
+              placeholder="金额"
+              :focus="isCustom"
+              @blur="onCustomBlur"
+            />
+            <text v-else class="recharge-page__amount-text">自定义</text>
           </view>
         </view>
       </view>
@@ -59,12 +76,21 @@ export default {
     return {
       balance: 0,
       selectedAmount: 10,
-      amountOptions: [10, 20, 50, 100, 200, 500]
+      amountOptions: [10, 20, 50, 100, 200, 500],
+      isCustom: false,
+      customAmount: ''
     }
   },
   computed: {
     formatBalance() {
       return Number(this.balance || 0).toFixed(2)
+    },
+    finalAmount() {
+      if (this.isCustom) {
+        const n = parseFloat(this.customAmount)
+        return (!isNaN(n) && n > 0) ? n : 0
+      }
+      return this.selectedAmount
     }
   },
   onLoad() {
@@ -84,13 +110,27 @@ export default {
         this.balance = 0
       }
     },
+    selectPreset(amount) {
+      this.isCustom = false
+      this.selectedAmount = amount
+    },
+    selectCustom() {
+      this.isCustom = true
+    },
+    onCustomBlur() {
+      if (!this.customAmount || parseFloat(this.customAmount) <= 0) {
+        this.isCustom = false
+        this.customAmount = ''
+      }
+    },
     async onRecharge() {
-      if (!this.selectedAmount) {
-        uni.showToast({ title: '请选择充值金额', icon: 'none' })
+      const amount = this.finalAmount
+      if (!amount || amount <= 0) {
+        uni.showToast({ title: '请选择或输入充值金额', icon: 'none' })
         return
       }
       try {
-        const res = await walletApi.rechargeCreate(this.selectedAmount)
+        const res = await walletApi.rechargeCreate(amount)
         if (res && res.outTradeNo) {
           const payInfo = await payApi.create({
             outTradeNo: res.outTradeNo,
@@ -228,6 +268,18 @@ export default {
     font-size: 28rpx;
     color: #ededed;
     font-weight: 700;
+  }
+
+  &__custom-input {
+    width: 100%;
+    text-align: center;
+    font-size: 28rpx;
+    font-weight: 700;
+    color: #FFFFFF;
+  }
+
+  &__amount-item--custom {
+    position: relative;
   }
 
   &__bottom-space {

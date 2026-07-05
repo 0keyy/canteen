@@ -28,7 +28,7 @@ const orderApi = {
   dishDel: (id) => utils_request.post("/front/order/cart/dishDel", null, { id }),
   toEmpty: (orderId) => utils_request.post("/front/order/cart/toEmpty", null, { orderId }),
   submit: (data) => utils_request.post("/front/order/submit", data),
-  list: () => utils_request.get("/front/order/list"),
+  list: (status, page = 1, pageSize = 20) => utils_request.get("/front/order/list", { status, page, pageSize }),
   detail: (orderId) => utils_request.get("/front/order/detail", { orderId }),
   cancel: (orderId, reason) => utils_request.post("/front/order/cancel", null, { orderId, reason })
 };
@@ -72,6 +72,11 @@ const integralApi = {
   categoryList: () => utils_request.get("/front/integral/category/list"),
   goodsList: (categoryId, page = 1, pageSize = 20) => utils_request.get("/front/integral/goods/list", { categoryId, page, pageSize })
 };
+const signinApi = {
+  status: () => utils_request.get("/front/signin/status"),
+  sign: () => utils_request.post("/front/signin/sign"),
+  rewards: () => utils_request.get("/front/signin/rewards")
+};
 exports.addressApi = addressApi;
 exports.authApi = authApi;
 exports.companyApi = companyApi;
@@ -82,5 +87,6 @@ exports.memberApi = memberApi;
 exports.orderApi = orderApi;
 exports.payApi = payApi;
 exports.serviceApi = serviceApi;
+exports.signinApi = signinApi;
 exports.walletApi = walletApi;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/api/index.js.map

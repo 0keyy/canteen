@@ -6,12 +6,14 @@ const _sfc_main = {
     return {
       form: {
         id: null,
-        contactName: "",
-        contactMobile: "",
+        companyName: "",
+        address: "",
         province: "",
         city: "",
         district: "",
         detail: "",
+        contactName: "",
+        contactMobile: "",
         isDefault: 0
       },
       gender: ""
@@ -45,6 +47,9 @@ const _sfc_main = {
     onDefaultChange(e) {
       this.form.isDefault = e.detail.value ? 1 : 0;
     },
+    selectAddress() {
+      common_vendor.index.showToast({ title: "地址选择功能开发中", icon: "none" });
+    },
     buildContactName() {
       if (this.form.contactName && this.gender) {
         return this.form.contactName + this.gender;
@@ -62,26 +67,23 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
-    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
-    b: $data.form.contactName,
-    c: common_vendor.o(($event) => $data.form.contactName = $event.detail.value),
-    d: $data.gender === "先生" ? 1 : "",
-    e: common_vendor.o(($event) => $options.selectGender("先生")),
-    f: $data.gender === "女士" ? 1 : "",
-    g: common_vendor.o(($event) => $options.selectGender("女士")),
-    h: $data.form.contactMobile,
-    i: common_vendor.o(($event) => $data.form.contactMobile = $event.detail.value),
-    j: $data.form.province,
-    k: common_vendor.o(($event) => $data.form.province = $event.detail.value),
-    l: $data.form.city,
-    m: common_vendor.o(($event) => $data.form.city = $event.detail.value),
-    n: $data.form.district,
-    o: common_vendor.o(($event) => $data.form.district = $event.detail.value),
-    p: $data.form.detail,
-    q: common_vendor.o(($event) => $data.form.detail = $event.detail.value),
-    r: $data.form.isDefault === 1,
-    s: common_vendor.o((...args) => $options.onDefaultChange && $options.onDefaultChange(...args)),
-    t: common_vendor.o((...args) => $options.save && $options.save(...args))
+    a: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "d0"),
+    b: common_vendor.t($data.form.companyName || "请选择地址"),
+    c: common_vendor.t($data.form.address || "请选择详细地址"),
+    d: common_vendor.o((...args) => $options.selectAddress && $options.selectAddress(...args), "f5"),
+    e: $data.form.detail,
+    f: common_vendor.o(($event) => $data.form.detail = $event.detail.value, "b4"),
+    g: $data.form.contactName,
+    h: common_vendor.o(($event) => $data.form.contactName = $event.detail.value, "ff"),
+    i: $data.gender === "先生" ? 1 : "",
+    j: common_vendor.o(($event) => $options.selectGender("先生"), "bc"),
+    k: $data.gender === "女士" ? 1 : "",
+    l: common_vendor.o(($event) => $options.selectGender("女士"), "c0"),
+    m: $data.form.contactMobile,
+    n: common_vendor.o(($event) => $data.form.contactMobile = $event.detail.value, "d7"),
+    o: $data.form.isDefault === 1,
+    p: common_vendor.o((...args) => $options.onDefaultChange && $options.onDefaultChange(...args), "b2"),
+    q: common_vendor.o((...args) => $options.save && $options.save(...args), "8c")
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-dcb1f0d8"]]);

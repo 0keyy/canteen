@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   props: {
     menu: {
@@ -35,18 +34,16 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         a: $props.activeIndex === index
       }, $props.activeIndex === index ? {} : {}, {
         b: index === 0
-      }, index === 0 ? {
-        c: common_assets._imports_0$11
-      } : {}, {
-        d: common_vendor.t(index === 0 ? "猜你喜欢" : cate.name),
-        e: common_vendor.n($props.activeIndex === index ? "sidebar__name--active" : ""),
-        f: $options.badgeCount(index) > 0
+      }, index === 0 ? {} : {}, {
+        c: common_vendor.t(index === 0 ? "猜你喜欢" : cate.name),
+        d: common_vendor.n($props.activeIndex === index ? "sidebar__name--active" : ""),
+        e: $options.badgeCount(index) > 0
       }, $options.badgeCount(index) > 0 ? {
-        g: common_vendor.t($options.badgeCount(index))
+        f: common_vendor.t($options.badgeCount(index))
       } : {}, {
-        h: cate.id || cate.name || index,
-        i: common_vendor.n($props.activeIndex === index ? "sidebar__item--active" : ""),
-        j: common_vendor.o(($event) => _ctx.$emit("select", index), cate.id || cate.name || index)
+        g: cate.id || cate.name || index,
+        h: common_vendor.n($props.activeIndex === index ? "sidebar__item--active" : ""),
+        i: common_vendor.o(($event) => _ctx.$emit("select", index), cate.id || cate.name || index)
       });
     })
   };

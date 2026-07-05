@@ -1,19 +1,34 @@
 <template>
   <view class="edit-page">
-    <!-- 自定义导航栏 -->
     <view class="edit-page__header">
-      <view class="edit-page__nav">
-        <view class="edit-page__back-btn" @click="goBack">
+        <view class="edit-page__back-btn" @tap="goBack">
           <text class="edit-page__back-icon">‹</text>
         </view>
         <text class="edit-page__title">编辑地址</text>
-        <view class="edit-page__nav-empty"></view>
+        <view class="edit-page__header-right"></view>
       </view>
-    </view>
+      <view class="edit-page__content" scroll-y :show-scrollbar="false">
+      <view class="edit-page__address-card" @tap="selectAddress">
+        <view class="edit-page__address-main">
+          <text class="edit-page__address-name">{{ form.companyName || '请选择地址' }}</text>
+          <text class="edit-page__address-detail">{{ form.address || '请选择详细地址' }}</text>
+        </view>
+        <text class="edit-page__address-change">更换地址</text>
+      </view>
 
-    <scroll-view class="edit-page__content" scroll-y :show-scrollbar="false">
-      <!-- 表单区域 -->
       <view class="edit-page__section">
+        <view class="edit-page__form-item">
+          <text class="edit-page__label">详细地址</text>
+          <view class="edit-page__input-wrap">
+            <input 
+              v-model="form.detail" 
+              class="edit-page__input" 
+              placeholder="例：1幢101" 
+              placeholder-class="edit-page__placeholder"
+            />
+          </view>
+        </view>
+
         <view class="edit-page__form-item">
           <text class="edit-page__label">联系人</text>
           <view class="edit-page__contact-row">
@@ -23,20 +38,22 @@
               placeholder="请填写" 
               placeholder-class="edit-page__placeholder"
             />
-            <view class="edit-page__gender-selector">
+            <view class="edit-page__gender-radio">
               <view 
-                class="edit-page__gender-option" 
-                :class="{ 'edit-page__gender-option--active': gender === '先生' }"
-                @click="selectGender('先生')"
+                class="edit-page__radio-option" 
+                :class="{ 'edit-page__radio-option--active': gender === '先生' }"
+                @tap="selectGender('先生')"
               >
-                <text class="edit-page__gender-text">先生</text>
+                <view class="edit-page__radio-dot"></view>
+                <text class="edit-page__radio-text">先生</text>
               </view>
               <view 
-                class="edit-page__gender-option" 
-                :class="{ 'edit-page__gender-option--active': gender === '女士' }"
-                @click="selectGender('女士')"
+                class="edit-page__radio-option" 
+                :class="{ 'edit-page__radio-option--active': gender === '女士' }"
+                @tap="selectGender('女士')"
               >
-                <text class="edit-page__gender-text">女士</text>
+                <view class="edit-page__radio-dot"></view>
+                <text class="edit-page__radio-text">女士</text>
               </view>
             </view>
           </view>
@@ -55,65 +72,23 @@
         </view>
 
         <view class="edit-page__form-item">
-          <text class="edit-page__label">省份</text>
-          <input 
-            v-model="form.province" 
-            class="edit-page__input" 
-            placeholder="请填写" 
-            placeholder-class="edit-page__placeholder"
-          />
-        </view>
-
-        <view class="edit-page__form-item">
-          <text class="edit-page__label">城市</text>
-          <input 
-            v-model="form.city" 
-            class="edit-page__input" 
-            placeholder="请填写" 
-            placeholder-class="edit-page__placeholder"
-          />
-        </view>
-
-        <view class="edit-page__form-item">
-          <text class="edit-page__label">区县</text>
-          <input 
-            v-model="form.district" 
-            class="edit-page__input" 
-            placeholder="请填写" 
-            placeholder-class="edit-page__placeholder"
-          />
-        </view>
-
-        <view class="edit-page__form-item">
-          <text class="edit-page__label">详细地址</text>
-          <input 
-            v-model="form.detail" 
-            class="edit-page__input" 
-            placeholder="请填写" 
-            placeholder-class="edit-page__placeholder"
-          />
-        </view>
-
-        <view class="edit-page__form-item">
-          <text class="edit-page__label">设为默认地址</text>
+          <text class="edit-page__label">设置为默认</text>
           <switch 
             :checked="form.isDefault === 1" 
-            color="#C41E3A" 
+            color="#D00000" 
             @change="onDefaultChange" 
           />
         </view>
       </view>
 
       <view class="edit-page__bottom-space"></view>
-    </scroll-view>
+    </view>
 
-    <!-- 底部保存按钮 -->
     <view class="edit-page__footer safe-area-bottom">
-      <view class="edit-page__save-btn" @click="save">
+      <view class="edit-page__save-btn" @tap="save">
         <text class="edit-page__save-text">保存</text>
       </view>
     </view>
-
   </view>
 </template>
 
@@ -125,12 +100,14 @@ export default {
     return {
       form: {
         id: null,
-        contactName: '',
-        contactMobile: '',
+        companyName: '',
+        address: '',
         province: '',
         city: '',
         district: '',
         detail: '',
+        contactName: '',
+        contactMobile: '',
         isDefault: 0
       },
       gender: ''
@@ -140,7 +117,6 @@ export default {
     if (options.id) {
       const detail = await addressApi.detail(Number(options.id))
       this.form = { ...detail }
-      // 从联系人姓名中尝试提取性别称呼
       this.extractGender()
     }
   },
@@ -165,6 +141,9 @@ export default {
     onDefaultChange(e) {
       this.form.isDefault = e.detail.value ? 1 : 0
     },
+    selectAddress() {
+      uni.showToast({ title: '地址选择功能开发中', icon: 'none' })
+    },
     buildContactName() {
       if (this.form.contactName && this.gender) {
         return this.form.contactName + this.gender
@@ -185,22 +164,17 @@ export default {
 <style lang="scss" scoped>
 .edit-page {
   min-height: 100vh;
-  background: #FFF9F7;
+  background: #FFFFFF;
   display: flex;
   flex-direction: column;
 
   &__header {
-    background: linear-gradient(135deg, #FFE4E1 0%, #FFF5F5 100%);
-    flex-shrink: 0;
-    padding-top: var(--status-bar-height, 44rpx);
-  }
-
-  &__nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 88rpx;
-    padding: 0 24rpx;
+	margin-top: 38rpx;
+    padding: 60rpx 32rpx 24rpx;
+    background: #FFFFFF;
   }
 
   &__back-btn {
@@ -212,36 +186,77 @@ export default {
   }
 
   &__back-icon {
-    font-size: 48rpx;
+    font-size: 80rpx;
     color: #333333;
     font-weight: 300;
     line-height: 1;
   }
 
   &__title {
-    font-size: 32rpx;
+    font-size: 34rpx;
     font-weight: 600;
     color: #333333;
   }
 
-  &__nav-empty {
+  &__header-right {
     width: 64rpx;
   }
 
   &__content {
     flex: 1;
-    padding: 24rpx 0;
+    padding: 0 24rpx;
+  }
+
+  &__address-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28rpx;
+    background: #FFFFFF;
+    border: 1rpx solid #E8E8E8;
+    border-radius: 16rpx;
+    margin-bottom: 24rpx;
+    margin-top: 32rpx;
+	border: 2px solid #b6b5b5;
+  }
+
+  &__address-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__address-name {
+    display: block;
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 8rpx;
+  }
+
+  &__address-detail {
+    display: block;
+    font-size: 24rpx;
+    color: #999999;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__address-change {
+    font-size: 26rpx;
+    color: #a01e1e;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-left: 16rpx;
   }
 
   &__section {
     background: #FFFFFF;
-    margin: 16rpx 24rpx;
-    border-radius: 24rpx;
+    border-radius: 16rpx;
+    border: 1rpx solid #F0F0F0;
     padding: 0;
-    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
   }
 
-  // 表单项
   &__form-item {
     display: flex;
     align-items: center;
@@ -259,18 +274,24 @@ export default {
     color: #333333;
     font-weight: 500;
     flex-shrink: 0;
+    width: 140rpx;
+  }
+
+  &__input-wrap {
+    flex: 1;
+    text-align: left;
   }
 
   &__input {
     flex: 1;
-    text-align: right;
+    text-align: left;
     font-size: 28rpx;
     color: #333333;
-    margin-left: 16rpx;
 
     &--name {
       flex: none;
-      width: 200rpx;
+      width: 300rpx;
+      text-align: left;
     }
   }
 
@@ -283,49 +304,65 @@ export default {
     align-items: center;
     justify-content: flex-end;
     flex: 1;
-  }
-
-  &__gender-selector {
-    display: flex;
     gap: 16rpx;
-    margin-left: 16rpx;
   }
 
-  &__gender-option {
-    padding: 8rpx 20rpx;
-    border: 1rpx solid #E8E8E8;
-    border-radius: 999rpx;
-    transition: all 0.2s;
+  &__gender-radio {
+    display: flex;
+    align-items: center;
+    gap: 24rpx;
   }
 
-  &__gender-option--active {
-    border-color: #C41E3A;
-    background: #FFF5F5;
+  &__radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
   }
 
-  &__gender-text {
-    font-size: 24rpx;
-    color: #666666;
+  &__radio-dot {
+    width: 28rpx;
+    height: 28rpx;
+    border: 2rpx solid #CCCCCC;
+    border-radius: 50%;
+    position: relative;
+  }
 
-    .edit-page__gender-option--active & {
-      color: #C41E3A;
+  &__radio-option--active &__radio-dot {
+    border-color: #a01e1e;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 14rpx;
+      height: 14rpx;
+      background:#a01e1e;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 
-  // 底部区域
+  &__radio-text {
+    font-size: 26rpx;
+    color: #666666;
+  }
+
+  &__radio-option--active &__radio-text {
+    color: #333333;
+  }
+
   &__footer {
-    background: #FFFFFF;
-    padding: 24rpx 24rpx;
-    box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
+    padding: 24rpx;
     flex-shrink: 0;
   }
 
   &__save-btn {
-    background:#a01e1e;
-    border-radius: 999rpx;
-    padding: 28rpx;
+    background: #a01e1e;
+    border-radius: 8rpx;
+    padding: 26rpx;
     text-align: center;
-    box-shadow: 0 8rpx 24rpx rgba(196, 30, 58, 0.3);
+	margin-bottom: 48rpx;
 
     &:active {
       opacity: 0.9;
@@ -335,7 +372,7 @@ export default {
   &__save-text {
     color: #FFFFFF;
     font-size: 32rpx;
-    font-weight: 700;
+    font-weight: 600;
   }
 
   &__bottom-space {
