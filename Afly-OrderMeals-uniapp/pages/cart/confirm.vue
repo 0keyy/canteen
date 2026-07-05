@@ -52,10 +52,10 @@
         <view class="checkout__items">
           <view v-for="dish in order.dishes" :key="dish.id" class="checkout__item">
             <view class="checkout__item-left">
-              <image class="checkout__item-img" :src="dish.image || staticImgPrefix + '/placeholder.png'" mode="aspectFill" />
+              <img class="checkout__item-img" :src="dish.dishImage ? dish.dishImage.replace(/^http:/, 'https:') : staticImgPrefix + '/placeholder.png'" mode="aspectFill" />
               <view class="checkout__item-info">
                 <text class="checkout__item-name">{{ dish.dishName }}</text>
-                <text class="checkout__item-qty">1份</text>
+                <text class="checkout__item-qty">{{ dish.quantity }}份</text>
               </view>
             </view>
             <view class="checkout__item-right">

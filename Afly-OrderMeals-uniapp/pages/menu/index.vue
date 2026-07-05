@@ -25,7 +25,7 @@
           <text class="order-page__store-time">营业时间：6:00_22:00</text>
         </view>
         <view class="order-page__mode-board" @tap="toggleMode">
-          <image class="order-page__mode-board-bg" :src="staticImgPrefix + '/tabbar/矢量 38.png'" mode="aspectFit" />?
+          <image class="order-page__mode-board-bg" src="/static/tabbar/矢量 38.png" mode="aspectFit" />
           <text class="order-page__mode-board-text">{{ diningMode === 3 ? '外卖' : '堂食' }}</text>
         </view>
       </view>
@@ -36,15 +36,33 @@
     <view v-else-if="menu.length === 0" class="order-page__empty">暂无菜品，请先在后台添加菜品分类和菜品</view>
     <view v-else class="order-page__main">
       <view class="order-page__sidebar-wrap">
-        <menu-category-sidebar
-          :menu="menu"
-          :active-index="activeIndex"
-          :cart-map="cartMap"
-          @select="selectCategory"
-        />
+        <!-- 侧边独立滚动，与菜品区完全隔离 -->
+        <scroll-view 
+          scroll-y 
+          class="sidebar-scroll" 
+          :show-scrollbar="false"
+          scroll-with-animation
+          enhanced
+        >
+          <menu-category-sidebar
+            :menu="menu"
+            :active-index="activeIndex"
+            :cart-map="cartMap"
+            @select="selectCategory"
+          />
+          <!-- 底部留白避开购物车+底部tab遮挡 -->
+          <view class="sidebar-bottom-space"></view>
+        </scroll-view>
       </view>
 
-      <scroll-view scroll-y class="order-page__dishes" :show-scrollbar="false">
+      <!-- 菜品区独立滚动，内容少时原生自动禁止滑动 -->
+      <scroll-view 
+        scroll-y 
+        class="order-page__dishes" 
+        :show-scrollbar="false"
+        scroll-with-animation
+        enhanced
+      >
         <text class="order-page__section-title">{{ currentCategoryName }}</text>
         <view class="order-page__dish-list">
           <view v-for="(food, idx) in currentFoods" :key="food.id" class="menu-card">
@@ -92,7 +110,7 @@
       @tap="goConfirm"
     >
       <view class="cart-bar__bag">
-        <image class="cart-bar__person" :src="staticImgPrefix + '/新版小唐.png'" mode="aspectFit" />
+        <image class="cart-bar__person" src="/static/新版小唐.png" mode="aspectFit" />
         <view class="cart-bar__badge" v-if="cartItemCount > 0">
           <text class="cart-bar__badge-text">{{ cartItemCount }}</text>
         </view>
@@ -135,7 +153,7 @@
 <script>
 import { orderApi, decorateApi } from '../../api/index'
 import { DEFAULT_SHOP_ID } from '../../utils/config'
-import { resolveImageUrl, STATIC_IMAGE_PREFIX } from '../../utils/image'
+import { resolveImageUrl } from '../../utils/image'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getMenuButtonMarginRight, getNavMetrics } from '../../utils/navbar'
 import PageLoading from '../../components/page-loading/page-loading.vue'
@@ -161,8 +179,7 @@ export default {
       cartReady: false,
       cartBusy: false,
       cartInitPromise: null,
-      banners: [],
-      staticImgPrefix: STATIC_IMAGE_PREFIX
+      banners: []
     }
   },
   computed: {
@@ -187,7 +204,7 @@ export default {
     },
     displayBanners() {
       if (this.banners.length) return this.banners
-      return [{ image: STATIC_IMAGE_PREFIX + '/首页广告.png' }]
+      return [{ image: '/static/首页广告.png' }]
     },
     totalPrice() {
       let total = 0
@@ -557,6 +574,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/* 核心修复：禁止页面全局滚动，解决左右联动滑动 */
+page {
+  height: 100%;
+  overflow: hidden;
+}
 .order-page {
   display: flex;
   flex-direction: column;
@@ -733,14 +755,20 @@ export default {
     flex: 1;
     display: flex;
     align-items: stretch;
-    overflow: hidden;
+    overflow: hidden; /* 锁住主区域，内部滚动互不干扰 */
     min-height: 0;
   }
 
   &__sidebar-wrap {
     width: 172rpx;
     flex-shrink: 0;
-    overflow: hidden;
+    background: #f7f7f7;
+    .sidebar-scroll {
+      height: 100%;
+    }
+  }
+  .sidebar-bottom-space {
+    height: calc(140rpx + #{$tabbar-height});
   }
 
   &__dishes {

@@ -1,8 +1,0 @@
-{
-  "navigationStyle": "custom",
-  "transparentTitle": "always",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "page-loading": "../../components/page-loading/page-loading"
-  }
-}

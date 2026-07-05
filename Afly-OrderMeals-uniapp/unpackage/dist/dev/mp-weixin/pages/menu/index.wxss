@@ -12,6 +12,11 @@
 /* ===== 动画 ===== */
 /* 底部自定义 Tab 栏占位高度 */
 /* ===== 兼容旧变量 ===== */
+/* 核心修复：禁止页面全局滚动，解决左右联动滑动 */
+page.data-v-1f245baa {
+  height: 100%;
+  overflow: hidden;
+}
 .order-page.data-v-1f245baa {
   display: flex;
   flex-direction: column;
@@ -168,12 +173,19 @@
   display: flex;
   align-items: stretch;
   overflow: hidden;
+  /* 锁住主区域，内部滚动互不干扰 */
   min-height: 0;
 }
 .order-page__sidebar-wrap.data-v-1f245baa {
   width: 172rpx;
   flex-shrink: 0;
-  overflow: hidden;
+  background: #f7f7f7;
+}
+.order-page__sidebar-wrap .sidebar-scroll.data-v-1f245baa {
+  height: 100%;
+}
+.order-page .sidebar-bottom-space.data-v-1f245baa {
+  height: calc(140rpx + calc(108rpx + env(safe-area-inset-bottom)));
 }
 .order-page__dishes.data-v-1f245baa {
   flex: 1;

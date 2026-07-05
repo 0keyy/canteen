@@ -44,7 +44,7 @@
         <view class="detail-page__items">
           <view v-for="dish in order.dishes" :key="dish.id" class="detail-page__item">
             <view class="detail-page__item-left">
-              <image class="detail-page__item-img" :src="dish.image || staticImgPrefix + '/placeholder.png'" mode="aspectFill" />
+              <image class="detail-page__item-img" :src="dish.dishImage || staticImgPrefix + '/placeholder.png'" mode="aspectFill" />
               <view class="detail-page__item-info">
                 <text class="detail-page__item-name">{{ dish.dishName }}</text>
                 <text class="detail-page__item-qty">x{{ dish.quantity }}</text>

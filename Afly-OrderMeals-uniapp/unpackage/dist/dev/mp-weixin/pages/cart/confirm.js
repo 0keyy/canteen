@@ -162,7 +162,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $data.order
   }, $data.order ? common_vendor.e({
-    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "26"),
+    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
     c: $data.staticImgPrefix + "/logo.png",
     d: $data.diningMode === 3
   }, $data.diningMode === 3 ? common_vendor.e({
@@ -170,7 +170,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $options.addressInfo ? {
     f: common_vendor.t($options.addressInfo)
   } : {}, {
-    g: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args), "03")
+    g: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args))
   }) : {}, {
     h: $data.diningMode === 1
   }, $data.diningMode === 1 ? {} : {}, {
@@ -178,7 +178,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.diningMode === 3 ? {} : {}, {
     j: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
       return {
-        a: dish.image || $data.staticImgPrefix + "/placeholder.png",
+        a: dish.dishImage ? dish.dishImage.replace(/^http:/, "https:") : $data.staticImgPrefix + "/placeholder.png",
         b: common_vendor.t(dish.dishName),
         c: common_vendor.t($options.lineAmount(dish)),
         d: dish.id
@@ -191,26 +191,26 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   } : {}, {
     n: common_vendor.t($options.finalAmount),
     o: common_vendor.t($options.payChannelText),
-    p: common_vendor.o(($event) => $data.showPayPicker = true, "44"),
+    p: common_vendor.o(($event) => $data.showPayPicker = true),
     q: $data.remark,
-    r: common_vendor.o(($event) => $data.remark = $event.detail.value, "32"),
+    r: common_vendor.o(($event) => $data.remark = $event.detail.value),
     s: common_vendor.t($options.finalAmount),
     t: common_vendor.t($data.loading ? "提交中..." : "去支付"),
-    v: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "3a"),
+    v: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args)),
     w: $data.loading ? 1 : "",
     x: $data.showPayPicker
   }, $data.showPayPicker ? {
-    y: common_vendor.o($options.onPayMethodChange, "63"),
-    z: common_vendor.o($options.onPayMethodsLoaded, "ed"),
-    A: common_vendor.o(($event) => $data.payChannel = $event, "b9"),
+    y: common_vendor.o($options.onPayMethodChange),
+    z: common_vendor.o($options.onPayMethodsLoaded),
+    A: common_vendor.o(($event) => $data.payChannel = $event),
     B: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    C: common_vendor.o(($event) => $data.showPayPicker = false, "e9"),
+    C: common_vendor.o(($event) => $data.showPayPicker = false),
     D: common_vendor.o(() => {
-    }, "d4"),
-    E: common_vendor.o(($event) => $data.showPayPicker = false, "35")
+    }),
+    E: common_vendor.o(($event) => $data.showPayPicker = false)
   } : {}, {
     F: common_vendor.p({
       visible: $data.pageLoading,
