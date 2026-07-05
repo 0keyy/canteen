@@ -19,7 +19,7 @@
       </view>
 
       <view class="address-page__empty" v-if="list.length === 0">
-        <image class="address-page__empty-emoji" :src="staticImgPrefix + '/tabbar/暂无收货地址.png'" mode=""></image>
+        <image class="address-page__empty-emoji" src="/static/tabbar/暂无收货地址.png" mode=""></image>
         <text class="address-page__empty-text">暂无收货地址</text>
       </view>
 
@@ -34,12 +34,10 @@
 
 <script>
 import { addressApi } from '../../api/index'
-import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 export default {
   data() {
     return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
       list: [],
       selectMode: false
     }

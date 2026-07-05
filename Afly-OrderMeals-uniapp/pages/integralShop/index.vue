@@ -13,7 +13,7 @@
             <text class="integral-score-desc">积分换好礼，别忘记使用哦</text>
           </view>
           <view class="integral-header-avatar">
-            <image class="avatar-box" :src="staticImgPrefix + '/static/新版小唐.png'" mode="aspectFill"></image>
+            <image class="avatar-box" src="/static/新版小唐.png" mode="aspectFill"></image>
           </view>
         </view>
       </view>
@@ -62,11 +62,9 @@
 // 引入用户信息接口、积分商品接口
 import { authApi } from '../../api/index'
 import { getIntegralGoodsList } from '../../api/integral'
-import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 export default {
   data() {
     return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
       userScore: 0,
       // 兜底本地商品（后端接口异常时展示）
       defaultGoods: [

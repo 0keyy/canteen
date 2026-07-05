@@ -17,7 +17,8 @@
   flex-direction: column;
   height: 100vh;
   background: #FFFCF8;
-  /* 顶部轮播区域，移除红色渐变 */
+  /* 顶部轮播容器 必须加relative，作为卡片定位父级 */
+  /* 悬浮积分卡片，贴轮播底部，只占一小条 */
   /* 到店外卖卡片独立区块 */
   /* ===== 内容区 ===== */
   /* ===== 红色线描图标 ===== */
@@ -34,6 +35,9 @@
 .home__banner-top.data-v-1cf27b2a {
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  /* 新增核心代码 */
 }
 .home__banner-wrap.data-v-1cf27b2a {
   width: 100%;
@@ -42,24 +46,59 @@
   background: transparent;
   border: none;
 }
+.home .banner-user-card.data-v-1cf27b2a {
+  position: absolute;
+  left: 40rpx;
+  right: 35rpx;
+  bottom: 30rpx;
+  height: 100rpx;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30rpx;
+  /* 背景渐变：底部深棕红，往上半透明渐变 */
+  background: linear-gradient(180deg, rgba(80, 40, 30, 0.95) 0%, rgba(60, 25, 20, 0.85) 50%, rgba(40, 15, 10, 0.75) 100%);
+  /* 圆角：上面圆弧，下面隐藏 */
+  border-radius: 20rpx 20rpx 0 0;
+}
+.home .banner-user-card .card-name.data-v-1cf27b2a {
+  font-size: 28rpx;
+  /* 用户123：浅米黄色，和图中品牌文字更接近 */
+  color: #ffdd99;
+  font-weight: 500;
+  transform: translateY(-8rpx);
+}
+.home .banner-user-card .card-right.data-v-1cf27b2a {
+  display: flex;
+  gap: 40rpx;
+  transform: translateY(-8rpx);
+}
+.home .banner-user-card .card-right .card-num.data-v-1cf27b2a {
+  font-size: 28rpx;
+  /* 积分/优惠券文字：白色更清楚 */
+  color: #ffffff;
+  /* 如果想和用户123同色，就改成： */
+  /* color: #f7e8c8; */
+}
 .home__swiper.data-v-1cf27b2a {
   width: 100%;
-  height: 360rpx;
+  height: 600rpx;
   border-radius: 0;
   overflow: hidden;
 }
 .home__swiper-item.data-v-1cf27b2a {
   width: 100%;
-  height: 360rpx;
+  height: 550rpx;
 }
 .home__banner-image.data-v-1cf27b2a {
   display: block;
   width: 100%;
-  height: 360rpx;
+  height: 550rpx;
 }
 .home__banner-placeholder.data-v-1cf27b2a {
   width: 100%;
-  height: 360rpx;
+  height: 550rpx;
   background: #f5f5f5;
 }
 .home__primary-cards.data-v-1cf27b2a {

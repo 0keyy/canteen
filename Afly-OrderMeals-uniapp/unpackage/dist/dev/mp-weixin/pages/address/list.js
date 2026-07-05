@@ -1,11 +1,10 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
-const utils_image = require("../../utils/image.js");
+const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   data() {
     return {
-      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       list: [],
       selectMode: false
     };
@@ -54,9 +53,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     b: $data.list.length === 0
   }, $data.list.length === 0 ? {
-    c: $data.staticImgPrefix + "/tabbar/暂无收货地址.png"
+    c: common_assets._imports_0$4
   } : {}, {
-    d: common_vendor.o(($event) => $options.edit(), "d4")
+    d: common_vendor.o(($event) => $options.edit(), "43")
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-90a3874e"]]);

@@ -2,14 +2,12 @@
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const utils_pay_index = require("../../utils/pay/index.js");
-const utils_image = require("../../utils/image.js");
 const utils_pay_channels = require("../../utils/pay/channels.js");
 const PayMethodPicker = () => "../../components/pay-method-picker/pay-method-picker.js";
 const _sfc_main = {
   components: { PayMethodPicker },
   data() {
     return {
-      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       orderId: 0,
       order: null,
       payChannel: utils_pay_channels.DEFAULT_PAY_CHANNEL,
@@ -119,7 +117,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     j: common_vendor.t($data.order.number),
     k: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
       return {
-        a: dish.dishImage || $data.staticImgPrefix + "/placeholder.png",
+        a: dish.image || "/static/placeholder.png",
         b: common_vendor.t(dish.dishName),
         c: common_vendor.t(dish.quantity),
         d: common_vendor.t($options.lineAmount(dish)),
@@ -130,30 +128,30 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     m: $data.order.payStatus === 0 || $data.order.status === 4
   }, $data.order.payStatus === 0 || $data.order.status === 4 ? {
     n: common_vendor.t($options.payChannelText),
-    o: common_vendor.o(($event) => $data.showPayPicker = true, "a2")
+    o: common_vendor.o(($event) => $data.showPayPicker = true, "5f")
   } : {}, {
     p: $data.order.payStatus === 0 || $data.order.status === 4
   }, $data.order.payStatus === 0 || $data.order.status === 4 ? {
     q: common_vendor.t($data.order.amount),
-    r: common_vendor.o((...args) => $options.payNow && $options.payNow(...args), "00")
+    r: common_vendor.o((...args) => $options.payNow && $options.payNow(...args), "47")
   } : {}, {
     s: $data.order.status === 1
   }, $data.order.status === 1 ? {
-    t: common_vendor.o((...args) => $options.cancelOrder && $options.cancelOrder(...args), "79")
+    t: common_vendor.o((...args) => $options.cancelOrder && $options.cancelOrder(...args), "ce")
   } : {}, {
     v: $data.showPayPicker
   }, $data.showPayPicker ? {
-    w: common_vendor.o($options.onPayMethodChange, "92"),
-    x: common_vendor.o($options.onPayMethodsLoaded, "05"),
-    y: common_vendor.o(($event) => $data.payChannel = $event, "19"),
+    w: common_vendor.o($options.onPayMethodChange, "12"),
+    x: common_vendor.o($options.onPayMethodsLoaded, "11"),
+    y: common_vendor.o(($event) => $data.payChannel = $event, "a9"),
     z: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    A: common_vendor.o(($event) => $data.showPayPicker = false, "92"),
+    A: common_vendor.o(($event) => $data.showPayPicker = false, "b2"),
     B: common_vendor.o(() => {
-    }, "75"),
-    C: common_vendor.o(($event) => $data.showPayPicker = false, "e1")
+    }, "a9"),
+    C: common_vendor.o(($event) => $data.showPayPicker = false, "86")
   } : {}) : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-6b23c96c"]]);

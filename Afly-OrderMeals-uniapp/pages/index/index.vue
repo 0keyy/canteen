@@ -2,8 +2,17 @@
   <view class="home">
     <scroll-view class="home__content" scroll-y :show-scrollbar="false">
       <view class="home__scroll-inner">
-        <!-- 顶部纯轮播区域，无红色渐变 -->
+        <!-- 顶部纯轮播区域 -->
         <view class="home__banner-top" :style="heroPaddingStyle">
+          <!-- 悬浮积分卡片，贴轮播底部，盖在轮播上面 -->
+          <view class="banner-user-card">
+            <text class="card-name">用户123</text>
+            <view class="card-right">
+              <text class="card-num">0 积分</text>
+              <text class="card-num">0 优惠券</text>
+            </view>
+          </view>
+        
           <view class="home__banner-wrap">
             <swiper
               class="home__swiper"
@@ -11,7 +20,6 @@
               :autoplay="displayBanners.length > 0"
               :interval="4000"
               :duration="600"
-              indicator-dots
               indicator-color="rgba(255,255,255,0.45)"
               indicator-active-color="#FFFFFF"
             >
@@ -37,7 +45,7 @@
           <view class="home__primary-card-item" @click="selectMode(1)">
             <view class="home__primary-card-text">
               <text class="home__primary-name">到店堂食</text>
-            </view> <!-- 补上这一行闭合 -->
+            </view>
             <image class="home__primary-card-img" src="/static/图层 2.png" mode="aspectFit" />
           </view>
           <view
@@ -175,8 +183,9 @@ export default {
   computed: {
     heroPaddingStyle() {
       const { statusBarHeight } = this.navMetrics
+      // 修复：不要负数，避免轮播顶到刘海遮挡卡片
       return {
-        paddingTop: `${statusBarHeight + 10}px`
+        paddingTop: `${statusBarHeight + -55}px`
       }
     },
     searchRowStyle() {
@@ -351,10 +360,12 @@ $section-gap: 20rpx;
     overflow: hidden;
   }
 
-  /* 顶部轮播区域，移除红色渐变 */
+  /* 顶部轮播容器 必须加relative，作为卡片定位父级 */
   &__banner-top {
     width: 100%;
     box-sizing: border-box;
+    position: relative;
+    overflow: hidden; /* 新增核心代码 */
   }
 
   &__banner-wrap {
@@ -365,27 +376,78 @@ $section-gap: 20rpx;
     border: none;
   }
 
+  /* 悬浮积分卡片，贴轮播底部，只占一小条 */
+  .banner-user-card {
+    position: absolute;
+    left: 40rpx;
+    right: 35rpx;
+    bottom: 30rpx;
+    height: 100rpx;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30rpx;
+  
+    /* 背景渐变：底部深棕红，往上半透明渐变 */
+    background: linear-gradient(
+      180deg,
+      rgba(80, 40, 30, 0.95) 0%,
+      rgba(60, 25, 20, 0.85) 50%,
+      rgba(40, 15, 10, 0.75) 100%
+    );
+  
+    /* 圆角：上面圆弧，下面隐藏 */
+    border-radius: 20rpx 20rpx 0 0;
+  
+    .card-name {
+      font-size: 28rpx;
+  
+      /* 用户123：浅米黄色，和图中品牌文字更接近 */
+      color: #ffdd99;
+  
+      font-weight: 500;
+	  transform: translateY(-8rpx);
+    }
+  
+    .card-right {
+      display: flex;
+      gap: 40rpx;
+	  transform: translateY(-8rpx);
+  
+      .card-num {
+        font-size: 28rpx;
+  
+        /* 积分/优惠券文字：白色更清楚 */
+        color: #ffffff;
+  
+        /* 如果想和用户123同色，就改成： */
+        /* color: #f7e8c8; */
+      }
+    }
+  }
+
   &__swiper {
     width: 100%;
-    height: 360rpx;
+    height: 600rpx;
     border-radius: 0;
     overflow: hidden;
   }
 
   &__swiper-item {
     width: 100%;
-    height: 360rpx;
+    height: 550rpx;
   }
 
   &__banner-image {
     display: block;
     width: 100%;
-    height: 360rpx;
+    height: 550rpx;
   }
 
   &__banner-placeholder {
     width: 100%;
-    height: 360rpx;
+    height: 550rpx;
     background: #f5f5f5;
   }
 

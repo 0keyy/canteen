@@ -11,7 +11,7 @@
         <image
           v-if="index === 0"
           class="sidebar__heart-icon"
-          :src="staticImgPrefix + '/tabbar/爱心 _实心 1.png'"
+          src="/static/tabbar/爱心 _实心 1.png"
           mode="aspectFit"
         />
         <text :class="['sidebar__name', activeIndex === index ? 'sidebar__name--active' : '']">
@@ -24,8 +24,6 @@
 </template>
 
 <script>
-import { STATIC_IMAGE_PREFIX } from '../../utils/image'
-
 export default {
   props: {
     menu: {
@@ -39,11 +37,6 @@ export default {
     cartMap: {
       type: Object,
       default: () => ({})
-    }
-  },
-  data() {
-    return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX
     }
   },
   emits: ['select'],

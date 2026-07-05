@@ -1,11 +1,10 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_integral = require("../../api/integral.js");
-const utils_image = require("../../utils/image.js");
+const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   data() {
     return {
-      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       // 后端返回奖品数组
       prizeList: [],
       // 兜底本地默认文字奖品（接口异常时显示）
@@ -113,9 +112,9 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return {
-    a: $data.staticImgPrefix + "/static/黑logo.png",
-    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "01"),
-    c: $data.staticImgPrefix + "/static/雀跃.png",
+    a: common_assets._imports_0$10,
+    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "0a"),
+    c: common_assets._imports_1$2,
     d: common_vendor.f($data.prizeList.slice(0, 3), (item, idx, i0) => {
       return {
         a: common_vendor.t(item.numText),
@@ -133,7 +132,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     g: $data.activeIdx === 3 ? 1 : "",
     h: common_vendor.t($data.isRunning ? "抽奖中" : "抽"),
-    i: common_vendor.o((...args) => $options.handleDraw && $options.handleDraw(...args), "5d"),
+    i: common_vendor.o((...args) => $options.handleDraw && $options.handleDraw(...args), "0e"),
     j: $data.isRunning ? 1 : "",
     k: common_vendor.f($data.prizeList.slice(4, 5), (item, idx, i0) => {
       return {

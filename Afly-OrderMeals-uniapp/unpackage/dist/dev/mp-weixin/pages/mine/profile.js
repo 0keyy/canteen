@@ -1,16 +1,15 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
-const utils_image = require("../../utils/image.js");
+const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   data: function() {
     return {
       navPaddingStyle: {},
-      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
-      defaultAvatar: utils_image.STATIC_IMAGE_PREFIX + "/static/tabbar/avatar-default.png",
+      defaultAvatar: "/static/tabbar/avatar-default.png",
       defaultAvatars: [
-        utils_image.STATIC_IMAGE_PREFIX + "/static/1.png",
-        utils_image.STATIC_IMAGE_PREFIX + "/static/2.png"
+        "/static/1.png",
+        "/static/2.png"
       ],
       form: {
         nickname: "",
@@ -128,26 +127,26 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: _ctx.staticImgPrefix + "/static/tabbar/返回 2.png",
-    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "dd"),
+    a: common_assets._imports_0$6,
+    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "c6"),
     c: common_vendor.s(_ctx.navPaddingStyle),
     d: _ctx.avatarUrl || _ctx.defaultAvatar,
-    e: _ctx.staticImgPrefix + "/static/tabbar/写 1.png",
-    f: common_vendor.o((...args) => $options.chooseAvatar && $options.chooseAvatar(...args), "d1"),
+    e: common_assets._imports_1$1,
+    f: common_vendor.o((...args) => $options.chooseAvatar && $options.chooseAvatar(...args), "3d"),
     g: common_vendor.t(_ctx.form.nickname || "未设置"),
-    h: common_vendor.o((...args) => $options.editNickname && $options.editNickname(...args), "d5"),
+    h: common_vendor.o((...args) => $options.editNickname && $options.editNickname(...args), "fa"),
     i: common_vendor.t($options.maskedPhone || "未绑定"),
     j: _ctx.form.gender === 1
   }, _ctx.form.gender === 1 ? {} : {}, {
     k: common_vendor.n(_ctx.form.gender === 1 ? "profile-page__radio--checked" : ""),
-    l: common_vendor.o(($event) => $options.setGender(1), "f0"),
+    l: common_vendor.o(($event) => $options.setGender(1), "1d"),
     m: _ctx.form.gender === 2
   }, _ctx.form.gender === 2 ? {} : {}, {
     n: common_vendor.n(_ctx.form.gender === 2 ? "profile-page__radio--checked" : ""),
-    o: common_vendor.o(($event) => $options.setGender(2), "92"),
+    o: common_vendor.o(($event) => $options.setGender(2), "46"),
     p: common_vendor.t(_ctx.form.birthday || "请选择"),
     q: _ctx.form.birthday || "2000-01-01",
-    r: common_vendor.o((...args) => $options.onBirthdayChange && $options.onBirthdayChange(...args), "4a"),
+    r: common_vendor.o((...args) => $options.onBirthdayChange && $options.onBirthdayChange(...args), "a0"),
     s: _ctx.showAvatarModal
   }, _ctx.showAvatarModal ? {
     t: common_vendor.f(_ctx.defaultAvatars, (item, idx, i0) => {
@@ -155,29 +154,29 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         a: item,
         b: _ctx.avatarUrl === item
       }, _ctx.avatarUrl === item ? {
-        c: _ctx.staticImgPrefix + "/static/tabbar/对勾小 2.png"
+        c: common_assets._imports_2
       } : {}, {
         d: idx,
         e: common_vendor.n(_ctx.avatarUrl === item ? "profile-page__avatar-grid-item--active" : ""),
         f: common_vendor.o(($event) => $options.selectAvatar(item), idx)
       });
     }),
-    v: common_vendor.o(($event) => _ctx.showAvatarModal = false, "59"),
+    v: common_vendor.o(($event) => _ctx.showAvatarModal = false, "c6"),
     w: common_vendor.o(() => {
-    }, "91"),
-    x: common_vendor.o(($event) => _ctx.showAvatarModal = false, "f1")
+    }, "1b"),
+    x: common_vendor.o(($event) => _ctx.showAvatarModal = false, "c3")
   } : {}, {
     y: _ctx.saving,
-    z: common_vendor.o((...args) => $options.saveProfile && $options.saveProfile(...args), "fa"),
+    z: common_vendor.o((...args) => $options.saveProfile && $options.saveProfile(...args), "9f"),
     A: _ctx.showNicknameModal
   }, _ctx.showNicknameModal ? {
     B: _ctx.tempNickname,
-    C: common_vendor.o(($event) => _ctx.tempNickname = $event.detail.value, "c5"),
-    D: common_vendor.o((...args) => $options.closeNicknameModal && $options.closeNicknameModal(...args), "2c"),
-    E: common_vendor.o((...args) => $options.confirmNickname && $options.confirmNickname(...args), "b8"),
+    C: common_vendor.o(($event) => _ctx.tempNickname = $event.detail.value, "d9"),
+    D: common_vendor.o((...args) => $options.closeNicknameModal && $options.closeNicknameModal(...args), "ea"),
+    E: common_vendor.o((...args) => $options.confirmNickname && $options.confirmNickname(...args), "59"),
     F: common_vendor.o(() => {
-    }, "e4"),
-    G: common_vendor.o((...args) => $options.closeNicknameModal && $options.closeNicknameModal(...args), "b8")
+    }, "80"),
+    G: common_vendor.o((...args) => $options.closeNicknameModal && $options.closeNicknameModal(...args), "b5")
   } : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-935803c6"]]);

@@ -1,7 +1,7 @@
 <template>
   <view v-if="showContent" class="page-loading" @tap.stop.prevent="() => {}">
     <view class="page-loading__content">
-      <image class="page-loading__icon" :src="staticImgPrefix + '/新版小唐.png'" mode="aspectFit" />
+      <image class="page-loading__icon" src="/static/新版小唐.png" mode="aspectFit" />
       <view class="page-loading__bar">
         <view class="page-loading__bar-fill" :style="{ width: progress + '%' }"></view>
       </view>
@@ -11,8 +11,6 @@
 </template>
 
 <script>
-import { STATIC_IMAGE_PREFIX } from '../../utils/image'
-
 const MIN_DURATION = 300
 
 export default {
@@ -29,7 +27,6 @@ export default {
   },
   data() {
     return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
       showContent: false,
       progress: 0,
       startTime: 0,

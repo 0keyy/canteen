@@ -1,7 +1,7 @@
 # 项目配置
 like:
   upload-directory: /www/uploads/ # 上传目录
-  h5-base-url: http://146.56.199.215:8084 # H5 点餐页地址（桌号二维码）
+  h5-base-url: http://47.97.4.12:8084 # H5 点餐页地址（桌号二维码）
   app-mock-login: false
   app-mock-login-mobile: "13800138000"
 

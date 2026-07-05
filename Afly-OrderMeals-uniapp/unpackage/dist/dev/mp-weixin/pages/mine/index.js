@@ -4,6 +4,7 @@ const api_index = require("../../api/index.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
 const utils_navbar = require("../../utils/navbar.js");
 const utils_image = require("../../utils/image.js");
+const common_assets = require("../../common/assets.js");
 const PRIMARY_ACTIONS = [
   { title: "待支付", icon: "orders" },
   { title: "待发货", icon: "address" },
@@ -197,13 +198,14 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.companyVerified && $data.companyDeptName ? {
     i: common_vendor.t($data.companyDeptName)
   } : {}, {
-    j: common_vendor.o((...args) => $options.goMemberCode && $options.goMemberCode(...args), "70"),
-    k: common_vendor.t($data.balance),
-    l: common_vendor.t($data.pointCount),
-    m: common_vendor.t($data.couponCount),
-    n: common_vendor.s($options.heroPaddingStyle),
-    o: common_vendor.o((...args) => $options.goOrderList && $options.goOrderList(...args), "a4"),
-    p: common_vendor.f($data.primaryActions, (item, k0, i0) => {
+    j: common_assets._imports_0$5,
+    k: common_vendor.o((...args) => $options.goMemberCode && $options.goMemberCode(...args), "70"),
+    l: common_vendor.t($data.balance),
+    m: common_vendor.t($data.pointCount),
+    n: common_vendor.t($data.couponCount),
+    o: common_vendor.s($options.heroPaddingStyle),
+    p: common_vendor.o((...args) => $options.goOrderList && $options.goOrderList(...args), "a4"),
+    q: common_vendor.f($data.primaryActions, (item, k0, i0) => {
       return {
         a: common_vendor.n(`profile-page__action-icon--${item.icon}`),
         b: common_vendor.t(item.title),
@@ -211,7 +213,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       };
     }),
-    q: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
+    r: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
       return common_vendor.e({
         a: item.iconImg
       }, item.iconImg ? {
@@ -224,22 +226,22 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         f: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       });
     }),
-    r: $data.showAvatarPicker
+    s: $data.showAvatarPicker
   }, $data.showAvatarPicker ? {
-    s: $data.staticImgPrefix + "/1.png",
-    t: $data.avatarKey === "1" ? 1 : "",
-    v: common_vendor.o(($event) => $options.selectAvatar("1"), "58"),
-    w: $data.staticImgPrefix + "/2.png",
-    x: $data.avatarKey === "2" ? 1 : "",
-    y: common_vendor.o(($event) => $options.selectAvatar("2"), "5f"),
-    z: common_vendor.o(($event) => $data.showAvatarPicker = false, "85"),
-    A: common_vendor.o(() => {
+    t: $data.staticImgPrefix + "/1.png",
+    v: $data.avatarKey === "1" ? 1 : "",
+    w: common_vendor.o(($event) => $options.selectAvatar("1"), "58"),
+    x: $data.staticImgPrefix + "/2.png",
+    y: $data.avatarKey === "2" ? 1 : "",
+    z: common_vendor.o(($event) => $options.selectAvatar("2"), "5f"),
+    A: common_vendor.o(($event) => $data.showAvatarPicker = false, "85"),
+    B: common_vendor.o(() => {
     }, "d0"),
-    B: common_vendor.o(($event) => $data.showAvatarPicker = false, "62")
+    C: common_vendor.o(($event) => $data.showAvatarPicker = false, "62")
   } : {}, {
-    C: $data.showServicePicker
+    D: $data.showServicePicker
   }, $data.showServicePicker ? {
-    D: common_vendor.f($data.servicePhones, (item, index, i0) => {
+    E: common_vendor.f($data.servicePhones, (item, index, i0) => {
       return {
         a: common_vendor.t(item.name || "客服热线"),
         b: common_vendor.t(item.phone),
@@ -247,12 +249,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.makeCall(item.phone), index)
       };
     }),
-    E: common_vendor.o(($event) => $data.showServicePicker = false, "7f"),
-    F: common_vendor.o(() => {
+    F: common_vendor.o(($event) => $data.showServicePicker = false, "7f"),
+    G: common_vendor.o(() => {
     }, "ed"),
-    G: common_vendor.o(($event) => $data.showServicePicker = false, "a5")
+    H: common_vendor.o(($event) => $data.showServicePicker = false, "a5")
   } : {}, {
-    H: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    I: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),

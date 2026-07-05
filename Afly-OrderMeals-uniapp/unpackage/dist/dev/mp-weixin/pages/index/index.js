@@ -5,6 +5,7 @@ const utils_config = require("../../utils/config.js");
 const utils_image = require("../../utils/image.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
 const utils_navbar = require("../../utils/navbar.js");
+const common_assets = require("../../common/assets.js");
 const PageLoading = () => "../../components/page-loading/page-loading.js";
 const _sfc_main = {
   mixins: [mixins_tabbarPage.tabbarPageMixin],
@@ -20,7 +21,6 @@ const _sfc_main = {
       recommendLoading: false,
       pageLoading: false,
       pageLoadingTip: "",
-      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       shortcuts: [
         { name: "积分商城", desc: "神秘好物等你来", iconClass: "home__icon--points" },
         { name: "领券中心", desc: "限时领取优惠", iconClass: "home__icon--coupon" },
@@ -32,7 +32,7 @@ const _sfc_main = {
     heroPaddingStyle() {
       const { statusBarHeight } = this.navMetrics;
       return {
-        paddingTop: `${statusBarHeight + 10}px`
+        paddingTop: `${statusBarHeight + -55}px`
       };
     },
     searchRowStyle() {
@@ -210,12 +210,12 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     b: $options.displayBanners.length > 1,
     c: $options.displayBanners.length > 0,
-    d: $data.staticImgPrefix + "/图层 2.png",
-    e: common_vendor.o(($event) => $options.selectMode(1), "42"),
-    f: $data.staticImgPrefix + "/小唐骑车.png",
-    g: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
-    h: common_vendor.o(($event) => $options.selectMode(3), "89"),
-    i: common_vendor.s($options.heroPaddingStyle),
+    d: common_vendor.s($options.heroPaddingStyle),
+    e: common_assets._imports_0,
+    f: common_vendor.o(($event) => $options.selectMode(1), "6f"),
+    g: common_assets._imports_1,
+    h: $data.shop && $data.shop.deliveryEnable !== 1 ? 1 : "",
+    i: common_vendor.o(($event) => $options.selectMode(3), "b9"),
     j: common_vendor.f($data.shortcuts, (item, k0, i0) => {
       return {
         a: common_vendor.n(item.iconClass),
@@ -225,7 +225,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: common_vendor.o(($event) => $options.onShortcutTap(item), item.name)
       };
     }),
-    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "9e"),
+    k: common_vendor.o((...args) => $options.goMenu && $options.goMenu(...args), "30"),
     l: $options.homeRecommendDishes.length
   }, $options.homeRecommendDishes.length ? {
     m: common_vendor.f($options.homeRecommendDishes, (dish, k0, i0) => {

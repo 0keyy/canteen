@@ -1,11 +1,10 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
 const api_index = require("../../../api/index.js");
-const utils_image = require("../../../utils/image.js");
+const common_assets = require("../../../common/assets.js");
 const _sfc_main = {
   data() {
     return {
-      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       memberId: "",
       nickname: "",
       level: "",
@@ -17,7 +16,7 @@ const _sfc_main = {
   },
   computed: {
     avatarSrc() {
-      return `${utils_image.STATIC_IMAGE_PREFIX}/${this.avatarKey || "1"}.png`;
+      return `/static/${this.avatarKey || "1"}.png`;
     }
   },
   onLoad() {
@@ -44,7 +43,7 @@ const _sfc_main = {
           this.balance = data.balance != null ? data.balance : "0.00";
         }
       } catch (e) {
-        common_vendor.index.__f__("log", "at pages/mine/memberCode/index.vue:99", "会员码接口暂未开发", e);
+        common_vendor.index.__f__("log", "at pages/mine/memberCode/index.vue:97", "会员码接口暂未开发", e);
       }
       this.refreshQrCode();
     },
@@ -68,7 +67,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     a: $options.avatarSrc,
     b: common_vendor.t($data.nickname || "加载中..."),
     c: common_vendor.t($data.level || "会员"),
-    d: $data.staticImgPrefix + "/logo.png",
+    d: common_assets._imports_0$3,
     e: common_vendor.t($data.memberId || "--"),
     f: $data.qrCodeContent
   }, $data.qrCodeContent ? {
@@ -77,7 +76,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       size: "320"
     })
   } : {}, {
-    h: $data.staticImgPrefix + "/tabbar/刷新.png",
+    h: common_assets._imports_1$3,
     i: common_vendor.t($data.balance || "0.00")
   });
 }

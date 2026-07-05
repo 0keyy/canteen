@@ -1,11 +1,10 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
-const utils_image = require("../../utils/image.js");
+const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   data() {
     return {
-      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       loading: false,
       coupons: []
     };
@@ -48,7 +47,7 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: $data.staticImgPrefix + "/static/拱手.png",
+    a: common_assets._imports_0$7,
     b: $data.loading
   }, $data.loading ? {} : $data.coupons.length === 0 ? {} : {
     d: common_vendor.f($data.coupons, (coupon, k0, i0) => {

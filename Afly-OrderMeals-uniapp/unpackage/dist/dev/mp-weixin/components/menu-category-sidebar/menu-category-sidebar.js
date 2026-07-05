@@ -1,6 +1,6 @@
 "use strict";
-const utils_image = require("../../utils/image.js");
 const common_vendor = require("../../common/vendor.js");
+const common_assets = require("../../common/assets.js");
 const _sfc_main = {
   props: {
     menu: {
@@ -15,11 +15,6 @@ const _sfc_main = {
       type: Object,
       default: () => ({})
     }
-  },
-  data() {
-    return {
-      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX
-    };
   },
   emits: ["select"],
   methods: {
@@ -41,7 +36,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       }, $props.activeIndex === index ? {} : {}, {
         b: index === 0
       }, index === 0 ? {
-        c: $data.staticImgPrefix + "/tabbar/爱心 _实心 1.png"
+        c: common_assets._imports_0$11
       } : {}, {
         d: common_vendor.t(index === 0 ? "猜你喜欢" : cate.name),
         e: common_vendor.n($props.activeIndex === index ? "sidebar__name--active" : ""),

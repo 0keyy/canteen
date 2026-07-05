@@ -5,6 +5,7 @@ const utils_config = require("../../utils/config.js");
 const utils_image = require("../../utils/image.js");
 const mixins_tabbarPage = require("../../mixins/tabbar-page.js");
 const utils_navbar = require("../../utils/navbar.js");
+const common_assets = require("../../common/assets.js");
 const PageLoading = () => "../../components/page-loading/page-loading.js";
 const MenuCategorySidebar = () => "../../components/menu-category-sidebar/menu-category-sidebar.js";
 const _sfc_main = {
@@ -27,8 +28,7 @@ const _sfc_main = {
       cartReady: false,
       cartBusy: false,
       cartInitPromise: null,
-      banners: [],
-      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX
+      banners: []
     };
   },
   computed: {
@@ -59,7 +59,7 @@ const _sfc_main = {
     displayBanners() {
       if (this.banners.length)
         return this.banners;
-      return [{ image: utils_image.STATIC_IMAGE_PREFIX + "/首页广告.png" }];
+      return [{ image: "/static/首页广告.png" }];
     },
     totalPrice() {
       let total = 0;
@@ -223,7 +223,7 @@ const _sfc_main = {
         await this.initCart();
       } catch (e) {
         this.cartReady = false;
-        common_vendor.index.__f__("error", "at pages/menu/index.vue:344", "菜单页加载失败:", e);
+        common_vendor.index.__f__("error", "at pages/menu/index.vue:361", "菜单页加载失败:", e);
         common_vendor.index.showToast({ title: e.message || e || "页面加载失败", icon: "none", duration: 3e3 });
       } finally {
         this.loading = false;
@@ -302,7 +302,7 @@ const _sfc_main = {
         await this.syncCart();
         this.cartReady = true;
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/menu/index.vue:425", "购物车刷新失败:", e);
+        common_vendor.index.__f__("error", "at pages/menu/index.vue:442", "购物车刷新失败:", e);
       }
     },
     async ensureCart() {
@@ -461,7 +461,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     d: $options.displayBanners.length > 1
   } : {}, {
     e: common_vendor.t($options.shopName),
-    f: $data.staticImgPrefix + "/tabbar/矢量 38.png",
+    f: common_assets._imports_0$2,
     g: common_vendor.t($data.diningMode === 3 ? "外卖" : "堂食"),
     h: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "e2"),
     i: common_vendor.s($options.headerPaddingStyle),
@@ -471,7 +471,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     k: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    m: common_vendor.o($options.selectCategory, "f4"),
+    m: common_vendor.o($options.selectCategory, "5c"),
     n: common_vendor.p({
       menu: $data.menu,
       ["active-index"]: $data.activeIndex,
@@ -508,7 +508,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     r: $options.currentFoods.length === 0
   }, $options.currentFoods.length === 0 ? {} : {}), {
     l: $data.menu.length === 0,
-    s: $data.staticImgPrefix + "/新版小唐.png",
+    s: common_assets._imports_0$1,
     t: $options.cartItemCount > 0
   }, $options.cartItemCount > 0 ? {
     v: common_vendor.t($options.cartItemCount)
@@ -516,7 +516,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     w: common_vendor.t($options.cartSummary),
     x: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
     y: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    z: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "8e"),
+    z: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "0a"),
     A: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,

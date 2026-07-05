@@ -1,7 +1,7 @@
 "use strict";
 const utils_config = require("./config.js");
 const API_ORIGIN = utils_config.BASE_URL.replace(/\/api\/?$/, "");
-const STATIC_IMAGE_PREFIX = "https://canteen.zhongtang-group.com/api/uploads/image/static";
+const STATIC_IMAGE_PREFIX = "/static";
 function resolveImageUrl(url) {
   if (!url)
     return "";
@@ -11,7 +11,7 @@ function resolveImageUrl(url) {
     value = nested[2];
   }
   if (/^https?:\/\//i.test(value)) {
-    return value.replace(/^http:/i, "https:");
+    return value;
   }
   if (value.startsWith("//")) {
     return `https:${value}`;

@@ -2,7 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
 const utils_pay_index = require("../../utils/pay/index.js");
-const utils_image = require("../../utils/image.js");
+const common_assets = require("../../common/assets.js");
 const utils_pay_channels = require("../../utils/pay/channels.js");
 const PayMethodPicker = () => "../../components/pay-method-picker/pay-method-picker.js";
 const PageLoading = () => "../../components/page-loading/page-loading.js";
@@ -10,7 +10,6 @@ const _sfc_main = {
   components: { PayMethodPicker, PageLoading },
   data() {
     return {
-      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       orderId: 0,
       order: null,
       remark: "",
@@ -162,15 +161,15 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
     a: $data.order
   }, $data.order ? common_vendor.e({
-    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args)),
-    c: $data.staticImgPrefix + "/logo.png",
+    b: common_vendor.o((...args) => $options.goBack && $options.goBack(...args), "fb"),
+    c: common_assets._imports_0$3,
     d: $data.diningMode === 3
   }, $data.diningMode === 3 ? common_vendor.e({
     e: $options.addressInfo
   }, $options.addressInfo ? {
     f: common_vendor.t($options.addressInfo)
   } : {}, {
-    g: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args))
+    g: common_vendor.o((...args) => $options.goAddress && $options.goAddress(...args), "49")
   }) : {}, {
     h: $data.diningMode === 1
   }, $data.diningMode === 1 ? {} : {}, {
@@ -178,10 +177,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.diningMode === 3 ? {} : {}, {
     j: common_vendor.f($data.order.dishes, (dish, k0, i0) => {
       return {
-        a: dish.dishImage ? dish.dishImage.replace(/^http:/, "https:") : $data.staticImgPrefix + "/placeholder.png",
+        a: dish.image || "/static/placeholder.png",
         b: common_vendor.t(dish.dishName),
-        c: common_vendor.t($options.lineAmount(dish)),
-        d: dish.id
+        c: common_vendor.t(dish.quantity),
+        d: common_vendor.t($options.lineAmount(dish)),
+        e: dish.id
       };
     }),
     k: common_vendor.t($options.totalAmount),
@@ -191,26 +191,26 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   } : {}, {
     n: common_vendor.t($options.finalAmount),
     o: common_vendor.t($options.payChannelText),
-    p: common_vendor.o(($event) => $data.showPayPicker = true),
+    p: common_vendor.o(($event) => $data.showPayPicker = true, "65"),
     q: $data.remark,
-    r: common_vendor.o(($event) => $data.remark = $event.detail.value),
+    r: common_vendor.o(($event) => $data.remark = $event.detail.value, "76"),
     s: common_vendor.t($options.finalAmount),
     t: common_vendor.t($data.loading ? "提交中..." : "去支付"),
-    v: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args)),
+    v: common_vendor.o((...args) => $options.handleSubmit && $options.handleSubmit(...args), "fa"),
     w: $data.loading ? 1 : "",
     x: $data.showPayPicker
   }, $data.showPayPicker ? {
-    y: common_vendor.o($options.onPayMethodChange),
-    z: common_vendor.o($options.onPayMethodsLoaded),
-    A: common_vendor.o(($event) => $data.payChannel = $event),
+    y: common_vendor.o($options.onPayMethodChange, "a5"),
+    z: common_vendor.o($options.onPayMethodsLoaded, "32"),
+    A: common_vendor.o(($event) => $data.payChannel = $event, "72"),
     B: common_vendor.p({
       ["order-id"]: $data.orderId,
       modelValue: $data.payChannel
     }),
-    C: common_vendor.o(($event) => $data.showPayPicker = false),
+    C: common_vendor.o(($event) => $data.showPayPicker = false, "63"),
     D: common_vendor.o(() => {
-    }),
-    E: common_vendor.o(($event) => $data.showPayPicker = false)
+    }, "2d"),
+    E: common_vendor.o(($event) => $data.showPayPicker = false, "79")
   } : {}, {
     F: common_vendor.p({
       visible: $data.pageLoading,

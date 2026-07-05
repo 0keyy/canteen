@@ -44,7 +44,7 @@
         <view class="detail-page__items">
           <view v-for="dish in order.dishes" :key="dish.id" class="detail-page__item">
             <view class="detail-page__item-left">
-              <image class="detail-page__item-img" :src="dish.dishImage || staticImgPrefix + '/placeholder.png'" mode="aspectFill" />
+              <image class="detail-page__item-img" :src="dish.image || '/static/placeholder.png'" mode="aspectFill" />
               <view class="detail-page__item-info">
                 <text class="detail-page__item-name">{{ dish.dishName }}</text>
                 <text class="detail-page__item-qty">x{{ dish.quantity }}</text>
@@ -121,14 +121,12 @@
 <script>
 import { orderApi } from '../../api/index'
 import { payOrder, DEFAULT_PAY_CHANNEL } from '../../utils/pay/index'
-import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 import PayMethodPicker from '../../components/pay-method-picker/pay-method-picker.vue'
 
 export default {
   components: { PayMethodPicker },
   data() {
     return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
       orderId: 0,
       order: null,
       payChannel: DEFAULT_PAY_CHANNEL,

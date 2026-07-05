@@ -16,7 +16,7 @@ like:
 
 # 服务配置
 server:
-  port: 8088
+  port: 8082
   servlet:
     context-path: /
 

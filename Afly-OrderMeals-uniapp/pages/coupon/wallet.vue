@@ -17,7 +17,7 @@
     </view>
 
     <view v-else-if="coupons.length === 0" class="coupon-wallet__status">
-      <image :src="staticImgPrefix + '/static/tabbar/优惠券.png'" mode="" class="coupon-wallet__empty-icon"></image>
+      <image src="/static/tabbar/优惠券.png" mode="" class="coupon-wallet__empty-icon"></image>
       <text class="coupon-wallet__empty-text">暂无优惠券</text>
       <text class="coupon-wallet__empty-sub">去领券中心看看吧</text>
     </view>
@@ -79,12 +79,10 @@
 
 <script>
 import { couponApi } from '../../api/index'
-import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 export default {
   data() {
     return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
       tabs: [
         { label: '可使用', status: 1 },
         { label: '已使用', status: 2 },

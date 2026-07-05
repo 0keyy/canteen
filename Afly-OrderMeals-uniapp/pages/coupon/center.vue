@@ -6,7 +6,7 @@
 			<text class="coupon-center__sub">领取优惠券，下单更优惠</text>
 		</view>
 		<view class="coupon-center__header-right">
-			<image :src="staticImgPrefix + '/static/拱手.png'" mode="" class="coupon-center__header-image"></image>
+			<image src="/static/拱手.png" mode="" class="coupon-center__header-image"></image>
 		</view>
     </view>
 
@@ -67,12 +67,10 @@
 
 <script>
 import { couponApi } from '../../api/index'
-import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 export default {
   data() {
     return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
       loading: false,
       coupons: []
     }

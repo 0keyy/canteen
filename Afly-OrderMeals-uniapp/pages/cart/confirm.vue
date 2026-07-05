@@ -6,7 +6,7 @@
         <view class="checkout__back-btn" @tap="goBack">
           <text class="checkout__back-icon">‹</text>
         </view>
-        <image class="checkout__logo" :src="staticImgPrefix + '/logo.png'" mode="aspectFit" />
+        <image class="checkout__logo" src="/static/logo.png" mode="aspectFit" />
         <view class="checkout__nav-empty"></view>
       </view>
     </view>
@@ -52,7 +52,7 @@
         <view class="checkout__items">
           <view v-for="dish in order.dishes" :key="dish.id" class="checkout__item">
             <view class="checkout__item-left">
-              <img class="checkout__item-img" :src="dish.dishImage ? dish.dishImage.replace(/^http:/, 'https:') : staticImgPrefix + '/placeholder.png'" mode="aspectFill" />
+              <image class="checkout__item-img" :src="dish.image || '/static/placeholder.png'" mode="aspectFill" />
               <view class="checkout__item-info">
                 <text class="checkout__item-name">{{ dish.dishName }}</text>
                 <text class="checkout__item-qty">{{ dish.quantity }}份</text>
@@ -144,7 +144,6 @@
 <script>
 import { orderApi, couponApi } from '../../api/index'
 import { payOrder, DEFAULT_PAY_CHANNEL } from '../../utils/pay/index'
-import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 import PayMethodPicker from '../../components/pay-method-picker/pay-method-picker.vue'
 import PageLoading from '../../components/page-loading/page-loading.vue'
 
@@ -152,7 +151,6 @@ export default {
   components: { PayMethodPicker, PageLoading },
   data() {
     return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
       orderId: 0,
       order: null,
       remark: '',
