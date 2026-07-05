@@ -12,6 +12,7 @@ const _sfc_main = {
   components: { PageLoading, MenuCategorySidebar },
   data() {
     return {
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       navMetrics: utils_navbar.getNavMetrics(),
       menuButtonRight: 96,
       aid: utils_config.DEFAULT_SHOP_ID,
@@ -58,7 +59,7 @@ const _sfc_main = {
     displayBanners() {
       if (this.banners.length)
         return this.banners;
-      return [{ image: "/static/首页广告.png" }];
+      return [{ image: this.staticImgPrefix + "/首页广告.png" }];
     },
     totalPrice() {
       let total = 0;
@@ -222,7 +223,7 @@ const _sfc_main = {
         await this.initCart();
       } catch (e) {
         this.cartReady = false;
-        common_vendor.index.__f__("error", "at pages/menu/index.vue:361", "菜单页加载失败:", e);
+        common_vendor.index.__f__("error", "at pages/menu/index.vue:362", "菜单页加载失败:", e);
         common_vendor.index.showToast({ title: e.message || e || "页面加载失败", icon: "none", duration: 3e3 });
       } finally {
         this.loading = false;
@@ -301,7 +302,7 @@ const _sfc_main = {
         await this.syncCart();
         this.cartReady = true;
       } catch (e) {
-        common_vendor.index.__f__("error", "at pages/menu/index.vue:442", "购物车刷新失败:", e);
+        common_vendor.index.__f__("error", "at pages/menu/index.vue:443", "购物车刷新失败:", e);
       }
     },
     async ensureCart() {
@@ -460,23 +461,24 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     d: $options.displayBanners.length > 1
   } : {}, {
     e: common_vendor.t($options.shopName),
-    f: common_vendor.t($data.diningMode === 3 ? "外卖" : "堂食"),
-    g: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "e2"),
-    h: common_vendor.s($options.headerPaddingStyle),
-    i: common_vendor.p({
+    f: $data.staticImgPrefix + "/tabbar/矢量 38.png",
+    g: common_vendor.t($data.diningMode === 3 ? "外卖" : "堂食"),
+    h: common_vendor.o((...args) => $options.toggleMode && $options.toggleMode(...args), "e2"),
+    i: common_vendor.s($options.headerPaddingStyle),
+    j: common_vendor.p({
       visible: $data.pageLoading,
       tip: $data.pageLoadingTip
     }),
-    j: $data.loading
+    k: $data.loading
   }, $data.loading ? {} : $data.menu.length === 0 ? {} : common_vendor.e({
-    l: common_vendor.o($options.selectCategory, "5c"),
-    m: common_vendor.p({
+    m: common_vendor.o($options.selectCategory, "be"),
+    n: common_vendor.p({
       menu: $data.menu,
       ["active-index"]: $data.activeIndex,
       ["cart-map"]: $data.cartMap
     }),
-    n: common_vendor.t($options.currentCategoryName),
-    o: common_vendor.f($options.currentFoods, (food, idx, i0) => {
+    o: common_vendor.t($options.currentCategoryName),
+    p: common_vendor.f($options.currentFoods, (food, idx, i0) => {
       return common_vendor.e({
         a: food.image,
         b: $options.foodTag(idx)
@@ -502,19 +504,20 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         n: food.id
       });
     }),
-    p: $data.cartBusy || !$data.cartReady ? 1 : "",
-    q: $options.currentFoods.length === 0
+    q: $data.cartBusy || !$data.cartReady ? 1 : "",
+    r: $options.currentFoods.length === 0
   }, $options.currentFoods.length === 0 ? {} : {}), {
-    k: $data.menu.length === 0,
-    r: $options.cartItemCount > 0
+    l: $data.menu.length === 0,
+    s: $data.staticImgPrefix + "/新版小唐.png",
+    t: $options.cartItemCount > 0
   }, $options.cartItemCount > 0 ? {
-    s: common_vendor.t($options.cartItemCount)
+    v: common_vendor.t($options.cartItemCount)
   } : {}, {
-    t: common_vendor.t($options.cartSummary),
-    v: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    w: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
-    x: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "0a"),
-    y: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    w: common_vendor.t($options.cartSummary),
+    x: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
+    y: !$data.cartReady || $options.cartItemCount === 0 ? 1 : "",
+    z: common_vendor.o((...args) => $options.goConfirm && $options.goConfirm(...args), "96"),
+    A: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),

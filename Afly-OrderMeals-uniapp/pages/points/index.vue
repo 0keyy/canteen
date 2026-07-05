@@ -137,28 +137,28 @@ const DEFAULT_CATEGORIES = [
 const DEFAULT_PRODUCTS = [
   {
     id: 1,
-    image: STATIC_IMAGE_PREFIX + '/static/1.png',
+    image: STATIC_IMAGE_PREFIX + '/1.png',
     title: '【堂食专享】可口可乐',
     points: 10,
     redeemed: 47
   },
   {
     id: 2,
-    image: STATIC_IMAGE_PREFIX + '/static/2.png',
+    image: STATIC_IMAGE_PREFIX + '/2.png',
     title: '【堂食专享】香脆薯条',
     points: 20,
     redeemed: 32
   },
   {
     id: 3,
-    image: STATIC_IMAGE_PREFIX + '/static/3.png',
+    image: STATIC_IMAGE_PREFIX + '/3.png',
     title: '【外卖专享】珍珠奶茶',
     points: 30,
     redeemed: 58
   },
   {
     id: 4,
-    image: STATIC_IMAGE_PREFIX + '/static/4.png',
+    image: STATIC_IMAGE_PREFIX + '/4.png',
     title: '【积分秒杀】香辣鸡翅',
     points: 50,
     redeemed: 19

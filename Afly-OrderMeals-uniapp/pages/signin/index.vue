@@ -38,7 +38,7 @@
                     <view class="signin-page__date-body">
                       <image
                         class="signin-page__date-icon"
-                        src="./static/tabbar/calender.png"
+                        :src="staticImgPrefix + '/tabbar/calender.png'"
                         mode="aspectFit"
                       />
                     </view>
@@ -700,9 +700,9 @@ export default {
 
   &__reward-status-text {
     font-size: 24rpx;
-    color: #b20300;
+    color: #f1d4d4;
     font-weight: 500;
-    background: rgba(208, 0, 0, 0.1);
+    background:#b20300;
     padding: 8rpx 20rpx;
     border-radius: 999rpx;
   }

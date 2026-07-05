@@ -1,10 +1,12 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
+const utils_image = require("../../utils/image.js");
 const utils_pay_weixin = require("../../utils/pay/weixin.js");
 const _sfc_main = {
   data() {
     return {
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       balance: 0,
       selectedAmount: 10,
       amountOptions: [10, 20, 50, 100, 200, 500],
@@ -94,8 +96,9 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.t($options.formatBalance),
-    b: common_vendor.f($data.amountOptions, (item, index, i0) => {
+    a: $data.staticImgPrefix + "/tabbar/充值金额 1.png",
+    b: common_vendor.t($options.formatBalance),
+    c: common_vendor.f($data.amountOptions, (item, index, i0) => {
       return {
         a: common_vendor.t(item),
         b: index,
@@ -103,17 +106,17 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.selectPreset(item), index)
       };
     }),
-    c: $data.isCustom
+    d: $data.isCustom
   }, $data.isCustom ? {
-    d: $data.isCustom,
-    e: common_vendor.o((...args) => $options.onCustomBlur && $options.onCustomBlur(...args), "1f"),
-    f: $data.customAmount,
-    g: common_vendor.o(($event) => $data.customAmount = $event.detail.value, "06")
+    e: $data.isCustom,
+    f: common_vendor.o((...args) => $options.onCustomBlur && $options.onCustomBlur(...args), "f0"),
+    g: $data.customAmount,
+    h: common_vendor.o(($event) => $data.customAmount = $event.detail.value, "f6")
   } : {}, {
-    h: $data.isCustom ? 1 : "",
-    i: common_vendor.o((...args) => $options.selectCustom && $options.selectCustom(...args), "eb"),
-    j: common_vendor.o((...args) => $options.onRecharge && $options.onRecharge(...args), "d0"),
-    k: common_vendor.o((...args) => $options.goRecord && $options.goRecord(...args), "aa")
+    i: $data.isCustom ? 1 : "",
+    j: common_vendor.o((...args) => $options.selectCustom && $options.selectCustom(...args), "52"),
+    k: common_vendor.o((...args) => $options.onRecharge && $options.onRecharge(...args), "96"),
+    l: common_vendor.o((...args) => $options.goRecord && $options.goRecord(...args), "f0")
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-c45a7485"]]);

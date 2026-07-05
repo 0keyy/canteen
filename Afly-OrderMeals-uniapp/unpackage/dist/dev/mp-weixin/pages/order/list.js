@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
+const utils_image = require("../../utils/image.js");
 const TABS = [
   { key: "all", name: "全部" },
   { key: "paying", name: "待支付" },
@@ -15,7 +16,8 @@ const _sfc_main = {
       activeTab: 0,
       allList: [],
       navHeight: 0,
-      statusBarHeight: 0
+      statusBarHeight: 0,
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX
     };
   },
   computed: {
@@ -132,7 +134,7 @@ const _sfc_main = {
           statusKey: "completed",
           statusText: "已完成",
           dishes: [
-            { id: 1, name: "可口可乐", image: "/static/首页广告.png", price: "3", quantity: 1 }
+            { id: 1, name: "可口可乐", image: this.staticImgPrefix + "/首页广告.png", price: "3", quantity: 1 }
           ]
         },
         {
@@ -142,7 +144,7 @@ const _sfc_main = {
           statusKey: "delivering",
           statusText: "待收货",
           dishes: [
-            { id: 2, name: "红烧牛肉面", image: "/static/首页广告.png", price: "15", quantity: 1 }
+            { id: 2, name: "红烧牛肉面", image: this.staticImgPrefix + "/首页广告.png", price: "15", quantity: 1 }
           ]
         }
       ];

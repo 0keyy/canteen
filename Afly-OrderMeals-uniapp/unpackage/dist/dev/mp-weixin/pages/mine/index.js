@@ -140,6 +140,10 @@ const _sfc_main = {
         common_vendor.index.navigateTo({ url: "/pages/signin/index" });
         return;
       }
+      if (item.title === "积分抽奖") {
+        common_vendor.index.navigateTo({ url: "/pages/lottery/index" });
+        return;
+      }
       if (item.title === "积分商城") {
         common_vendor.index.navigateTo({ url: "/pages/integralShop/index" });
         return;
@@ -280,14 +284,15 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   }, $data.companyVerified && $data.companyDeptName ? {
     i: common_vendor.t($data.companyDeptName)
   } : {}, {
-    j: common_vendor.o((...args) => $options.goMemberCode && $options.goMemberCode(...args), "70"),
-    k: common_vendor.t($data.balance),
-    l: common_vendor.t($data.pointCount),
-    m: common_vendor.t($data.couponCount),
-    n: common_vendor.s($options.heroPaddingStyle),
-    o: common_vendor.t(">"),
-    p: common_vendor.o((...args) => $options.goOrderList && $options.goOrderList(...args), "a4"),
-    q: common_vendor.f($data.primaryActions, (item, k0, i0) => {
+    j: $data.staticImgPrefix + "/tabbar/二维码图标.png",
+    k: common_vendor.o((...args) => $options.goMemberCode && $options.goMemberCode(...args), "70"),
+    l: common_vendor.t($data.balance),
+    m: common_vendor.t($data.pointCount),
+    n: common_vendor.t($data.couponCount),
+    o: common_vendor.s($options.heroPaddingStyle),
+    p: common_vendor.t(">"),
+    q: common_vendor.o((...args) => $options.goOrderList && $options.goOrderList(...args), "a5"),
+    r: common_vendor.f($data.primaryActions, (item, k0, i0) => {
       return {
         a: common_vendor.n(`profile-page__action-icon--${item.icon}`),
         b: common_vendor.t(item.title),
@@ -295,7 +300,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       };
     }),
-    r: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
+    s: common_vendor.f($data.secondaryActions, (item, k0, i0) => {
       return common_vendor.e({
         a: item.iconImg
       }, item.iconImg ? {
@@ -308,22 +313,22 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         f: common_vendor.o(($event) => $options.onActionTap(item), item.title)
       });
     }),
-    s: $data.showAvatarPicker
+    t: $data.showAvatarPicker
   }, $data.showAvatarPicker ? {
-    t: $data.staticImgPrefix + "/1.png",
-    v: $data.avatarKey === "1" ? 1 : "",
-    w: common_vendor.o(($event) => $options.selectAvatar("1"), "8a"),
-    x: $data.staticImgPrefix + "/2.png",
-    y: $data.avatarKey === "2" ? 1 : "",
-    z: common_vendor.o(($event) => $options.selectAvatar("2"), "ba"),
-    A: common_vendor.o(($event) => $data.showAvatarPicker = false, "f7"),
-    B: common_vendor.o(() => {
-    }, "3a"),
-    C: common_vendor.o(($event) => $data.showAvatarPicker = false, "27")
+    v: $data.staticImgPrefix + "/1.png",
+    w: $data.avatarKey === "1" ? 1 : "",
+    x: common_vendor.o(($event) => $options.selectAvatar("1"), "61"),
+    y: $data.staticImgPrefix + "/2.png",
+    z: $data.avatarKey === "2" ? 1 : "",
+    A: common_vendor.o(($event) => $options.selectAvatar("2"), "25"),
+    B: common_vendor.o(($event) => $data.showAvatarPicker = false, "5a"),
+    C: common_vendor.o(() => {
+    }, "1e"),
+    D: common_vendor.o(($event) => $data.showAvatarPicker = false, "6e")
   } : {}, {
-    D: $data.showServicePicker
+    E: $data.showServicePicker
   }, $data.showServicePicker ? {
-    E: common_vendor.f($data.servicePhones, (item, index, i0) => {
+    F: common_vendor.f($data.servicePhones, (item, index, i0) => {
       return {
         a: common_vendor.t(item.name || "客服热线"),
         b: common_vendor.t(item.phone),
@@ -331,16 +336,16 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.makeCall(item.phone), index)
       };
     }),
-    F: common_vendor.o(($event) => $data.showServicePicker = false, "d7"),
-    G: common_vendor.o(() => {
-    }, "b8"),
-    H: common_vendor.o(($event) => $data.showServicePicker = false, "a9")
+    G: common_vendor.o(($event) => $data.showServicePicker = false, "75"),
+    H: common_vendor.o(() => {
+    }, "8a"),
+    I: common_vendor.o(($event) => $data.showServicePicker = false, "dc")
   } : {}, {
-    I: $data.showRechargePicker
+    J: $data.showRechargePicker
   }, $data.showRechargePicker ? common_vendor.e({
-    J: common_vendor.o(($event) => $data.showRechargePicker = false, "49"),
-    K: common_vendor.t($data.balance),
-    L: common_vendor.f($data.rechargeAmounts, (item, index, i0) => {
+    K: common_vendor.o(($event) => $data.showRechargePicker = false, "a5"),
+    L: common_vendor.t($data.balance),
+    M: common_vendor.f($data.rechargeAmounts, (item, index, i0) => {
       return {
         a: common_vendor.t(item),
         b: index,
@@ -348,21 +353,21 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         d: common_vendor.o(($event) => $options.selectRechargePreset(item), index)
       };
     }),
-    M: $data.rechargeIsCustom
+    N: $data.rechargeIsCustom
   }, $data.rechargeIsCustom ? {
-    N: $data.rechargeIsCustom,
-    O: common_vendor.o((...args) => $options.onRechargeCustomBlur && $options.onRechargeCustomBlur(...args), "e8"),
-    P: $data.rechargeCustomAmount,
-    Q: common_vendor.o(($event) => $data.rechargeCustomAmount = $event.detail.value, "73")
+    O: $data.rechargeIsCustom,
+    P: common_vendor.o((...args) => $options.onRechargeCustomBlur && $options.onRechargeCustomBlur(...args), "9f"),
+    Q: $data.rechargeCustomAmount,
+    R: common_vendor.o(($event) => $data.rechargeCustomAmount = $event.detail.value, "b1")
   } : {}, {
-    R: $data.rechargeIsCustom ? 1 : "",
-    S: common_vendor.o((...args) => $options.selectRechargeCustom && $options.selectRechargeCustom(...args), "02"),
-    T: common_vendor.o((...args) => $options.doRecharge && $options.doRecharge(...args), "91"),
-    U: common_vendor.o(() => {
-    }, "d4"),
-    V: common_vendor.o(($event) => $data.showRechargePicker = false, "78")
+    S: $data.rechargeIsCustom ? 1 : "",
+    T: common_vendor.o((...args) => $options.selectRechargeCustom && $options.selectRechargeCustom(...args), "d0"),
+    U: common_vendor.o((...args) => $options.doRecharge && $options.doRecharge(...args), "bf"),
+    V: common_vendor.o(() => {
+    }, "1e"),
+    W: common_vendor.o(($event) => $data.showRechargePicker = false, "b8")
   }) : {}, {
-    W: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
+    X: common_vendor.f(_ctx.tabbarList, (item, index, i0) => {
       return {
         a: _ctx.tabbarSelected === index ? item.selected : item.unselected,
         b: common_vendor.t(item.name),

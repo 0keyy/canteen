@@ -20,7 +20,7 @@
             <text v-if="companyVerified && companyDeptName" class="profile-page__company">{{ companyDeptName }}</text>
           </view>
           <view class="profile-page__member-btn" @tap="goMemberCode">
-            <image class="profile-page__member-img" src="/static/tabbar/二维码图标.png" mode="aspectFit"></image>
+            <image class="profile-page__member-img" :src="staticImgPrefix + '/tabbar/二维码图标.png'" mode="aspectFit"></image>
             <!-- <text class="profile-page__member-text">会员码</text> -->
           </view>
         </view>
@@ -352,6 +352,10 @@ export default {
       }
       if (item.title === '签到中心') {
         uni.navigateTo({ url: '/pages/signin/index' })
+        return
+      }
+      if (item.title === '积分抽奖') {
+        uni.navigateTo({ url: '/pages/lottery/index' })
         return
       }
       if (item.title === '积分商城') {

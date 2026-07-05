@@ -2,7 +2,11 @@ import { BASE_URL } from './config'
 
 const API_ORIGIN = BASE_URL.replace(/\/api\/?$/, '')
 
-export const STATIC_IMAGE_PREFIX = '/static'
+// 服务器图片前缀，所有 /static 下的图片都从服务器加载
+export const STATIC_IMAGE_PREFIX = 'https://canteen.zhongtang-group.com/api/uploads/image/static'
+
+// 兼容旧引用
+export const SERVER_IMAGE_PREFIX = 'https://canteen.zhongtang-group.com/api/uploads/image'
 
 export function resolveImageUrl(url) {
   if (!url) return ''

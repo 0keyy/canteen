@@ -1,9 +1,11 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_index = require("../../api/index.js");
+const utils_image = require("../../utils/image.js");
 const _sfc_main = {
   data() {
     return {
+      staticImgPrefix: utils_image.STATIC_IMAGE_PREFIX,
       loading: false,
       coupons: []
     };
@@ -46,9 +48,10 @@ const _sfc_main = {
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: $data.loading
+    a: $data.staticImgPrefix + "/拱手.png",
+    b: $data.loading
   }, $data.loading ? {} : $data.coupons.length === 0 ? {} : {
-    c: common_vendor.f($data.coupons, (coupon, k0, i0) => {
+    d: common_vendor.f($data.coupons, (coupon, k0, i0) => {
       return common_vendor.e({
         a: common_vendor.t(coupon.discountAmount),
         b: coupon.type === 2 && coupon.minAmount > 0
@@ -80,7 +83,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       });
     })
   }, {
-    b: $data.coupons.length === 0
+    c: $data.coupons.length === 0
   });
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-31f84e9e"]]);

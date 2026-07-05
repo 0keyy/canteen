@@ -26,7 +26,7 @@
       </view>
 
       <view v-else-if="coupons.length === 0" class="wallet-page__empty">
-        <image src="/static/tabbar/优惠券.png" mode="aspectFit" class="wallet-page__empty-icon"></image>
+        <image :src="staticImgPrefix + '/tabbar/优惠券.png'" mode="aspectFit" class="wallet-page__empty-icon"></image>
         <text class="wallet-page__empty-text">暂无优惠券</text>
         <text class="wallet-page__empty-sub">去领券中心看看吧</text>
       </view>
@@ -84,10 +84,12 @@
 
 <script>
 import { couponApi } from '../../api/index'
+import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 export default {
   data() {
     return {
+      staticImgPrefix: STATIC_IMAGE_PREFIX,
       tabs: [
         { label: '到店堂食', value: 'instore' },
         { label: '外卖配送', value: 'delivery' }

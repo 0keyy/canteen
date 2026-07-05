@@ -65,6 +65,7 @@
 
 <script>
 import { orderApi } from '../../api/index'
+import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 const TABS = [
   { key: 'all', name: '全部' },
@@ -81,7 +82,8 @@ export default {
       activeTab: 0,
       allList: [],
       navHeight: 0,
-      statusBarHeight: 0
+      statusBarHeight: 0,
+      staticImgPrefix: STATIC_IMAGE_PREFIX
     }
   },
   computed: {
@@ -200,7 +202,7 @@ export default {
           statusKey: 'completed',
           statusText: '已完成',
           dishes: [
-            { id: 1, name: '可口可乐', image: '/static/首页广告.png', price: '3', quantity: 1 }
+            { id: 1, name: '可口可乐', image: this.staticImgPrefix + '/首页广告.png', price: '3', quantity: 1 }
           ]
         },
         {
@@ -210,7 +212,7 @@ export default {
           statusKey: 'delivering',
           statusText: '待收货',
           dishes: [
-            { id: 2, name: '红烧牛肉面', image: '/static/首页广告.png', price: '15', quantity: 1 }
+            { id: 2, name: '红烧牛肉面', image: this.staticImgPrefix + '/首页广告.png', price: '15', quantity: 1 }
           ]
         }
       ]

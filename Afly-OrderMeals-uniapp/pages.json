@@ -146,6 +146,13 @@
       }
     },
     {
+      "path": "pages/lottery/index",
+      "style": {
+        "navigationStyle": "custom",
+        "animationType": "slide-in-right"
+      }
+    },
+    {
       "path": "pages/mine/memberCode/index",
       "style": {
         "navigationBarTitleText": "会员码",

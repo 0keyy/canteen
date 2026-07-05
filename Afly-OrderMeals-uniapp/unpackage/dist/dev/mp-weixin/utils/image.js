@@ -1,7 +1,7 @@
 "use strict";
 const utils_config = require("./config.js");
 const API_ORIGIN = utils_config.BASE_URL.replace(/\/api\/?$/, "");
-const STATIC_IMAGE_PREFIX = "/static";
+const STATIC_IMAGE_PREFIX = "https://canteen.zhongtang-group.com/api/uploads/image/static";
 function resolveImageUrl(url) {
   if (!url)
     return "";

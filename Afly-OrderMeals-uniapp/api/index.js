@@ -92,3 +92,9 @@ export const signinApi = {
   sign: () => post('/front/signin/sign'),
   rewards: () => get('/front/signin/rewards')
 }
+
+export const lotteryApi = {
+  info: () => get('/front/lottery/info'),
+  draw: () => post('/front/lottery/draw'),
+  prizes: () => get('/front/lottery/prizes')
+}

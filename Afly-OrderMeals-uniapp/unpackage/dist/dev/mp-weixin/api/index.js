@@ -77,12 +77,18 @@ const signinApi = {
   sign: () => utils_request.post("/front/signin/sign"),
   rewards: () => utils_request.get("/front/signin/rewards")
 };
+const lotteryApi = {
+  info: () => utils_request.get("/front/lottery/info"),
+  draw: () => utils_request.post("/front/lottery/draw"),
+  prizes: () => utils_request.get("/front/lottery/prizes")
+};
 exports.addressApi = addressApi;
 exports.authApi = authApi;
 exports.companyApi = companyApi;
 exports.couponApi = couponApi;
 exports.decorateApi = decorateApi;
 exports.integralApi = integralApi;
+exports.lotteryApi = lotteryApi;
 exports.memberApi = memberApi;
 exports.orderApi = orderApi;
 exports.payApi = payApi;
