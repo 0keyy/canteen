@@ -136,7 +136,7 @@ export default {
       if (coupon.type === 3 || coupon.type === 4) {
         uni.navigateTo({ url: `/pages/coupon/verify-code?id=${coupon.id}` })
       } else {
-        uni.switchTab({ url: '/pages/menu/index' })
+        uni.navigateTo({ url: '/pages/menu/index' })
       }
     },
     goExchange() {

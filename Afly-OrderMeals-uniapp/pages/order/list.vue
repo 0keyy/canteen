@@ -252,7 +252,7 @@ export default {
       uni.navigateTo({ url: `/pages/order/detail?orderId=${orderId}` })
     },
     reorder(order) {
-      uni.switchTab({ url: '/pages/menu/index' })
+      uni.navigateTo({ url: '/pages/menu/index' })
     },
     confirmReceive(order) {
       uni.showToast({ title: '确认收货功能开发中', icon: 'none' })

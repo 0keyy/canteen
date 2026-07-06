@@ -46,7 +46,7 @@
             <view class="home__primary-card-text">
               <text class="home__primary-name">到店堂食</text>
             </view>
-            <image class="home__primary-card-img" :src="staticImgPrefix + '/图层 2.png'" mode="aspectFit" />
+            <image class="home__primary-card-img" src="/static/图层 2.png" mode="aspectFit" />
           </view>
           <view
             class="home__primary-card-item"
@@ -56,7 +56,7 @@
             <view class="home__primary-card-text">
               <text class="home__primary-name">外卖配送</text>
             </view>
-            <image class="home__primary-card-img" :src="staticImgPrefix + '/小唐骑车.png'" mode="aspectFit" />
+            <image class="home__primary-card-img" src="/static/小唐骑车.png" mode="aspectFit" />
           </view>
         </view>
 
@@ -103,10 +103,10 @@
                   <text class="home__dish-desc">{{ dish.intro || '匠心制作，每日新鲜' }}</text>
                   <view class="home__dish-bottom">
                     <text class="home__dish-price">¥{{ dish.price }}</text>
-                    <view class="home__dish-btn" @tap.stop="selectSpec(dish)">
-                      <text class="home__dish-btn-text">立即下单</text>
-                    </view>
                   </view>
+                </view>
+                <view class="home__dish-btn" @tap.stop="selectSpec(dish)">
+                  <text class="home__dish-btn-text">立即下单</text>
                 </view>
               </view>
             </view>
@@ -153,7 +153,7 @@
 <script>
 import { orderApi, decorateApi, authApi, couponApi } from '../../api/index'
 import { DEFAULT_SHOP_ID } from '../../utils/config'
-import { resolveImageUrl, STATIC_IMAGE_PREFIX } from '../../utils/image'
+import { resolveImageUrl } from '../../utils/image'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getMenuButtonMarginRight, getNavMetrics } from '../../utils/navbar'
 import PageLoading from '../../components/page-loading/page-loading.vue'
@@ -163,7 +163,6 @@ export default {
   components: { PageLoading },
   data() {
     return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
       navMetrics: getNavMetrics(),
       menuButtonRight: 96,
       shop: null,
@@ -333,11 +332,11 @@ export default {
         uni.navigateTo({ url: '/pages/address/list?select=1' })
         return
       }
-      uni.switchTab({ url: '/pages/menu/index' })
+      uni.navigateTo({ url: '/pages/menu/index' })
     },
     goMenu() {
       uni.setStorageSync('diningMode', 1)
-      uni.switchTab({ url: '/pages/menu/index' })
+      uni.navigateTo({ url: '/pages/menu/index' })
     },
     selectSpec() {
       this.goMenu()
@@ -515,11 +514,11 @@ $section-gap: 20rpx;
   }
   
   &__primary-card-img {
-    width: 200rpx;
+    width: 180rpx;
     height: 160rpx;
     flex-shrink: 0;
     position: absolute;
-    right: -30rpx;
+    right: -25rpx;
     bottom: 20rpx;
   }
   
@@ -573,7 +572,7 @@ $section-gap: 20rpx;
   }
 
   &__shortcut-name {
-    margin-top: 5rpx;
+    margin-top: 8rpx;
     font-size: 23rpx;
     font-weight: 900;
     color: $text-primary;
@@ -587,17 +586,14 @@ $section-gap: 20rpx;
     line-height: 1.35;
   }
 
-  /* ===== 红色图标 ===== */
+  /* ===== 红色线描图标 ===== */
   &__icon {
-    width: 60rpx;
-    height: 60rpx;
+    width: 48rpx;
+    height: 48rpx;
     position: relative;
     box-sizing: border-box;
-    background: $brand-primary;
+    background: rgba(177,10,15,0.08);
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
     &--store {
       border: 3rpx solid $brand-primary;
@@ -737,82 +733,63 @@ $section-gap: 20rpx;
     }
 
     &--recharge {
-      background: $brand-primary;
+      border: 3rpx solid $brand-primary;
       border-radius: 50%;
 
       &::before {
-        content: '¥';
+        content: '￥';
         position: absolute;
-        font-size: 28rpx;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -52%);
+        font-size: 26rpx;
         line-height: 1;
-        color: #fff;
-        font-weight: 700;
-      }
-    }
-
-    &--redpacket {
-      background: $brand-primary;
-      border-radius: 50%;
-
-      &::before {
-        content: '';
-        position: absolute;
-        width: 28rpx;
-        height: 28rpx;
-        border: 3rpx solid #fff;
-        border-radius: 50%;
-      }
-
-      &::after {
-        content: '¥';
-        position: absolute;
-        font-size: 14rpx;
-        line-height: 1;
-        color: #fff;
+        color: $brand-primary;
         font-weight: 700;
       }
     }
 
     &--order {
-      background: $brand-primary;
-      border-radius: 50%;
+      border: 3rpx solid $brand-primary;
+      border-radius: 6rpx;
 
       &::before {
         content: '';
         position: absolute;
-        left: 16rpx;
-        top: 14rpx;
-        width: 24rpx;
+        left: 12rpx;
+        top: 10rpx;
+        width: 20rpx;
         height: 3rpx;
-        background: #fff;
-        box-shadow: 0 10rpx 0 #fff, 0 20rpx 0 #fff;
+        background: $brand-primary;
+        box-shadow: 0 10rpx 0 $brand-primary, 0 20rpx 0 $brand-primary;
       }
     }
 
     &--service {
-      background: $brand-primary;
+      border: 3rpx solid $brand-primary;
+      border-top-color: transparent;
       border-radius: 50%;
 
       &::before {
         content: '';
         position: absolute;
-        left: 10rpx;
-        top: 20rpx;
-        width: 12rpx;
-        height: 18rpx;
-        border: 3rpx solid #fff;
-        border-radius: 10rpx;
-        box-shadow: 46rpx 0 0 -3rpx transparent, 46rpx 0 0 0 #fff;
+        left: -8rpx;
+        top: 18rpx;
+        width: 10rpx;
+        height: 16rpx;
+        border: 3rpx solid $brand-primary;
+        border-radius: 8rpx;
+        box-shadow: 42rpx 0 0 -3rpx transparent, 42rpx 0 0 0 $brand-primary;
       }
 
       &::after {
         content: '';
         position: absolute;
-        right: 8rpx;
-        bottom: 6rpx;
-        width: 14rpx;
+        right: 4rpx;
+        bottom: 2rpx;
+        width: 12rpx;
         height: 3rpx;
-        background: #fff;
+        background: $brand-primary;
         border-radius: 999rpx;
       }
     }
@@ -821,6 +798,7 @@ $section-gap: 20rpx;
   /* ===== 招牌推荐 ===== */
   &__recommend {
     padding-top: 0;
+    padding: 0 20rpx;
   }
 
   &__recommend-header {
@@ -886,7 +864,7 @@ $section-gap: 20rpx;
     align-items: center;
     gap: 20rpx;
     padding: 18rpx 22rpx;
-    margin: 0 10rpx;
+    margin: 0 13rpx;
     background: #FFE8CD;
     border-radius: 16rpx;
     box-shadow: none;
@@ -925,13 +903,11 @@ $section-gap: 20rpx;
   }
 
   &__dish-info {
-    position: relative;
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0 160rpx 0 0;
   }
 
   &__dish-name {
@@ -969,18 +945,16 @@ $section-gap: 20rpx;
   }
 
   &__dish-btn {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
     background: #c82d24;
     border-radius: 999rpx;
     padding: 12rpx 28rpx;
     box-shadow: none;
     transition: transform $transition-fast;
+    margin-left: auto;
+    margin-right: 30rpx;
 
     &:active {
-      transform: translateY(-50%) scale(0.95);
+      transform: scale(0.95);
     }
   }
 

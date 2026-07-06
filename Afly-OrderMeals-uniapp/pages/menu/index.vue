@@ -1,6 +1,9 @@
 <template>
   <view class="order-page">
     <view class="order-page__header" :style="headerPaddingStyle">
+      <view class="order-page__back-btn" @tap="goBack">
+        <text class="order-page__back-icon">‹</text>
+      </view>
       <!-- 轮播图 -->
       <view class="order-page__banner" v-if="displayBanners.length">
         <swiper
@@ -9,9 +12,6 @@
           :circular="displayBanners.length > 1"
           :interval="4000"
           :duration="500"
-          indicator-dots
-          indicator-color="rgba(255,255,255,0.4)"
-          indicator-active-color="#ffffff"
         >
           <swiper-item v-for="(banner, idx) in displayBanners" :key="idx" class="order-page__swiper-item">
             <image :src="banner.image" class="order-page__banner-image" mode="aspectFill" />
@@ -22,11 +22,11 @@
       <view class="order-page__store-card">
         <view class="order-page__store-info">
           <text class="order-page__store-open">{{ shopName }}正在营业中</text>
-          <text class="order-page__store-time">营业时间：6:00_22:00</text>
+          <text class="order-page__store-time">营业时间：6:00-22:00</text>
         </view>
-        <view class="order-page__mode-board" @tap="toggleMode">
+        <view class="order-page__mode-board" @tap="goToConfirm">
           <image class="order-page__mode-board-bg" :src="staticImgPrefix + '/tabbar/矢量 38.png'" mode="aspectFit" />
-          <text class="order-page__mode-board-text">{{ diningMode === 3 ? '外卖' : '堂食' }}</text>
+          <text class="order-page__mode-board-text">{{ diningMode === 3 ? '外卖' : '自取' }}</text>
         </view>
       </view>
     </view>
@@ -109,45 +109,82 @@
       :class="{ 'cart-bar--disabled': !cartReady || cartItemCount === 0 }"
       @tap="goConfirm"
     >
-      <view class="cart-bar__bag">
-        <image class="cart-bar__person" :src="staticImgPrefix + '/新版小唐.png'" mode="aspectFit" />
+      <view class="cart-bar__bag" @tap.stop="openCart">
+        <image class="cart-bar__person" :src="staticImgPrefix + '/点赞.png'" mode="aspectFit" />
         <view class="cart-bar__badge" v-if="cartItemCount > 0">
           <text class="cart-bar__badge-text">{{ cartItemCount }}</text>
         </view>
       </view>
       <text class="cart-bar__price">{{ cartSummary }}</text>
-      <view
-        class="cart-bar__btn"
+      <view class="cart-bar__btn"
         :class="{ 'cart-bar__btn--disabled': !cartReady || cartItemCount === 0 }"
       >
         <text class="cart-bar__btn-text">去结算</text>
       </view>
     </view>
 
-    <view class="app-tab-bar">
-      <view
-        v-for="(item, index) in tabbarList"
-        :key="index"
-        class="app-tab-item"
-        :class="{ 'app-tab-item--active': tabbarSelected === index }"
-        @tap.stop="switchTabbar(item, index)"
-      >
-        <view class="app-tab-icon-wrap">
-          <image
-            class="app-tab-icon"
-            :src="tabbarSelected === index ? item.selected : item.unselected"
-            mode="aspectFit"
-          />
+    <!-- 购物车弹窗遮罩 -->
+    <view class="cart-mask" v-if="showCartPopup" @tap="closeCart"></view>
+    
+    <!-- 购物车弹窗 -->
+    <view class="cart-popup" v-if="showCartPopup">
+      <view class="cart-popup__header">
+        <text class="cart-popup__title">购物车</text>
+        <text class="cart-popup__clear" @tap="clearCart">清空购物车</text>
+      </view>
+      <scroll-view scroll-y class="cart-popup__content">
+        <view v-if="cartList.length === 0" class="cart-popup__empty">
+          <text>购物车是空的</text>
         </view>
-        <text
-          class="app-tab-text"
-          :style="{ color: tabbarSelected === index ? tabbarSelectedColor : tabbarDefaultColor }"
+        <view v-for="item in cartList" :key="item.odid" class="cart-popup__item">
+          <image :src="item.food.image" class="cart-popup__image" mode="aspectFit" />
+          <view class="cart-popup__info">
+            <text class="cart-popup__name">{{ item.food.name }}</text>
+            <text class="cart-popup__price">¥{{ item.price }}</text>
+          </view>
+          <view class="cart-popup__quantity">
+            <view class="cart-popup__btn cart-popup__btn--minus" @tap="decFood(item.food)">
+              <text>-</text>
+            </view>
+            <text class="cart-popup__count">{{ item.count }}</text>
+            <view class="cart-popup__btn cart-popup__btn--plus" @tap="addFood(item.food)">
+              <text>+</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="cart-popup__footer">
+        <view class="cart-popup__total">
+          <text class="cart-popup__total-label">合计：</text>
+          <text class="cart-popup__total-price">¥{{ totalPrice }}</text>
+        </view>
+        <view 
+          class="cart-popup__submit" 
+          :class="{ 'cart-popup__submit--disabled': cartItemCount === 0 }"
+          @tap="goConfirm"
         >
-          {{ item.name }}
-        </text>
+          <text>去结算</text>
+        </view>
       </view>
     </view>
-  </view>
+
+    <!-- 清空购物车确认弹窗遮罩 -->
+    <view class="clear-mask" v-if="showClearConfirm"></view>
+    
+    <!-- 清空购物车确认弹窗 -->
+    <view class="clear-confirm" v-if="showClearConfirm">
+      <text class="clear-confirm__title">清空购物车？</text>
+      <view class="clear-confirm__actions">
+        <view class="clear-confirm__btn clear-confirm__btn--cancel" @tap="showClearConfirm = false">
+          <text>取消</text>
+        </view>
+        <view class="clear-confirm__btn clear-confirm__btn--confirm" @tap="confirmClearCart">
+          <text>确定</text>
+        </view>
+      </view>
+    </view>
+
+    </view>
 </template>
 
 <script>
@@ -180,7 +217,9 @@ export default {
       cartReady: false,
       cartBusy: false,
       cartInitPromise: null,
-      banners: []
+      banners: [],
+      showCartPopup: false,
+      showClearConfirm: false
     }
   },
   computed: {
@@ -221,6 +260,15 @@ export default {
       if (!this.cartReady) return '¥0.00'
       if (this.cartItemCount === 0) return '¥0.00'
       return `¥ ${this.totalPrice}`
+    },
+    cartList() {
+      return Object.values(this.cartMap).map((item) => {
+        const food = this.findFood(item.dishId)
+        return {
+          ...item,
+          food
+        }
+      }).filter(item => item.food)
     }
   },
   onLoad() {
@@ -244,6 +292,34 @@ export default {
     }
   },
   methods: {
+    goBack() {
+      const pages = getCurrentPages()
+      if (pages.length <= 1) {
+        uni.switchTab({ url: '/pages/index/index' })
+      } else {
+        uni.navigateBack({ delta: 1 })
+      }
+    },
+    openCart() {
+      this.showCartPopup = true
+    },
+    closeCart() {
+      this.showCartPopup = false
+    },
+    clearCart() {
+      this.showClearConfirm = true
+    },
+    async confirmClearCart() {
+      this.showClearConfirm = false
+      if (!this.orderId || this.cartItemCount === 0) return
+      try {
+        await orderApi.toEmpty(this.orderId)
+        await this.syncCart()
+        uni.showToast({ title: '已清空购物车', icon: 'success' })
+      } catch (e) {
+        uni.showToast({ title: '清空失败', icon: 'none' })
+      }
+    },
     updateNavPadding() {
       this.navMetrics = getNavMetrics()
       this.menuButtonRight = getMenuButtonMarginRight(96)
@@ -253,6 +329,13 @@ export default {
     },
     goSearch() {
       uni.showToast({ title: '搜索功能开发中', icon: 'none' })
+    },
+    goToConfirm() {
+      if (this.cartItemCount === 0) {
+        uni.showToast({ title: '请先选择菜品', icon: 'none' })
+        return
+      }
+      uni.navigateTo({ url: '/pages/cart/confirm' })
     },
     toggleMode() {
       const next = this.diningMode === 3 ? 1 : 3
@@ -589,10 +672,30 @@ page {
   &__header {
     flex-shrink: 0;
     position: relative;
-    padding: 0 24rpx 0;
-    background: linear-gradient(180deg, #FFD7D7 0%, #F36F7B 100%);
+    padding: 0;
+    background: transparent;
     overflow: hidden;
     border-bottom: none;
+	margin-top: -62px;
+  }
+
+  &__back-btn {
+    position: absolute;
+    left: 20rpx;
+    top: 170rpx;
+    z-index: 10;
+    width: 64rpx;
+    height: 64rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__back-icon {
+    font-size: 80rpx;
+    color: #FFFFFF;
+    font-weight: 300;
+    line-height: 1;
   }
 
  
@@ -600,27 +703,27 @@ page {
     flex-shrink: 0;
     position: relative;
     z-index: 2;
-    padding: 0 20rpx;
-    margin: 16rpx 0 0;
+    padding: 0;
+    margin: 0;
   }
 
   &__swiper {
     width: 100%;
-    height: 280rpx;
-    border-radius: 16rpx;
+    height: 630rpx;
+    border-radius: 0;
     overflow: hidden;
   }
 
   &__swiper-item {
     width: 100%;
-    height: 280rpx;
+    height: 630rpx;
   }
 
   &__banner-image {
     width: 100%;
-    height: 280rpx;
+    height: 630rpx;
     display: block;
-    border-radius: 16rpx;
+    border-radius: 0;
   }
 
   &__brand-hero {
@@ -681,13 +784,15 @@ page {
   }
 
   &__store-card {
-    position: relative;
+    position: absolute;
     z-index: 4;
+    bottom: -10rpx;
+    left: 0;
+    right: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
     min-height: 126rpx;
-    margin: 0 -24rpx;
     padding: 22rpx 54rpx 22rpx 34rpx;
     background: #FFFFFF;
     border-radius: 18rpx 18rpx 0 0;
@@ -717,7 +822,7 @@ page {
     width: 122rpx;
     height: 110rpx;
     flex-shrink: 0;
-    margin-top: -50rpx;
+    margin-top: -10rpx;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -764,12 +869,15 @@ page {
     width: 172rpx;
     flex-shrink: 0;
     background: #f7f7f7;
+    position: relative;
+    height: 100%;
+    overflow: hidden;
     .sidebar-scroll {
       height: 100%;
     }
   }
   .sidebar-bottom-space {
-    height: calc(140rpx + #{$tabbar-height});
+    height: 260rpx;
   }
 
   &__dishes {
@@ -927,9 +1035,9 @@ page {
 
 .cart-bar {
   position: fixed;
-  left: 52rpx;
-  right: 18rpx;
-  bottom: calc(#{$tabbar-height} + 12rpx);
+  left: 70rpx;
+  right: 38rpx;
+  bottom: 30rpx;
   z-index: 99;
   display: flex;
   align-items: center;
@@ -942,7 +1050,8 @@ page {
   overflow: visible;
 
   &--disabled {
-    opacity: 0.82;
+    background: #999999;
+    box-shadow: none;
   }
 
   &__bag {
@@ -955,13 +1064,13 @@ page {
     border-radius: 0;
     background: transparent;
     flex-shrink: 0;
-    margin-left: -106rpx;
-    margin-top: -30rpx;
+    margin-left: -50rpx;
+    margin-top: -40rpx;
   }
 
   &__person {
-    width: 100rpx;
-    height: 112rpx;
+    width: 1250rpx;
+    height: 150rpx;
     display: block;
   }
 
@@ -1012,6 +1121,263 @@ page {
     color: $text-white;
     font-size: 28rpx;
     font-weight: 900;
+  }
+}
+
+.cart-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.cart-popup {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border-radius: 32rpx 32rpx 0 0;
+  z-index: 101;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30rpx 32rpx;
+    border-bottom: 1rpx solid #f0f0f0;
+  }
+
+  &__title {
+    font-size: 36rpx;
+    font-weight: 600;
+    color: #333333;
+  }
+
+  &__clear {
+    font-size: 28rpx;
+    color: #999999;
+  }
+
+  &__content {
+    flex: 1;
+    padding: 20rpx 32rpx;
+    overflow-y: auto;
+  }
+
+  &__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200rpx;
+    color: #999999;
+    font-size: 28rpx;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    padding: 24rpx 0;
+    border-bottom: 1rpx solid #f5f5f5;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__image {
+    width: 160rpx;
+    height: 160rpx;
+    border-radius: 12rpx;
+    flex-shrink: 0;
+  }
+
+  &__info {
+    flex: 1;
+    margin-left: 20rpx;
+    min-width: 0;
+  }
+
+  &__name {
+    display: block;
+    font-size: 32rpx;
+    color: #333333;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__price {
+    display: block;
+    font-size: 32rpx;
+    color: #E33A30;
+    font-weight: 900;
+    margin-top: 8rpx;
+  }
+
+  &__quantity {
+    display: flex;
+    align-items: center;
+    gap: 24rpx;
+    flex-shrink: 0;
+  }
+
+  &__btn {
+    width: 56rpx;
+    height: 56rpx;
+    border-radius: 50%;
+    border: 2rpx solid #E33A30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text {
+      font-size: 36rpx;
+      color: #E33A30;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    &--minus {
+      border-color: #999999;
+      text {
+        color: #999999;
+      }
+    }
+  }
+
+  &__count {
+    font-size: 32rpx;
+    color: #333333;
+    font-weight: 600;
+    min-width: 48rpx;
+    text-align: center;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24rpx 32rpx;
+    padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+    background: #FFFFFF;
+    border-top: 1rpx solid #f0f0f0;
+  }
+
+  &__total {
+    display: flex;
+    align-items: baseline;
+  }
+
+  &__total-label {
+    font-size: 28rpx;
+    color: #666666;
+  }
+
+  &__total-price {
+    font-size: 44rpx;
+    color: #E33A30;
+    font-weight: 900;
+    margin-left: 8rpx;
+  }
+
+  &__submit {
+    height: 88rpx;
+    padding: 0 48rpx;
+    background: linear-gradient(90deg, #B80000 0%, #D00000 62%, #E33A30 100%);
+    border-radius: 44rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text {
+      color: #FFFFFF;
+      font-size: 32rpx;
+      font-weight: 600;
+    }
+
+    &--disabled {
+      background: #CCCCCC;
+    }
+  }
+}
+
+.clear-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 102;
+}
+
+.clear-confirm {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 48rpx 64rpx;
+  z-index: 103;
+  min-width: 560rpx;
+
+  &__title {
+    display: block;
+    text-align: center;
+    font-size: 36rpx;
+    color: #333333;
+    font-weight: 600;
+    margin-bottom: 48rpx;
+  }
+
+  &__actions {
+    display: flex;
+    border-top: 1rpx solid #f0f0f0;
+  }
+
+  &__btn {
+    flex: 1;
+    height: 96rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text {
+      font-size: 32rpx;
+    }
+
+    &--cancel {
+      border-right: 1rpx solid #f0f0f0;
+      text {
+        color: #999999;
+      }
+    }
+
+    &--confirm {
+      text {
+        color: #E33A30;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }
 </style>
