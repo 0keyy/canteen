@@ -25,10 +25,16 @@ const TAB_NAME_PATH_MAP = {
   '点单': 'pages/menu/index',
   '菜单': 'pages/menu/index',
   '堂食': 'pages/menu/index',
+  '外卖': 'pages/menu/index',
   '积分商城': 'pages/points/index',
+  '积分': 'pages/points/index',
+  '商城': 'pages/points/index',
+  '积分商店': 'pages/points/index',
+  '积分中心': 'pages/points/index',
   '我的': 'pages/mine/index',
   '个人中心': 'pages/mine/index',
-  '我的主页': 'pages/mine/index'
+  '我的主页': 'pages/mine/index',
+  '会员中心': 'pages/mine/index'
 }
 
 const DEFAULT_TABBAR = {
@@ -51,9 +57,14 @@ export function normalizeTabPath(path) {
 }
 
 export function resolveTabPagePath(item) {
+  const name = item?.name || ''
+  const fromName = TAB_NAME_PATH_MAP[name]
+  if (fromName) return fromName
   const fromLink = normalizeTabPath(item?.link?.path || item?.link?.url || item?.pagePath || '')
-  if (fromLink) return fromLink
-  return TAB_NAME_PATH_MAP[item?.name] || ''
+  if (fromLink && /\//.test(fromLink)) return fromLink
+  const fromLinkName = TAB_NAME_PATH_MAP[fromLink]
+  if (fromLinkName) return fromLinkName
+  return ''
 }
 
 export function filterTabbarList(list) {
@@ -102,37 +113,50 @@ export function hideNativeTabBar() {
 export function normalizeTabbarItem(item) {
   const link = item?.link || {}
   const pagePath = resolveTabPagePath(item)
-  const selectedImg =
-    item?.selected ||
-    item?.selectedIcon ||
-    item?.selectedIconPath ||
-    item?.activeIcon ||
-    item?.iconSelected ||
-    item?.selectIcon ||
-    item?.icon ||
-    ''
-  const unselectedImg =
-    item?.unselected ||
-    item?.unselectedIcon ||
-    item?.unselectedIconPath ||
-    item?.inactiveIcon ||
-    item?.iconUnselected ||
-    item?.defaultIcon ||
-    item?.icon ||
-    ''
+  const getFirstValue = (keys) => {
+    for (const key of keys) {
+      if (item?.[key]) return item[key]
+    }
+    if (item?.icon && typeof item.icon === 'object') {
+      for (const key of keys) {
+        if (item.icon?.[key]) return item.icon[key]
+      }
+    }
+    return ''
+  }
+  const selectedKeys = [
+    'selected', 'selectedIcon', 'selectedIconPath', 'selectedImage',
+    'activeIcon', 'iconSelected', 'selectIcon', 'activeImage',
+    'iconActive', 'selected_url', 'selectedUrl'
+  ]
+  const unselectedKeys = [
+    'unselected', 'unselectedIcon', 'unselectedIconPath', 'unselectedImage',
+    'inactiveIcon', 'iconUnselected', 'defaultIcon', 'defaultImage',
+    'iconDefault', 'normalIcon', 'normal', 'unselected_url', 'unselectedUrl'
+  ]
+  let selectedImg = getFirstValue(selectedKeys)
+  let unselectedImg = getFirstValue(unselectedKeys)
+  if (!selectedImg && !unselectedImg && item?.icon) {
+    if (typeof item.icon === 'string') {
+      selectedImg = item.icon
+      unselectedImg = item.icon
+    }
+  }
+  if (!selectedImg && unselectedImg) selectedImg = unselectedImg
+  if (!unselectedImg && selectedImg) unselectedImg = selectedImg
   return {
     ...item,
     pagePath,
     link: {
       ...link,
-      path: link.path || link.url || (pagePath ? `/${pagePath}` : '')
+      path: pagePath ? `/${pagePath}` : (link.path || link.url || '')
     },
     selected: selectedImg,
     unselected: unselectedImg
   }
 }
 
-export const TABBAR_CACHE_VERSION = 12
+export const TABBAR_CACHE_VERSION = 16
 
 export function readTabbarCache() {
   const cached = uni.getStorageSync('tabbarConfig')

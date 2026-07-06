@@ -19,7 +19,7 @@
       </view>
 
       <view class="address-page__empty" v-if="list.length === 0">
-        <image class="address-page__empty-emoji" :src="STATIC_IMAGE_PREFIX + '/开心呢.png'" mode=""></image>
+        <image class="address-page__empty-emoji" :src="emptyImg" mode="aspectFit"></image>
         <text class="address-page__empty-text">暂无收货地址</text>
       </view>
 
@@ -34,13 +34,14 @@
 
 <script>
 import { addressApi } from '../../api/index'
-import { STATIC_IMAGE_PREFIX } from '../../utils/image'
+import { STATIC_IMAGE_PREFIX, resolveImageUrl } from '../../utils/image'
 
 export default {
   data() {
     return {
       list: [],
-      selectMode: false
+      selectMode: false,
+      emptyImg: resolveImageUrl(STATIC_IMAGE_PREFIX + '/开心呢.png')
     }
   },
   onLoad(options) {
@@ -91,8 +92,8 @@ export default {
   }
 
   &__empty-emoji {
-	width: 80rpx;
-	height: 80rpx;
+	  width: 300rpx;
+	  height: 300rpx;
     margin-bottom: 24rpx;
   }
 

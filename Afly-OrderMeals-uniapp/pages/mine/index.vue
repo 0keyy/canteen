@@ -7,7 +7,7 @@
 		</view>
 		<!-- 用户信息 -->
         <view class="profile-page__user-row">
-          <view class="profile-page__avatar-wrap" @tap="showAvatarPicker = true">
+          <view class="profile-page__avatar-wrap" @tap="goProfile">
             <image class="profile-page__avatar" :src="avatarSrc" mode="aspectFill" />
           </view>
           <view class="profile-page__user-info">
@@ -58,7 +58,13 @@
               @tap="onActionTap(item)"
             >
               <view class="profile-page__grid-icon profile-page__grid-icon--primary">
-                <view :class="['profile-page__action-icon', `profile-page__action-icon--${item.icon}`]"></view>
+                <image
+                  v-if="item.iconImg"
+                  class="profile-page__action-img"
+                  :src="item.iconImg"
+                  mode="aspectFit"
+                />
+                <view v-else :class="['profile-page__action-icon', `profile-page__action-icon--${item.icon}`]"></view>
               </view>
               <text class="profile-page__grid-label">{{ item.title }}</text>
             </view>
@@ -213,20 +219,21 @@ import { getNavMetrics } from '../../utils/navbar'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 const PRIMARY_ACTIONS = [
-  { title: '待支付', icon: 'orders' },
-  { title: '待发货', icon: 'address' },
-  { title: '待收货', icon: 'service' },
-  { title: '退款售后', icon: 'code' }
+  { title: '待支付', icon: 'orders' ,iconImg: STATIC_IMAGE_PREFIX + '/tabbar/待支付 1.png'},
+  { title: '待发货', icon: 'address',iconImg: STATIC_IMAGE_PREFIX + '/tabbar/待发货 1.png' },
+  { title: '待收货', icon: 'service',iconImg: STATIC_IMAGE_PREFIX + '/tabbar/待收货 1.png' },
+  { title: '退款售后', icon: 'code' ,iconImg: STATIC_IMAGE_PREFIX + '/tabbar/售后 1.png'}
 ]
 
 const SECONDARY_ACTIONS = [
-  { title: '我的订单', icon: 'check', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/公司认证.png' },
-  { title: '地址管理', icon: 'wallet', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/充值 1.png' },
-  { title: '客服中心', icon: 'coins', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/积分商城.png' },
-  { title: '充值中心', icon: 'ticket', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.png' },
-  { title: '红包卡券', icon: 'crown', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/名词 1.png' },
-  { title: '签到中心', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/退出 1.png' },
-  { title: '积分抽奖', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/退出 1.png' },
+  { title: '公司认证', icon: 'company', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/公司认证.png' },
+  { title: '我的订单', icon: 'check', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/全部订单 1.png' },
+  { title: '地址管理', icon: 'wallet', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/地址管理 1.png' },
+  { title: '客服中心', icon: 'coins', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/客服 1.png' },
+  { title: '充值中心', icon: 'ticket', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/储值 1.png' },
+  { title: '红包卡券', icon: 'crown', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.png' },
+  { title: '签到中心', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/签到 1.png' },
+  { title: '积分抽奖', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/抽奖 1.png' },
   { title: '安全退出', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/退出 1.png' }
 ]
 
@@ -495,8 +502,8 @@ export default {
   }
 
   &__hero {
-	  height: 35vh;
-      padding: 0 32rpx 48rpx;
+	  min-height: 380rpx;
+      padding: 0 32rpx 100rpx;
       background: linear-gradient(180deg, #e63946 0%, #f8f8f8 100%);
       position: relative;
       overflow: hidden;
@@ -522,7 +529,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 24rpx;
-	height:18vh;
+	padding-top: 100rpx;
   }
 
   &__avatar-wrap {
@@ -934,15 +941,16 @@ export default {
   }
 
   &__stats {
-	  height: 200rpx;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 32rpx;
-      padding: 24rpx 0;
+      margin: 90rpx 24rpx -100rpx;
+      padding: 32rpx 0;
       background: #ffffff;
       border-radius: 20rpx;
       box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.1);
+	  position: relative;
+	  z-index: 10;
     }
   
     &__stat-item {
@@ -1188,8 +1196,8 @@ export default {
   }
 
   &__action-img {
-    width: 36rpx;
-    height: 36rpx;
+    width: 44rpx;
+    height: 44rpx;
     display: block;
   }
 

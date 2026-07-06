@@ -128,6 +128,7 @@ export default {
           this.allList = this.getMockList()
         }
       } catch (e) {
+        console.log('[order list] 接口报错，使用mock数据:', e)
         this.allList = this.getMockList()
       }
     },
@@ -173,25 +174,44 @@ export default {
       }
     },
     getStatusInfo(item) {
-      if (item.payStatus === 0 || item.status === 4) {
+      const status = item.status
+      const payStatus = item.payStatus
+      const orderStatus = item.orderStatus
+      const statusText = item.statusText || item.statusName || ''
+
+      if (payStatus === 0 || status === 0 || status === 4 || orderStatus === 0) {
         return { key: 'paying', text: '待支付' }
       }
-      if (item.status === 1 && item.shippingStatus === 0) {
-        return { key: 'shipping', text: '待发货' }
+      if (status === 1 || status === 'pending' || status === 'preparing' ||
+          orderStatus === 1 || orderStatus === 2 ||
+          statusText.includes('制作') || statusText.includes('备餐') ||
+          statusText.includes('接单') || statusText.includes('待发货')) {
+        if (item.shippingStatus === 1 || statusText.includes('配送') || statusText.includes('已发货')) {
+          return { key: 'delivering', text: '待收货' }
+        }
+        return { key: 'shipping', text: statusText || '制作中' }
       }
-      if (item.status === 1 && item.shippingStatus === 1) {
-        return { key: 'delivering', text: '待收货' }
-      }
-      if (item.status === 2) {
+      if (status === 2 || status === 'completed' || status === 'finished' ||
+          orderStatus === 3 || statusText.includes('完成') || statusText.includes('已完成')) {
         return { key: 'completed', text: '已完成' }
       }
-      if (item.status === 3) {
+      if (status === 3 || status === 'refunded' || statusText.includes('已退款')) {
         return { key: 'refund', text: '已退款' }
       }
-      if (item.status === 5) {
+      if (status === 5 || status === 'refunding' || statusText.includes('退款中') || statusText.includes('退款申请')) {
         return { key: 'refund', text: '退款中' }
       }
-      return { key: 'completed', text: '已完成' }
+      if (item.shippingStatus === 1 || statusText.includes('配送') || statusText.includes('发货')) {
+        return { key: 'delivering', text: '待收货' }
+      }
+      if (statusText) {
+        if (statusText.includes('支付')) return { key: 'paying', text: statusText }
+        if (statusText.includes('制作') || statusText.includes('备餐') || statusText.includes('接单')) return { key: 'shipping', text: statusText }
+        if (statusText.includes('配送') || statusText.includes('发货')) return { key: 'delivering', text: statusText }
+        if (statusText.includes('完成')) return { key: 'completed', text: statusText }
+        if (statusText.includes('退款')) return { key: 'refund', text: statusText }
+      }
+      return { key: 'completed', text: statusText || '已完成' }
     },
     getMockList() {
       return [
