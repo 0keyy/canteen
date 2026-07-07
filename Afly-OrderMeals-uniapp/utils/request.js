@@ -39,7 +39,16 @@ export function request(options) {
         }
       },
       fail(err) {
-        reject(err.errMsg || '网络错误')
+        const errMsg = err.errMsg || ''
+        let msg = '网络错误'
+        if (errMsg.includes('ERR_INTERNET_DISCONNECTED') || errMsg.includes('net::ERR')) {
+          msg = '网络连接已断开，请检查网络'
+        } else if (errMsg.includes('timeout')) {
+          msg = '请求超时，请重试'
+        } else if (errMsg.includes('fail')) {
+          msg = '网络请求失败'
+        }
+        reject(msg)
       }
     })
   })
