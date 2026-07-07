@@ -8,15 +8,25 @@
         <image class="checkout__logo" :src="staticImgPrefix + '/logo.png'" mode="aspectFit" />
         <view class="checkout__nav-empty"></view>
       </view>
-      <text class="checkout__header-title">请确认用餐方式</text>
+      <text class="checkout__header-title">{{ isDeliveryMode ? '请选择配送方式' : '请确认用餐方式' }}</text>
     </view>
 
     <scroll-view class="checkout__scroll" scroll-y :show-scrollbar="false">
-      <view class="checkout__section checkout__section--dining-mode">
+      <view class="checkout__section" v-if="isDeliveryMode" @tap="goToAddress">
+        <text class="checkout__section-label">请选择配送位置</text>
+        <view class="checkout__section-right">
+          <text class="checkout__section-value" :class="{ 'checkout__section-value--primary': deliveryAddress }">
+            {{ deliveryAddress ? deliveryAddress.address : '请选择' }}
+          </text>
+          <text class="checkout__arrow">›</text>
+        </view>
+      </view>
+
+      <view class="checkout__section checkout__section--dining-mode" v-if="!isDeliveryMode">
         <view 
           class="checkout__mode-card" 
           :class="{ 'checkout__mode-card--active': diningMode === 1 }"
-          @tap="selectDiningMode(1)"
+          @tap="selectDiningMode(1)" 
         >
           <view class="checkout__mode-icon">
             <image :src="staticImgPrefix + '/tabbar/商城-幸福餐桌 1.png'" mode="aspectFit" />
@@ -40,7 +50,7 @@
       </view>
 
       <view class="checkout__section checkout__section--time" @tap="showTimePicker = true">
-        <text class="checkout__section-label">取餐时间</text>
+        <text class="checkout__section-label">{{ isDeliveryMode ? '送达时间' : '取餐时间' }}</text>
         <view class="checkout__section-right">
           <text class="checkout__section-value checkout__section-value--primary">{{ pickupTimeText }}</text>
           <text class="checkout__arrow">›</text>
@@ -92,7 +102,7 @@
         </view>
         <view class="checkout__section-right">
           <text class="checkout__section-value" :class="{ 'checkout__section-value--primary': selectedCoupon }">
-            {{ selectedCoupon ? `-${couponDiscount.toFixed(2)}元` : `${availableCoupons.length}个可用` }}
+            {{ selectedCoupon ? `-${couponDiscount.toFixed(2)}元` : (availableCoupons.length > 0 ? `${availableCoupons.length}个可用` : '暂无可用') }}
           </text>
           <text class="checkout__arrow">›</text>
         </view>
@@ -134,7 +144,7 @@
     <view class="checkout__mask" v-if="showTimePicker" @tap="showTimePicker = false">
       <view class="checkout__time-picker" @tap.stop>
         <view class="checkout__picker-header">
-          <text class="checkout__picker-title">请选择时间</text>
+          <text class="checkout__picker-title">{{ isDeliveryMode ? '请选择送达时间' : '请选择取餐时间' }}</text>
         </view>
         <view class="checkout__time-content">
           <scroll-view scroll-y class="checkout__time-days">
@@ -268,12 +278,16 @@ export default {
       selectedCoupon: null,
       selectedTimeDay: 0,
       selectedTimeSlot: 0,
-      pickupTime: '立即取餐'
+      pickupTime: '立即取餐',
+      deliveryAddress: null
     }
   },
   computed: {
+    isDeliveryMode() {
+      return this.diningMode === 3
+    },
     diningModeText() {
-      return { 1: '堂食', 2: '打包' }[this.diningMode] || '堂食'
+      return { 1: '堂食', 2: '打包', 3: '外卖' }[this.diningMode] || '堂食'
     },
     payChannelText() {
       const m = this.payMethodList.find((item) => item.channel === this.payChannel)
@@ -285,10 +299,6 @@ export default {
     },
     totalAmount() {
       if (!this.order) return '0.00'
-      const orderAmount = this.order.amount
-      if (orderAmount !== null && orderAmount !== undefined && orderAmount !== '') {
-        return Number(orderAmount).toFixed(2)
-      }
       return this.calcDishesAmount(this.order.dishes)
     },
     pickupTimeText() {
@@ -305,13 +315,14 @@ export default {
       ]
     },
     currentTimeSlots() {
-      const slots = ['立即取餐']
+      const prefix = this.isDeliveryMode ? '送达' : '取餐'
+      const slots = [this.isDeliveryMode ? '立即出发' : '立即取餐']
       const now = new Date()
       const startHour = now.getHours() + 1
       for (let i = 0; i < 8; i++) {
         const hour = startHour + i
         if (hour >= 24) break
-        slots.push(`${hour.toString().padStart(2, '0')}:20-${hour.toString().padStart(2, '0')}:40取餐`)
+        slots.push(`${hour.toString().padStart(2, '0')}:20-${hour.toString().padStart(2, '0')}:40${prefix}`)
       }
       return slots
     }
@@ -319,14 +330,31 @@ export default {
   async onLoad() {
     this.orderId = Number(uni.getStorageSync('orderId'))
     this.diningMode = Number(uni.getStorageSync('diningMode') || 1)
+    this.loadDeliveryAddress()
     await this.loadDetail()
     await this.loadCoupons()
     this.loadBestCoupon()
     this.loadPayMethods()
   },
+  onShow() {
+    this.loadDeliveryAddress()
+  },
   methods: {
     goBack() {
       uni.navigateBack()
+    },
+    goToAddress() {
+      uni.navigateTo({ url: '/pages/address/list?select=1' })
+    },
+    loadDeliveryAddress() {
+      const addr = uni.getStorageSync('selectedAddress')
+      if (addr) {
+        try {
+          this.deliveryAddress = typeof addr === 'string' ? JSON.parse(addr) : addr
+        } catch (e) {
+          this.deliveryAddress = null
+        }
+      }
     },
     selectDiningMode(mode) {
       this.diningMode = mode
@@ -341,7 +369,11 @@ export default {
     async loadCoupons() {
       try {
         const list = await couponApi.myCoupons(0)
+        const type = this.isDeliveryMode ? 'delivery' : 'instore'
         this.availableCoupons = (list || []).filter(c => {
+          if (c.status !== 1) return false
+          if (type === 'instore' && c.type !== 3 && c.type !== 4) return false
+          if (type === 'delivery' && c.type !== 1 && c.type !== 2 && c.type !== 5) return false
           const minAmount = Number(c.minAmount || 0)
           return minAmount <= Number(this.totalAmount)
         })
@@ -397,7 +429,17 @@ export default {
         const result = await couponApi.bestForOrder(this.orderId)
         if (result && result.hasCoupon) {
           this.selectedCouponId = result.userCouponId
-          const coupon = this.availableCoupons.find(c => c.id === result.userCouponId)
+          let coupon = this.availableCoupons.find(c => c.id === result.userCouponId)
+          if (!coupon) {
+            coupon = {
+              id: result.userCouponId,
+              discountAmount: result.discountAmount,
+              minAmount: result.minAmount || 0,
+              name: result.name || '优惠券',
+              endTime: result.endTime
+            }
+            this.availableCoupons.unshift(coupon)
+          }
           this.selectedCoupon = coupon
           this.couponDiscount = Number(result.discountAmount || 0)
         }
@@ -581,9 +623,17 @@ export default {
   }
 
   &__mode-icon {
-    width: 80rpx;
-    height: 80rpx;
+    width: 50rpx;
+    height: 50rpx;
     margin-bottom: 16rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    image {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   &__mode-name {

@@ -24,7 +24,7 @@
           <text class="order-page__store-open">{{ shopName }}正在营业中</text>
           <text class="order-page__store-time">营业时间：6:00-22:00</text>
         </view>
-        <view class="order-page__mode-board" @tap="goToConfirm">
+        <view class="order-page__mode-board" @tap="toggleMode">
           <image class="order-page__mode-board-bg" :src="staticImgPrefix + '/tabbar/矢量 38.png'" mode="aspectFit" />
           <text class="order-page__mode-board-text">{{ diningMode === 3 ? '外卖' : '自取' }}</text>
         </view>
@@ -107,7 +107,7 @@
     <view
       class="cart-bar"
       :class="{ 'cart-bar--disabled': !cartReady || cartItemCount === 0 }"
-      @tap="goConfirm"
+      @tap="openCart"
     >
       <view class="cart-bar__bag" @tap.stop="openCart">
         <image class="cart-bar__person" :src="staticImgPrefix + '/点赞.png'" mode="aspectFit" />
@@ -118,6 +118,7 @@
       <text class="cart-bar__price">{{ cartSummary }}</text>
       <view class="cart-bar__btn"
         :class="{ 'cart-bar__btn--disabled': !cartReady || cartItemCount === 0 }"
+        @tap.stop="goConfirm"
       >
         <text class="cart-bar__btn-text">去结算</text>
       </view>
@@ -334,6 +335,13 @@ export default {
       if (this.cartItemCount === 0) {
         uni.showToast({ title: '请先选择菜品', icon: 'none' })
         return
+      }
+      if (this.diningMode === 3) {
+        const addr = uni.getStorageSync('selectedAddress')
+        if (!addr) {
+          uni.navigateTo({ url: '/pages/address/list?select=1' })
+          return
+        }
       }
       uni.navigateTo({ url: '/pages/cart/confirm' })
     },
@@ -794,7 +802,7 @@ page {
     justify-content: space-between;
     min-height: 126rpx;
     padding: 22rpx 54rpx 22rpx 34rpx;
-    background: #FFFFFF;
+    background: #FEFCF8;
     border-radius: 18rpx 18rpx 0 0;
   }
 
@@ -822,7 +830,7 @@ page {
     width: 122rpx;
     height: 110rpx;
     flex-shrink: 0;
-    margin-top: -10rpx;
+    margin-top: -23rpx;
     display: flex;
     align-items: center;
     justify-content: center;
