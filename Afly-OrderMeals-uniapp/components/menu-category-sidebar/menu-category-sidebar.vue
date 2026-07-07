@@ -1,5 +1,5 @@
 <template>
-  <view class="sidebar">
+  <scroll-view scroll-y class="sidebar" :show-scrollbar="false">
     <view
       v-for="(cate, index) in menu"
       :key="cate.id || cate.name || index"
@@ -20,7 +20,7 @@
       </view>
       <text v-if="badgeCount(index) > 0" class="sidebar__badge">{{ badgeCount(index) }}</text>
     </view>
-  </view>
+  </scroll-view>
 </template>
 
 <script>
@@ -52,6 +52,7 @@ export default {
 <style lang="scss" scoped>
 .sidebar {
   width: 172rpx;
+  height: 100%;
   background: rgba(245, 240, 234, 0.7);
 
   &__item {

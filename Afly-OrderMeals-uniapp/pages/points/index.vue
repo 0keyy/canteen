@@ -33,16 +33,21 @@
 
         <!-- 推广卡片 -->
         <view class="points-page__promo-row">
-          <view class="points-page__promo-card points-page__promo-card--lottery">
+          <view class="points-page__promo-card points-page__promo-card--lottery" @tap="goLottery">
             <view class="points-page__promo-main">
-              <text class="points-page__promo-title">积分抽奖</text>
-              <text class="points-page__promo-sub">赢取优惠券</text>
+              <text class="points-page__promo-title">积分抽奖
+			  <text class="points-page__promo-icon">&#9654</text>
+			  </text>
+              <text class="points-page__promo-sub">赢取优惠券
+			  </text>
             </view>
             <image :src="staticImgPrefix + '/白logo.png'" mode="" class="points-page__promo-watermark"></image>
           </view>
-          <view class="points-page__promo-card points-page__promo-card--checkin">
+          <view class="points-page__promo-card points-page__promo-card--checkin" @tap="goSignin">
             <view class="points-page__promo-main">
-              <text class="points-page__promo-title">每日签到</text>
+              <text class="points-page__promo-title">每日签到
+			  <text class="points-page__promo-icon">&#9654</text>
+			  </text>
               <text class="points-page__promo-sub">每天有惊喜</text>
             </view>
             <image :src="staticImgPrefix + '/白logo.png'" mode="" class="points-page__promo-watermark"></image>
@@ -137,6 +142,7 @@ const DEFAULT_CATEGORIES = [
 const DEFAULT_PRODUCTS = [
   {
     id: 1,
+    category: 2,
     image: STATIC_IMAGE_PREFIX + '/1.png',
     title: '【堂食专享】可口可乐',
     points: 10,
@@ -144,13 +150,15 @@ const DEFAULT_PRODUCTS = [
   },
   {
     id: 2,
+    category: 2,
     image: STATIC_IMAGE_PREFIX + '/2.png',
-    title: '【堂食专享】香脆薯条',
-    points: 20,
+    title: '【堂食专享】雪碧',
+    points: 10,
     redeemed: 32
   },
   {
     id: 3,
+    category: 3,
     image: STATIC_IMAGE_PREFIX + '/3.png',
     title: '【外卖专享】珍珠奶茶',
     points: 30,
@@ -158,10 +166,75 @@ const DEFAULT_PRODUCTS = [
   },
   {
     id: 4,
+    category: 1,
     image: STATIC_IMAGE_PREFIX + '/4.png',
     title: '【积分秒杀】香辣鸡翅',
     points: 50,
     redeemed: 19
+  },
+  {
+    id: 5,
+    category: 2,
+    image: STATIC_IMAGE_PREFIX + '/1.png',
+    title: '【堂食专享】苦菊拌干豆腐丝',
+    points: 150,
+    redeemed: 12
+  },
+  {
+    id: 6,
+    category: 2,
+    image: STATIC_IMAGE_PREFIX + '/2.png',
+    title: '【堂食专享】老醋三样',
+    points: 200,
+    redeemed: 8
+  },
+  {
+    id: 7,
+    category: 3,
+    image: STATIC_IMAGE_PREFIX + '/3.png',
+    title: '【外卖专享】酸梅汤',
+    points: 15,
+    redeemed: 25
+  },
+  {
+    id: 8,
+    category: 1,
+    image: STATIC_IMAGE_PREFIX + '/4.png',
+    title: '【积分秒杀】原味瓜子',
+    points: 80,
+    redeemed: 36
+  },
+  {
+    id: 9,
+    category: 2,
+    image: STATIC_IMAGE_PREFIX + '/1.png',
+    title: '【堂食专享】番茄莎莎酱',
+    points: 150,
+    redeemed: 15
+  },
+  {
+    id: 10,
+    category: 3,
+    image: STATIC_IMAGE_PREFIX + '/2.png',
+    title: '【外卖专享】香脆薯条',
+    points: 20,
+    redeemed: 32
+  },
+  {
+    id: 11,
+    category: 1,
+    image: STATIC_IMAGE_PREFIX + '/3.png',
+    title: '【积分秒杀】5元优惠券',
+    points: 100,
+    redeemed: 89
+  },
+  {
+    id: 12,
+    category: 2,
+    image: STATIC_IMAGE_PREFIX + '/4.png',
+    title: '【堂食专享】盐焗花生',
+    points: 60,
+    redeemed: 42
   }
 ]
 
@@ -234,7 +307,11 @@ export default {
           this.products = []
         }
       } catch (e) {
-        this.products = categoryId === 0 ? DEFAULT_PRODUCTS : []
+        if (categoryId === 0) {
+          this.products = DEFAULT_PRODUCTS
+        } else {
+          this.products = DEFAULT_PRODUCTS.filter(p => p.category === categoryId)
+        }
       } finally {
         this.goodsLoading = false
       }
@@ -246,6 +323,19 @@ export default {
     },
     selectTab(index) {
       this.activeTab = index
+      if (index === 0) {
+        uni.navigateTo({ url: '/pages/points/rules' })
+      } else if (index === 1) {
+        uni.navigateTo({ url: '/pages/points/point-records' })
+      } else if (index === 2) {
+        uni.navigateTo({ url: '/pages/points/records' })
+      }
+    },
+    goLottery() {
+      uni.navigateTo({ url: '/pages/lottery/index' })
+    },
+    goSignin() {
+      uni.navigateTo({ url: '/pages/signin/index' })
     },
     onScan() {
       uni.showToast({ title: '扫码功能开发中', icon: 'none' })
@@ -297,23 +387,23 @@ export default {
     line-height: 1.1;
   }
 	&__points-text{
-		font-size: 32rpx;
+		font-size: 30rpx;
 		color: #0a0606;
 	}
   &__points-label {
     margin-top: 6rpx;
-    font-size: 16rpx;
+    font-size: 24rpx;
     color: #625b5b;
     line-height: 1.4;
   }
 
   &__mascot {
-    width: 180rpx;
-    height: 180rpx;
+    width: 240rpx;
+    height: 240rpx;
     flex-shrink: 0;
     position: absolute;
-    top: -60rpx;
-	right: 100rpx;
+    top: -100rpx;
+	right: 50rpx;
   }
 
   &__scan-btn {
@@ -381,26 +471,9 @@ export default {
     justify-content: center;
     padding: 24rpx 0;
     position: relative;
-	color: #676767;
 
-    &--active {
-      .points-page__nav-tab-text {
-        color: $brand-primary;
-        font-weight: 700;
-      }
 
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 48rpx;
-        height: 6rpx;
-        border-radius: 3rpx;
-        background: $brand-primary;
-      }
-    }
+   
   }
 
   &__nav-tab-text {
@@ -439,6 +512,10 @@ export default {
     font-weight: 900;
     color: #be0000;
   }
+  &__promo-icon{
+	font-size: 40rpx;
+	line-height: 48rpx;
+  }
 
   &__promo-sub {
     margin-top: 6rpx;
@@ -447,13 +524,14 @@ export default {
   }
 
   &__promo-watermark {
+	
     position: absolute;
-    right: 12rpx;
+    right: -25rpx;
 	width: 170rpx;
 	height: 210rpx;
 	top: -30rpx;
-	opacity: 0.3;
-	pointer-events: none;
+	opacity: 0.35;
+	filter: drop-shadow(4px 8px 12px rgba(0, 0, 0, 0.1));
   }
 
   /* ===== 分类筛选 ===== */
@@ -502,10 +580,9 @@ export default {
   }
 
   &__category-text {
-    font-size: $font-size-base;
-    color: $text-secondary;
-    font-weight: 500;
-    white-space: nowrap;
+	color: #070707;
+	font-weight: 600;
+	font-size: 28rpx;
   }
 
   /* ===== 商品网格 ===== */

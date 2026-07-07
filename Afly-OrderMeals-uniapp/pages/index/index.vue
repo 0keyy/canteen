@@ -46,7 +46,7 @@
             <view class="home__primary-card-text">
               <text class="home__primary-name">到店堂食</text>
             </view>
-            <image class="home__primary-card-img" src="/static/图层 2.png" mode="aspectFit" />
+            <image class="home__primary-card-img" :src="staticImgPrefix + '/图层 2.png'" mode="aspectFit" />
           </view>
           <view
             class="home__primary-card-item"
@@ -56,7 +56,7 @@
             <view class="home__primary-card-text">
               <text class="home__primary-name">外卖配送</text>
             </view>
-            <image class="home__primary-card-img" src="/static/小唐骑车.png" mode="aspectFit" />
+            <image class="home__primary-card-img" :src="staticImgPrefix + '/小唐骑车.png'" mode="aspectFit" />
           </view>
         </view>
 
@@ -157,12 +157,14 @@ import { resolveImageUrl } from '../../utils/image'
 import tabbarPageMixin from '../../mixins/tabbar-page'
 import { getMenuButtonMarginRight, getNavMetrics } from '../../utils/navbar'
 import PageLoading from '../../components/page-loading/page-loading.vue'
+import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 export default {
   mixins: [tabbarPageMixin],
   components: { PageLoading },
   data() {
     return {
+      staticImgPrefix: STATIC_IMAGE_PREFIX,
       navMetrics: getNavMetrics(),
       menuButtonRight: 96,
       shop: null,
@@ -332,11 +334,11 @@ export default {
         uni.navigateTo({ url: '/pages/address/list?select=1' })
         return
       }
-      uni.navigateTo({ url: '/pages/menu/index' })
+      uni.switchTab({ url: '/pages/menu/index' })
     },
     goMenu() {
       uni.setStorageSync('diningMode', 1)
-      uni.navigateTo({ url: '/pages/menu/index' })
+      uni.switchTab({ url: '/pages/menu/index' })
     },
     selectSpec() {
       this.goMenu()
@@ -358,7 +360,7 @@ export default {
         return
       }
       if (item?.name === '客服中心') {
-        uni.showToast({ title: '客服中心开发中', icon: 'none' })
+        uni.navigateTo({ url: '/pages/mine/service/index' })
         return
       }
       uni.showToast({ title: '功能开发中', icon: 'none' })
@@ -563,11 +565,12 @@ $section-gap: 20rpx;
 
     &:active {
       transform: scale(0.96);
+	  
     }
   }
 
   &__shortcut-img {
-    width: 20px;
+    width: 30px;
     height: 80rpx;
   }
 

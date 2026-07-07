@@ -121,7 +121,7 @@ export default {
     async loadCoupons() {
       this.loading = true
       try {
-        const list = await couponApi.myCoupons(this.activeTab) || []
+        const list = await couponApi.myCoupons(1) || []
         this.coupons = list
       } catch (e) {
         this.coupons = []
@@ -136,7 +136,7 @@ export default {
       if (coupon.type === 3 || coupon.type === 4) {
         uni.navigateTo({ url: `/pages/coupon/verify-code?id=${coupon.id}` })
       } else {
-        uni.navigateTo({ url: '/pages/menu/index' })
+        uni.switchTab({ url: '/pages/menu/index' })
       }
     },
     goExchange() {

@@ -31,11 +31,11 @@
             <text class="profile-page__stat-label">余额</text>
           </view>
           <!-- 新增积分项 -->
-          <view class="profile-page__stat-item">
+          <view class="profile-page__stat-item" @tap="goPointsMall">
             <text class="profile-page__stat-value">{{ pointCount }}</text>
             <text class="profile-page__stat-label">积分</text>
           </view>
-          <view class="profile-page__stat-item">
+          <view class="profile-page__stat-item" @tap="goCouponWallet">
             <text class="profile-page__stat-value">{{ couponCount }}</text>
             <text class="profile-page__stat-label">卡券</text>
           </view>
@@ -94,97 +94,6 @@
         <view class="profile-page__bottom-space"></view>
       </view>
     </scroll-view>
-
-    <!-- 头像选择弹窗 -->
-    <view class="profile-page__avatar-mask" v-if="showAvatarPicker" @tap="showAvatarPicker = false">
-      <view class="profile-page__avatar-picker" @tap.stop>
-        <text class="profile-page__avatar-picker-title">选择头像</text>
-        <view class="profile-page__avatar-options">
-          <view
-            class="profile-page__avatar-option"
-            :class="{ 'profile-page__avatar-option--active': avatarKey === '1' }"
-            @tap="selectAvatar('1')"
-          >
-            <image class="profile-page__avatar-option-img" :src="staticImgPrefix + '/1.png'" mode="aspectFill" />
-          </view>
-          <view
-            class="profile-page__avatar-option"
-            :class="{ 'profile-page__avatar-option--active': avatarKey === '2' }"
-            @tap="selectAvatar('2')"
-          >
-            <image class="profile-page__avatar-option-img" :src="staticImgPrefix + '/2.png'" mode="aspectFill" />
-          </view>
-        </view>
-        <text class="profile-page__avatar-picker-close" @tap="showAvatarPicker = false">取消</text>
-      </view>
-    </view>
-
-    <!-- 客服电话选择面板 -->
-    <view class="profile-page__service-mask" v-if="showServicePicker" @tap="showServicePicker = false">
-      <view class="profile-page__service-picker" @tap.stop>
-        <text class="profile-page__service-title">联系客服</text>
-        <view class="profile-page__service-list">
-          <view
-            v-for="(item, index) in servicePhones"
-            :key="index"
-            class="profile-page__service-item"
-            @tap="makeCall(item.phone)"
-          >
-            <view class="profile-page__service-icon"></view>
-            <view class="profile-page__service-info">
-              <text class="profile-page__service-name">{{ item.name || '客服热线' }}</text>
-              <text class="profile-page__service-phone">{{ item.phone }}</text>
-            </view>
-            <text class="profile-page__service-arrow">›</text>
-          </view>
-        </view>
-        <view class="profile-page__service-cancel" @tap="showServicePicker = false">取消</view>
-      </view>
-    </view>
-
-    <!-- 充值中心面板 -->
-    <view class="profile-page__recharge-mask" v-if="showRechargePicker" @tap="showRechargePicker = false">
-      <view class="profile-page__recharge-picker" @tap.stop>
-        <view class="profile-page__recharge-header">
-          <text class="profile-page__recharge-title">充值中心</text>
-          <text class="profile-page__recharge-close" @tap="showRechargePicker = false">✕</text>
-        </view>
-        <view class="profile-page__recharge-balance">
-          <text class="profile-page__recharge-balance-label">我的余额</text>
-          <text class="profile-page__recharge-balance-value">¥{{ balance }}</text>
-        </view>
-        <view class="profile-page__recharge-grid">
-          <view
-            v-for="(item, index) in rechargeAmounts"
-            :key="index"
-            class="profile-page__recharge-item"
-            :class="{ 'profile-page__recharge-item--active': !rechargeIsCustom && rechargeSelected === item }"
-            @tap="selectRechargePreset(item)"
-          >
-            <text class="profile-page__recharge-amount-text">{{ item }}元</text>
-          </view>
-          <view
-            class="profile-page__recharge-item profile-page__recharge-item--custom"
-            :class="{ 'profile-page__recharge-item--active': rechargeIsCustom }"
-            @tap="selectRechargeCustom"
-          >
-            <input
-              v-if="rechargeIsCustom"
-              class="profile-page__recharge-custom-input"
-              type="digit"
-              v-model="rechargeCustomAmount"
-              placeholder="金额"
-              :focus="rechargeIsCustom"
-              @blur="onRechargeCustomBlur"
-            />
-            <text v-else class="profile-page__recharge-amount-text">自定义</text>
-          </view>
-        </view>
-        <view class="profile-page__recharge-btn" @tap="doRecharge">
-          <text class="profile-page__recharge-btn-text">充值</text>
-        </view>
-      </view>
-    </view>
 
     <view class="app-tab-bar">
       <view
@@ -291,7 +200,7 @@ export default {
           this.companyDeptName = profile.companyDeptName || ''
           // 核心：后端返回最新余额直接赋值给页面展示变量
           this.balance = profile.balance != null ? profile.balance : 0
-          this.pointCount = profile.point ?? 0
+          this.pointCount = profile.point ?? profile.points ?? profile.integral ?? 0
           // 同步存入本地缓存备用
           uni.setStorageSync('balance', this.balance)
           uni.setStorageSync('companyVerified', this.companyVerified)
@@ -337,6 +246,10 @@ export default {
         uni.navigateTo({ url: '/pages/address/list' })
         return
       }
+      if (item.title === '客服中心') {
+        uni.navigateTo({ url: '/pages/mine/service/index' })
+        return
+      }
       if (item.title === '联系客服') {
         this.callService()
         return
@@ -366,7 +279,7 @@ export default {
         return
       }
       if (item.title === '积分商城') {
-        uni.navigateTo({ url: '/pages/integralShop/index' })
+        uni.switchTab({ url: '/pages/points/index' })
         return
       }
       if (item.title === '会员日') {
@@ -390,6 +303,12 @@ export default {
     },
     goProfile() {
       uni.navigateTo({ url: '/pages/mine/profile' })
+    },
+    goPointsMall() {
+      uni.switchTab({ url: '/pages/points/index' })
+    },
+    goCouponWallet() {
+      uni.navigateTo({ url: '/pages/coupon/wallet' })
     },
     async callService() {
       try {
@@ -565,308 +484,6 @@ export default {
     color: #ffffff;
     font-weight: 600;
     line-height: 1;
-  }
-
-  &__avatar-mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__avatar-picker {
-    width: 560rpx;
-    background: #ffffff;
-    border-radius: 24rpx;
-    padding: 40rpx 32rpx;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  &__avatar-picker-title {
-    font-size: 32rpx;
-    font-weight: 900;
-    color: #333333;
-    margin-bottom: 32rpx;
-  }
-
-  &__avatar-options {
-    display: flex;
-    gap: 40rpx;
-    margin-bottom: 32rpx;
-  }
-
-  &__avatar-option {
-    width: 160rpx;
-    height: 160rpx;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 4rpx solid transparent;
-    transition: border-color 0.24s;
-
-    &--active {
-      border-color: #C41E3A;
-    }
-  }
-
-  &__avatar-option-img {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  &__avatar-picker-close {
-    font-size: 28rpx;
-    color: #999999;
-    padding: 12rpx 48rpx;
-  }
-
-  &__service-mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    z-index: 1000;
-  }
-
-  &__service-picker {
-    width: 100%;
-    background: #FFFFFF;
-    border-radius: 24rpx 24rpx 0 0;
-    padding: 32rpx 0 24rpx;
-    padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-  }
-
-  &__service-title {
-    display: block;
-    font-size: 32rpx;
-    font-weight: 600;
-    color: #111111;
-    text-align: center;
-    margin-bottom: 16rpx;
-  }
-
-  &__service-list {
-    padding: 12rpx 0;
-  }
-
-  &__service-item {
-    display: flex;
-    align-items: center;
-    padding: 24rpx 32rpx;
-
-    &:active {
-      background: #F5F5F5;
-    }
-  }
-
-  &__service-icon {
-    width: 56rpx;
-    height: 56rpx;
-    border-radius: 50%;
-    background: #FFF0F0;
-    position: relative;
-    margin-right: 24rpx;
-    flex-shrink: 0;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 28rpx;
-      height: 28rpx;
-      border: 3rpx solid #C41E3A;
-      border-radius: 6rpx;
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%) rotate(45deg);
-      width: 20rpx;
-      height: 20rpx;
-      border-left: 3rpx solid #C41E3A;
-      border-bottom: 3rpx solid #C41E3A;
-    }
-  }
-
-  &__service-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  &__service-name {
-    display: block;
-    font-size: 28rpx;
-    color: #333333;
-    font-weight: 500;
-  }
-
-  &__service-phone {
-    display: block;
-    font-size: 24rpx;
-    color: #999999;
-    margin-top: 6rpx;
-  }
-
-  &__service-arrow {
-    font-size: 36rpx;
-    color: #CCCCCC;
-    font-weight: 400;
-    line-height: 1;
-    margin-left: 16rpx;
-  }
-
-  &__service-cancel {
-    font-size: 28rpx;
-    color: #999999;
-    text-align: center;
-    padding: 20rpx 0 0;
-    border-top: 1rpx solid #F0F0F0;
-    margin-top: 12rpx;
-  }
-
-  /* 充值中心面板 */
-  &__recharge-mask {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    display: flex;
-    align-items: flex-end;
-  }
-
-  &__recharge-picker {
-    width: 100%;
-    background: #FFFFFF;
-    border-radius: 32rpx 32rpx 0 0;
-    padding: 32rpx;
-    box-sizing: border-box;
-    animation: slideUp 0.3s ease;
-  }
-
-  &__recharge-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 32rpx;
-  }
-
-  &__recharge-title {
-    font-size: 32rpx;
-    font-weight: 700;
-    color: #333333;
-  }
-
-  &__recharge-close {
-    font-size: 32rpx;
-    color: #999999;
-    padding: 8rpx;
-  }
-
-  &__recharge-balance {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 24rpx 0 32rpx;
-    border-bottom: 1rpx solid #F0F0F0;
-    margin-bottom: 32rpx;
-  }
-
-  &__recharge-balance-label {
-    font-size: 24rpx;
-    color: #999999;
-    margin-bottom: 8rpx;
-  }
-
-  &__recharge-balance-value {
-    font-size: 48rpx;
-    font-weight: 700;
-    color: #D00000;
-  }
-
-  &__recharge-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20rpx;
-  }
-
-  &__recharge-item {
-    width: calc((100% - 40rpx) / 3);
-    height: 100rpx;
-    border-radius: 12rpx;
-    background: #F5F5F5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2rpx solid transparent;
-    box-sizing: border-box;
-
-    &--active {
-      background: #D00000;
-      border-color: #D00000;
-    }
-
-    &--custom {
-      position: relative;
-    }
-  }
-
-  &__recharge-amount-text {
-    font-size: 28rpx;
-    font-weight: 600;
-    color: #666666;
-  }
-
-  &__recharge-item--active &__recharge-amount-text {
-    color: #FFFFFF;
-  }
-
-  &__recharge-custom-input {
-    width: 100%;
-    text-align: center;
-    font-size: 28rpx;
-    font-weight: 600;
-    color: #FFFFFF;
-  }
-
-  &__recharge-btn {
-    margin-top: 40rpx;
-    height: 88rpx;
-    border-radius: 44rpx;
-    background: linear-gradient(135deg, #D00000 0%, #A01731 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &:active {
-      opacity: 0.9;
-    }
-  }
-
-  &__recharge-btn-text {
-    font-size: 32rpx;
-    font-weight: 600;
-    color: #FFFFFF;
   }
 
   @keyframes slideUp {

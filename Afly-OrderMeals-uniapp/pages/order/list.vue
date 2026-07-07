@@ -68,11 +68,11 @@ import { orderApi } from '../../api/index'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 const TABS = [
-  { key: 'all', name: '全部' },
-  { key: 'paying', name: '待支付' },
-  { key: 'shipping', name: '待发货' },
-  { key: 'delivering', name: '待收货' },
-  { key: 'refund', name: '退款/售后' }
+  { key: 'all', name: '全部', status: '' },
+  { key: 'paying', name: '待支付', status: '待支付' },
+  { key: 'shipping', name: '待发货', status: '制作中' },
+  { key: 'delivering', name: '待收货', status: '配送中' },
+  { key: 'refund', name: '退款/售后', status: '退款中' }
 ]
 
 export default {
@@ -113,7 +113,8 @@ export default {
   methods: {
     async loadList() {
       try {
-        const data = await orderApi.list()
+        const status = TABS[this.activeTab].status
+        const data = await orderApi.list(status)
         let list = []
         if (Array.isArray(data)) {
           list = data
@@ -123,6 +124,7 @@ export default {
           list = data.data
         }
         if (list.length > 0) {
+          console.log('[order list] 后端返回订单数据:', JSON.stringify(list[0]))
           this.allList = list.map(item => this.normalizeOrder(item))
         } else {
           this.allList = this.getMockList()
@@ -143,14 +145,20 @@ export default {
         dishes = item.goodsList
       } else if (Array.isArray(item.orderDishes)) {
         dishes = item.orderDishes
+      } else if (Array.isArray(item.items)) {
+        dishes = item.items
+      } else if (Array.isArray(item.orderItems)) {
+        dishes = item.orderItems
+      } else if (Array.isArray(item.details)) {
+        dishes = item.details
       }
 
       const dishList = dishes.length > 0 ? dishes.slice(0, 2).map(d => ({
-        id: d.id || d.dishId || d.goodsId,
-        name: d.name || d.dishName || d.goodsName || '',
-        image: d.image || d.img || d.cover || d.goodsImage || d.dishImage || '',
-        price: d.price || d.dishPrice || d.goodsPrice || 0,
-        quantity: d.quantity || d.count || d.dishQuantity || d.num || 1
+        id: d.id || d.dishId || d.goodsId || d.itemId,
+        name: d.name || d.dishName || d.goodsName || d.itemName || d.productName || '',
+        image: d.image || d.img || d.cover || d.goodsImage || d.dishImage || d.itemImage || d.productImage || '',
+        price: d.price || d.dishPrice || d.goodsPrice || d.itemPrice || d.productPrice || 0,
+        quantity: d.quantity || d.count || d.dishQuantity || d.num || d.itemQuantity || 1
       })) : []
 
       if (dishList.length === 0) {
@@ -252,10 +260,21 @@ export default {
       uni.navigateTo({ url: `/pages/order/detail?orderId=${orderId}` })
     },
     reorder(order) {
-      uni.navigateTo({ url: '/pages/menu/index' })
+      uni.switchTab({ url: '/pages/menu/index' })
     },
-    confirmReceive(order) {
-      uni.showToast({ title: '确认收货功能开发中', icon: 'none' })
+    async confirmReceive(order) {
+      const { confirm } = await uni.showModal({
+        title: '确认收货',
+        content: '确认已收到商品？'
+      })
+      if (!confirm) return
+      try {
+        await orderApi.confirmReceive(order.id)
+        uni.showToast({ title: '确认收货成功', icon: 'success' })
+        this.loadList()
+      } catch (e) {
+        uni.showToast({ title: e.message || '确认收货失败', icon: 'none' })
+      }
     }
   }
 }

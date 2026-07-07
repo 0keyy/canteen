@@ -42,6 +42,7 @@
     {
       "path": "pages/address/edit",
       "style": {
+		  "navigationBarTitleText": "编辑地址",
         "navigationStyle": "custom",
         "animationType": "slide-in-right"
       }
@@ -49,6 +50,7 @@
     {
       "path": "pages/order/list",
       "style": {
+		  "navigationBarTitleText": "点单",
         "navigationStyle": "custom"
       }
     },
@@ -64,6 +66,7 @@
     {
       "path": "pages/mine/index",
       "style": {
+		"navigationBarTitleText": "我的",
         "navigationStyle": "custom"
       }
     },
@@ -79,6 +82,7 @@
     {
       "path": "pages/mine/profile",
       "style": {
+		"navigationBarTitleText": "个人资料",
         "navigationStyle": "custom",
         "animationType": "slide-in-right"
       }
@@ -95,6 +99,7 @@
     {
       "path": "pages/coupon/wallet",
       "style": {
+		  "navigationBarTitleText": "红包卡券",
         "navigationStyle": "custom",
         "animationType": "slide-in-right"
       }
@@ -120,21 +125,35 @@
     {
       "path": "pages/points/index",
       "style": {
+		  "navigationBarTitleText": "积分商城",
         "navigationStyle": "custom",
         "animationType": "slide-in-right"
       }
     },
     {
-      "path": "pages/integralShop/index",
+      "path": "pages/points/rules",
       "style": {
-        "navigationStyle": "custom",
+        "navigationBarTitleText": "积分规则",
+        "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black",
         "animationType": "slide-in-right"
       }
     },
     {
-      "path": "pages/integralDraw/index",
+      "path": "pages/points/records",
       "style": {
-        "navigationStyle": "custom",
+        "navigationBarTitleText": "兑换记录",
+        "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black",
+        "animationType": "slide-in-right"
+      }
+    },
+    {
+      "path": "pages/points/point-records",
+      "style": {
+        "navigationBarTitleText": "积分明细",
+        "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black",
         "animationType": "slide-in-right"
       }
     },
@@ -158,6 +177,13 @@
         "navigationBarTitleText": "会员码",
         "animationType": "slide-in-right"
       }
+    },
+    {
+      "path": "pages/mine/service/index",
+      "style": {
+        "navigationStyle": "custom",
+        "animationType": "slide-in-right"
+      }
     }
   ],
   "globalStyle": {
@@ -179,6 +205,12 @@
       {
         "pagePath": "pages/index/index",
         "text": "首页",
+        "iconPath": "static/tabbar/icon.png",
+        "selectedIconPath": "static/tabbar/icon-active.png"
+      },
+      {
+        "pagePath": "pages/menu/index",
+        "text": "点餐",
         "iconPath": "static/tabbar/icon.png",
         "selectedIconPath": "static/tabbar/icon-active.png"
       },
