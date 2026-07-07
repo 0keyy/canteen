@@ -116,7 +116,10 @@ export default {
       defaultAvatar: STATIC_IMAGE_PREFIX + '/tabbar/avatar-default.png',
       defaultAvatars: [
         STATIC_IMAGE_PREFIX + '/1.png',
-        STATIC_IMAGE_PREFIX + '/2.png'
+        STATIC_IMAGE_PREFIX + '/2.png',
+		STATIC_IMAGE_PREFIX + '/3.png',
+		STATIC_IMAGE_PREFIX + '/4.png',
+		
       ],
       form: {
         nickname: '',
@@ -212,7 +215,8 @@ export default {
 		const data = {
         nickname: this.form.nickname,
         gender: this.form.gender,
-        birthday: this.form.birthday
+        birthday: this.form.birthday,
+        avatar: this.avatarUrl
       }
       authApi.updateProfile(data).then(function() {
         uni.setStorageSync('nickname', self.form.nickname)
@@ -221,7 +225,9 @@ export default {
           uni.navigateBack()
         }, 1500)
       }).catch(function(e) {
-        uni.showToast({ title: (e && e.message) || '保存失败', icon: 'none' })
+        const msg = typeof e === 'string' ? e : ((e && e.message) || '保存失败')
+        console.error('保存资料失败:', e)
+        uni.showToast({ title: msg, icon: 'none' })
       }).finally(function() {
         self.saving = false
       })
@@ -241,7 +247,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 156rpx;
+    height: 170rpx;
     padding: 0 24rpx;
     background: #FFFFFF;
     border-bottom: 1rpx solid #F0F0F0;

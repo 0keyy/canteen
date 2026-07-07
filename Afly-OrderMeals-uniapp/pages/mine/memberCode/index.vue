@@ -1,6 +1,5 @@
 <template>
   <view class="member-code-page">
-    <!-- 顶部会员信息区 -->
     <view class="member-header">
       <view class="user-info">
         <view class="avatar-box">
@@ -11,40 +10,35 @@
           <text class="user-desc">{{ level || '会员' }}</text>
         </view>
       </view>
-	  <view class="member-logo">
-	    <image :src="staticImgPrefix + '/logo.png'" mode="aspectFit" class="logo-img"></image>
-	  </view>
+      <view class="member-logo">
+        <image :src="staticImgPrefix + '/logo.png'" mode="aspectFit" class="logo-img"></image>
+      </view>
     </view>
 
-    <!-- 白色会员码卡片 -->
     <view class="code-card">
-      <!-- 条形码 -->
       <view class="barcode-section">
-        <!-- <view class="barcode"></view> -->
         <text class="card-no">会员卡号：{{ memberId || '--' }}</text>
       </view>
 
-      <!-- 二维码区域 -->
       <view class="qrcode-section">
-        <view class="qrcode-box">
-          <!-- 绑定会员唯一ID，动态内容 -->
-          <u-qrcode v-if="qrCodeContent" :value="qrCodeContent" size="320"></u-qrcode>
-          <view v-else class="qrcode-placeholder">加载中...</view>
-        </view>
+        <canvas
+          v-if="qrCodeContent"
+          canvas-id="tempQrCanvas"
+          class="qrcode-canvas"
+        ></canvas>
+        <view v-else class="qrcode-placeholder">加载中...</view>
         <view class="refresh-tip">
           <image :src="staticImgPrefix + '/tabbar/刷新.png'" mode="aspectFit" class="refresh-icon"></image>
           <text>会员码每30秒自动更新，请在店内消费使用</text>
         </view>
       </view>
 
-      <!-- 余额 -->
       <view class="balance-section">
         <text class="balance-value">{{ balance || '0.00' }}</text>
         <text class="balance-label">余额</text>
       </view>
     </view>
 
-    <!-- 底部说明 -->
     <view class="footer-tip">
       <text class="tip-text">使用会员码，可在门店享受会员优惠与积分抵扣</text>
     </view>
@@ -54,6 +48,9 @@
 <script>
 import { memberApi, authApi } from '../../../api/index'
 import { STATIC_IMAGE_PREFIX } from '../../../utils/image'
+import { BASE_URL } from '../../../utils/config'
+import QRCode from '../../../node_modules/qrcode/lib/core/qrcode'
+
 export default {
   data() {
     return {
@@ -64,6 +61,7 @@ export default {
       balance: "",
       avatarKey: "1",
       qrCodeContent: "",
+      qrImageBase64: "",
       timer: null
     }
   },
@@ -86,7 +84,6 @@ export default {
   },
   methods: {
     async loadMemberCode() {
-      // 先用 profile 接口获取用户信息（与 mine.vue 一致）
       try {
         const profile = await authApi.profile()
         if (profile) {
@@ -98,7 +95,6 @@ export default {
       } catch (e) {
         console.log('获取用户信息失败', e)
       }
-      // 再尝试会员码接口（后期对接）
       try {
         const res = await memberApi.code()
         if (res && res.code === 200 && res.data) {
@@ -116,7 +112,33 @@ export default {
     refreshQrCode() {
       if (!this.memberId) return
       const timeStamp = Date.now()
-      this.qrCodeContent = `https://你的后端核销接口.com/verify?uid=${this.memberId}&ts=${timeStamp}`
+      this.qrCodeContent = `${BASE_URL}/front/member/verify?uid=${this.memberId}&ts=${timeStamp}`
+      this.generateQrImage()
+    },
+    generateQrImage() {
+      try {
+        const qr = QRCode.create(this.qrCodeContent, { errorCorrectionLevel: 'M' })
+        const size = qr.modules.size
+        const scale = 8
+        const imageSize = size * scale
+
+        const canvas = uni.createCanvasContext('tempQrCanvas')
+        canvas.setFillStyle('#ffffff')
+        canvas.fillRect(0, 0, imageSize, imageSize)
+
+        canvas.setFillStyle('#000000')
+        for (let row = 0; row < size; row++) {
+          for (let col = 0; col < size; col++) {
+            if (qr.modules.get(row, col)) {
+              canvas.fillRect(col * scale, row * scale, scale, scale)
+            }
+          }
+        }
+
+        canvas.draw()
+      } catch (e) {
+        console.error('二维码生成失败', e)
+      }
     },
     goBack() {
       uni.navigateBack()
@@ -134,13 +156,12 @@ export default {
   box-sizing: border-box;
 }
 
-/* 顶部会员信息 */
 .member-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: #fff;
-  border-radius: 30rpx 30rpx 30rpx 30rpx;
+  border-radius: 30rpx;
   padding: 30rpx;
   box-sizing: border-box;
 }
@@ -188,16 +209,14 @@ export default {
   justify-content: center;
 }
 
-.logo-text {
-  font-size: 48rpx;
-  color: #B88222;
-  font-weight: 700;
+.logo-img {
+  width: 100%;
+  height: 100%;
 }
 
-/* 白色卡片 */
 .code-card {
   background: #fff;
-  border-radius: 30rpx 30rpx 30rpx 30rpx;
+  border-radius: 30rpx;
   padding: 40rpx 30rpx;
   margin-top: 40rpx;
   display: flex;
@@ -206,25 +225,13 @@ export default {
   box-sizing: border-box;
 }
 
-/* 条形码 */
 .barcode-section {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* 加上和原来条码一样的高度，占位 */
   min-height: 140rpx;
   justify-content: flex-end;
-}
-
-.barcode {
-  width: 100%;
-  height: 140rpx;
-  background: repeating-linear-gradient(
-    90deg,
-    #000 0 10rpx,
-    transparent 10rpx 20rpx
-  );
 }
 
 .card-no {
@@ -233,13 +240,13 @@ export default {
   color: #b10a0f;
 }
 
-/* 二维码 */
 .qrcode-section {
   margin-top: 30rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .qrcode-box {
   width: 360rpx;
   height: 360rpx;
@@ -250,27 +257,33 @@ export default {
   justify-content: center;
   background: #fff;
 }
+
+.qrcode-canvas {
+  width: 300rpx;
+  height: 300rpx;
+}
+
 .qrcode-placeholder {
   font-size: 24rpx;
   color: #999;
 }
+
 .refresh-tip {
   margin-top: 20rpx;
   font-size: 24rpx;
-  color: #b10a0f; /* 文字基准灰色 */
+  color: #b10a0f;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8rpx;
 }
+
 .refresh-icon {
   width: 28rpx;
   height: 28rpx;
   filter: none;
-  color: #b10a0f;
 }
 
-/* 余额 */
 .balance-section {
   margin-top: 40rpx;
   display: flex;
@@ -293,7 +306,6 @@ export default {
   color: #b10a0f;
 }
 
-/* 底部说明 */
 .footer-tip {
   margin-top: 40rpx;
   padding: 0 20rpx;
@@ -304,6 +316,5 @@ export default {
   color: #999;
   text-align: center;
   line-height: 1.6;
-  margin-left: 50px;
 }
 </style>

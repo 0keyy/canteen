@@ -26,7 +26,7 @@
       </view>
 
       <view v-else-if="coupons.length === 0" class="wallet-page__empty">
-        <image :src="staticImgPrefix + '/tabbar/优惠券.png'" mode="aspectFit" class="wallet-page__empty-icon"></image>
+        <image :src="staticImgPrefix + '/tabbar/专注.png'" mode="aspectFit" class="wallet-page__empty-icon"></image>
         <text class="wallet-page__empty-text">暂无优惠券</text>
         <text class="wallet-page__empty-sub">去领券中心看看吧</text>
       </view>

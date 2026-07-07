@@ -352,7 +352,7 @@ export default {
         return
       }
       if (item?.name === '红包卡券') {
-        uni.navigateTo({ url: '/pages/coupon/center' })
+        uni.navigateTo({ url: '/pages/coupon/wallet' })
         return
       }
       if (item?.name === '订单详情') {
