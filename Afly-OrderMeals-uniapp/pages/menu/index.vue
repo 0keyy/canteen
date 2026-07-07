@@ -14,7 +14,7 @@
           :duration="500"
         >
           <swiper-item v-for="(banner, idx) in displayBanners" :key="idx" class="order-page__swiper-item">
-            <image :src="banner.image" class="order-page__banner-image" mode="aspectFit" />
+            <image :src="banner.image" class="order-page__banner-image" mode="aspectFill" />
           </swiper-item>
         </swiper>
       </view>
@@ -708,7 +708,7 @@ page {
   &__back-btn {
     position: absolute;
     left: 20rpx;
-    top: 170rpx;
+    top: 190rpx;
     z-index: 10;
     width: 64rpx;
     height: 64rpx;
