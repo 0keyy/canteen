@@ -38,7 +38,7 @@
                     <view class="signin-page__date-body">
                       <image
                         class="signin-page__date-icon"
-                        src="./static/tabbar/calender.png"
+                        src="/static/tabbar/calender.png"
                         mode="aspectFit"
                       />
                     </view>

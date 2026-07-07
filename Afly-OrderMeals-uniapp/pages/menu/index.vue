@@ -14,7 +14,7 @@
           :duration="500"
         >
           <swiper-item v-for="(banner, idx) in displayBanners" :key="idx" class="order-page__swiper-item">
-            <image :src="banner.image" class="order-page__banner-image" mode="aspectFill" />
+            <image :src="banner.image" class="order-page__banner-image" mode="aspectFit" />
           </swiper-item>
         </swiper>
       </view>
@@ -107,7 +107,7 @@
     <view
       class="cart-bar"
       :class="{ 'cart-bar--disabled': !cartReady || cartItemCount === 0 }"
-      @tap="openCart"
+      @tap="goConfirm"
     >
       <view class="cart-bar__bag" @tap.stop="openCart">
         <image class="cart-bar__person" :src="staticImgPrefix + '/点赞.png'" mode="aspectFit" />
@@ -118,7 +118,6 @@
       <text class="cart-bar__price">{{ cartSummary }}</text>
       <view class="cart-bar__btn"
         :class="{ 'cart-bar__btn--disabled': !cartReady || cartItemCount === 0 }"
-        @tap.stop="goConfirm"
       >
         <text class="cart-bar__btn-text">去结算</text>
       </view>
@@ -459,13 +458,32 @@ export default {
     },
     async loadMenu() {
       const list = await orderApi.menu(this.aid)
-      this.menu = (Array.isArray(list) ? list : []).map((cate) => ({
-        ...cate,
-        foods: (cate.foods || []).map((food) => ({
-          ...food,
-          image: resolveImageUrl(food.image)
-        }))
-      }))
+      console.log('menu raw data type:', typeof list)
+      console.log('menu raw count:', Array.isArray(list) ? list.length : 0)
+      if (Array.isArray(list)) {
+        console.log('menu raw names:', list.map(c => c.name).join(', '))
+        list.forEach((c, i) => {
+          const keys = Object.keys(c)
+          console.log(`category ${i}: name=${c.name}, sort=${c.sort}, order=${c.order}, seq=${c.seq}, keys=${keys.join(',')}, foods=${(c.foods || []).length}, dishes=${(c.dishes || []).length}, items=${(c.items || []).length}`)
+        })
+      }
+      this.menu = (Array.isArray(list) ? list : [])
+        .sort((a, b) => {
+          const sortA = Number(a.sort || a.order || a.seq || 0)
+          const sortB = Number(b.sort || b.order || b.seq || 0)
+          return sortA - sortB
+        })
+        .map((cate) => {
+          const foods = cate.foods || cate.dishes || cate.items || []
+          return {
+            ...cate,
+            foods: foods.map((food) => ({
+              ...food,
+              image: resolveImageUrl(food.image)
+            }))
+          }
+        })
+      console.log('menu after process:', JSON.stringify(this.menu.map(c => ({name: c.name, sort: c.sort, foodCount: (c.foods || []).length}))))
       this.activeIndex = 0
     },
     async initOrder() {
@@ -830,7 +848,7 @@ page {
     width: 122rpx;
     height: 110rpx;
     flex-shrink: 0;
-    margin-top: -23rpx;
+    margin-top: -10rpx;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -885,7 +903,7 @@ page {
     }
   }
   .sidebar-bottom-space {
-    height: 260rpx;
+    height: 140rpx;
   }
 
   &__dishes {
