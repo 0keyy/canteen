@@ -16,7 +16,7 @@
               <text v-if="companyVerified" class="profile-page__level-tag profile-page__level-tag--verified">已认证</text>
               <text v-else class="profile-page__level-tag">默认等级</text>
             </view>
-            <text class="profile-page__mobile">{{ mobile || '请登录后查看' }}</text>
+            <text class="profile-page__mobile">{{ mobile || '' }}</text>
             <text v-if="companyVerified && companyDeptName" class="profile-page__company">{{ companyDeptName }}</text>
           </view>
           <view class="profile-page__member-btn" @tap="goMemberCode">
@@ -286,7 +286,7 @@ export default {
         uni.navigateTo({ url: '/pages/mine/memberDay/index' })
         return
       }
-      if (item.title === '退出登录') {
+      if (item.title === '退出登录' || item.title === '安全退出') {
         this.logout()
         return
       }
@@ -413,7 +413,7 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #fff9f3;
+  background:#f7f7f7;
 
   &__scroll {
     flex: 1;
@@ -510,15 +510,15 @@ export default {
   }
 
   &__level-tag {
-    padding: 4rpx 16rpx;
+    padding: 0rpx 20rpx;
     border-radius: 999rpx;
-    background: rgba(255, 255, 255, 0.25);
+    background: #fff5db;
     font-size: 20rpx;
-    color: #ffffff;
+    color: #b83c36;
 
     &--verified {
-      background: rgba(255, 255, 255, 0.3);
-      color: #ffffff;
+      background: #fff5db;
+      color: #b83c36;
     }
   }
 

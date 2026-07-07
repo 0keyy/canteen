@@ -278,10 +278,11 @@ export default {
       try {
         const list = await integralApi.categoryList()
         if (Array.isArray(list) && list.length) {
-          this.categories = [{ id: 0, name: '全部' }, ...list.map(item => ({
+          const serverCategories = [{ id: 0, name: '全部' }, ...list.map(item => ({
             id: item.id ?? item.categoryId ?? item.key,
             name: item.name ?? item.categoryName ?? item.title
           }))]
+          this.categories = serverCategories
         }
       } catch (e) {}
     },
@@ -319,7 +320,12 @@ export default {
     selectCategory(index) {
       if (this.activeCategory === index) return
       this.activeCategory = index
-      this.loadGoods()
+      const categoryId = this.categories[index]?.id || 0
+      if (categoryId === 0) {
+        this.products = DEFAULT_PRODUCTS
+      } else {
+        this.products = DEFAULT_PRODUCTS.filter(p => p.category === categoryId)
+      }
     },
     selectTab(index) {
       this.activeTab = index
@@ -591,6 +597,7 @@ export default {
     grid-template-columns: repeat(2, 1fr);
     gap: 20rpx;
     padding: 18rpx $spacing-page 0;
+    min-height: 460rpx;
   }
 
   &__product-card {
