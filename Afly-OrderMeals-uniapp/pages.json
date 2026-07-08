@@ -196,24 +196,6 @@
       "menu-category-sidebar": "components/menu-category-sidebar/menu-category-sidebar"
     }
   },
-  "fontFace": [
-    {
-      "family": "Alimama ShuHei Ti",
-      "source": "url('https://canteen.zhongtang-group.com/api/uploads/font/AlimamaShuHeiTi.ttf')"
-    },
-    {
-      "family": "Alimama DongFangDaKai",
-      "source": "url('https://canteen.zhongtang-group.com/api/uploads/font/AlimamaDongFangDaKai.ttf')"
-    },
-    {
-      "family": "ZhanKu QingKe HuangYou Ti",
-      "source": "url('https://canteen.zhongtang-group.com/api/uploads/font/ZhanKuQingKeHuangYouTi.ttf')"
-    },
-    {
-      "family": "ZiZhiQuXiMaiTi",
-      "source": "url('https://canteen.zhongtang-group.com/api/uploads/font/ZiZhiQuXiMaiTi.ttf')"
-    }
-  ],
   "tabBar": {
     "color": "#999999",
     "selectedColor": "#C41E3A",

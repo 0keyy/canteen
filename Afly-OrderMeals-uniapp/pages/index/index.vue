@@ -44,7 +44,7 @@
         <view class="home__primary-cards">
           <view class="home__primary-card-item" @click="selectMode(1)">
             <view class="home__primary-card-text">
-              <text class="home__primary-name">到店堂食</text>
+              <image class="home__primary-name-img" :src="staticImgPrefix + '/到店堂食.png'" mode="aspectFit" />
             </view>
             <image class="home__primary-card-img" :src="staticImgPrefix + '/图层 2.png'" mode="aspectFit" />
           </view>
@@ -54,7 +54,7 @@
             @click="selectMode(3)"
           >
             <view class="home__primary-card-text">
-              <text class="home__primary-name">外卖配送</text>
+              <image class="home__primary-name-img" :src="staticImgPrefix + '/外卖配送.png'" mode="aspectFit" />
             </view>
             <image class="home__primary-card-img" :src="staticImgPrefix + '/小唐骑车.png'" mode="aspectFit" />
           </view>
@@ -76,7 +76,7 @@
           <view class="home__recommend">
             <view class="home__recommend-header">
               <view class="home__recommend-title-row">
-                <text class="home__recommend-title">粮兴推荐</text>
+                <image class="home__recommend-title-img" :src="staticImgPrefix + '/粮兴推荐.png'" mode="aspectFit" />
                 <text class="home__recommend-tag">限时优惠</text>
               </view>
               <view class="home__recommend-link" @tap="goMenu">
@@ -531,13 +531,9 @@ $section-gap: 20rpx;
     padding: 20rpx 0 0 16rpx;
   }
   
-  &__primary-name {
-    font-size: 44rpx;
-    font-weight: 900;
-    color: #000000;
-    letter-spacing: 4rpx;
-    /* 优先使用站酷庆科黄油体，回退到系统字体 */
-    font-family: "ZhanKu QingKe HuangYou Ti", "ZCOOL QingKe HuangYou", sans-serif;
+  &__primary-name-img {
+    width: 200rpx;
+    height: 60rpx;
   }
 
   /* ===== 内容区 ===== */
@@ -817,10 +813,9 @@ $section-gap: 20rpx;
     gap: 12rpx;
   }
 
-  &__recommend-title {
-    font-size: 32rpx;
-    font-weight: 900;
-    color: $text-primary;
+  &__recommend-title-img {
+    width: 160rpx;
+    height: 40rpx;
   }
 
   &__recommend-tag {

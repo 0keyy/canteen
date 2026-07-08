@@ -37,7 +37,7 @@ export default {
 <style lang="scss">
 page {
   background-color: $bg-page;
-  font-family: 'HarmonyOS Sans SC', 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+  font-family: 'PingFang SC', 'HarmonyOS Sans SC', 'Noto Sans CJK SC', 'Microsoft YaHei', 'HarmonyOS Sans', sans-serif;
   font-size: 28rpx;
   color: $text-primary;
   -webkit-font-smoothing: antialiased;

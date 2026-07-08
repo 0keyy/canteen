@@ -36,7 +36,7 @@
           <view class="points-page__promo-card points-page__promo-card--lottery" @tap="goLottery">
             <view class="points-page__promo-main">
               <view class="points-page__promo-title-row">
-                <text class="points-page__promo-title">积分抽奖</text>
+                <image class="points-page__promo-title-img" :src="staticImgPrefix + '/积分抽奖.png'" mode="aspectFit" />
                 <image src="/static/tabbar/右箭头.png" mode="aspectFit" class="points-page__promo-icon"></image>
               </view>
               <view class="points-page__promo-sub-row">
@@ -48,7 +48,7 @@
           <view class="points-page__promo-card points-page__promo-card--checkin" @tap="goSignin">
             <view class="points-page__promo-main">
               <view class="points-page__promo-title-row">
-                <text class="points-page__promo-title">每日签到</text>
+                <image class="points-page__promo-title-img" :src="staticImgPrefix + '/每日签到.png'" mode="aspectFit" />
                 <image src="/static/tabbar/右箭头.png" mode="aspectFit" class="points-page__promo-icon"></image>
               </view>
               <text class="points-page__promo-sub">每天有惊喜</text>
@@ -523,15 +523,14 @@ export default {
     gap: 8rpx;
   }
 
-  &__promo-title {
-    font-size: 48rpx;
-    font-weight: 900;
-    color: #be0000;
+  &__promo-title-img {
+    width: 140rpx;
+    height: 50rpx;
   }
 
   &__promo-icon {
-    width: 48rpx;
-    height: 48rpx;
+    width: 44rpx;
+    height: 44rpx;
     flex-shrink: 0;
   }
 
