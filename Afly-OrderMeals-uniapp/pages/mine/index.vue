@@ -439,6 +439,7 @@ export default {
     }
 
     &__hero-bg image {
+	  filter: drop-shadow(2px 4px 4px rgba(139, 69, 19, 0.2));
       width: 100%;
       height: 100%;
       display: block;

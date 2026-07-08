@@ -35,22 +35,25 @@
         <view class="points-page__promo-row">
           <view class="points-page__promo-card points-page__promo-card--lottery" @tap="goLottery">
             <view class="points-page__promo-main">
-              <text class="points-page__promo-title">积分抽奖
-			  <text class="points-page__promo-icon">&#9654</text>
-			  </text>
-              <text class="points-page__promo-sub">赢取优惠券
-			  </text>
+              <view class="points-page__promo-title-row">
+                <text class="points-page__promo-title">积分抽奖</text>
+                <image src="/static/tabbar/右箭头.png" mode="aspectFit" class="points-page__promo-icon"></image>
+              </view>
+              <view class="points-page__promo-sub-row">
+                <text class="points-page__promo-sub">赢取优惠券</text>
+              </view>
             </view>
-            <image :src="staticImgPrefix + '/白logo.png'" mode="" class="points-page__promo-watermark"></image>
+            <image :src="staticImgPrefix + '/立体logo.png'" mode="" class="points-page__promo-watermark"></image>
           </view>
           <view class="points-page__promo-card points-page__promo-card--checkin" @tap="goSignin">
             <view class="points-page__promo-main">
-              <text class="points-page__promo-title">每日签到
-			  <text class="points-page__promo-icon">&#9654</text>
-			  </text>
+              <view class="points-page__promo-title-row">
+                <text class="points-page__promo-title">每日签到</text>
+                <image src="/static/tabbar/右箭头.png" mode="aspectFit" class="points-page__promo-icon"></image>
+              </view>
               <text class="points-page__promo-sub">每天有惊喜</text>
             </view>
-            <image :src="staticImgPrefix + '/白logo.png'" mode="" class="points-page__promo-watermark"></image>
+            <image :src="staticImgPrefix + '/立体logo.png'" mode="" class="points-page__promo-watermark"></image>
           </view>
         </view>
 
@@ -513,14 +516,23 @@ export default {
     z-index: 1;
   }
 
+  &__promo-title-row,
+  &__promo-sub-row {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+  }
+
   &__promo-title {
     font-size: 48rpx;
     font-weight: 900;
     color: #be0000;
   }
-  &__promo-icon{
-	font-size: 40rpx;
-	line-height: 48rpx;
+
+  &__promo-icon {
+    width: 48rpx;
+    height: 48rpx;
+    flex-shrink: 0;
   }
 
   &__promo-sub {
@@ -530,14 +542,12 @@ export default {
   }
 
   &__promo-watermark {
-	
     position: absolute;
     right: -25rpx;
 	width: 170rpx;
 	height: 210rpx;
-	top: -30rpx;
-	opacity: 0.35;
-	filter: drop-shadow(4px 8px 12px rgba(0, 0, 0, 0.1));
+	top: -25rpx;
+	filter: drop-shadow(2px 4px 4px rgba(139, 69, 19, 0.2));
   }
 
   /* ===== 分类筛选 ===== */

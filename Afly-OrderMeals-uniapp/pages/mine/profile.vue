@@ -107,16 +107,15 @@
 <script>
 import { authApi } from '../../api/index'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
-
 export default {
   data: function() {
     return {
       staticImgPrefix: STATIC_IMAGE_PREFIX,
       navPaddingStyle: {},
-      defaultAvatar: STATIC_IMAGE_PREFIX + '/tabbar/avatar-default.png',
+      defaultAvatar: STATIC_IMAGE_PREFIX + '/2.png',
       defaultAvatars: [
-        STATIC_IMAGE_PREFIX + '/1.png',
         STATIC_IMAGE_PREFIX + '/2.png',
+        STATIC_IMAGE_PREFIX + '/1.png',
 		STATIC_IMAGE_PREFIX + '/3.png',
 		STATIC_IMAGE_PREFIX + '/4.png',
 		
@@ -209,28 +208,7 @@ export default {
       this.form.birthday = e.detail.value
     },
     saveProfile: function() {
-      if (this.saving) return
-      this.saving = true
-      const self = this
-		const data = {
-        nickname: this.form.nickname,
-        gender: this.form.gender,
-        birthday: this.form.birthday,
-        avatar: this.avatarUrl
-      }
-      authApi.updateProfile(data).then(function() {
-        uni.setStorageSync('nickname', self.form.nickname)
-        uni.showToast({ title: '保存成功', icon: 'success' })
-        setTimeout(function() {
-          uni.navigateBack()
-        }, 1500)
-      }).catch(function(e) {
-        const msg = typeof e === 'string' ? e : ((e && e.message) || '保存失败')
-        console.error('保存资料失败:', e)
-        uni.showToast({ title: msg, icon: 'none' })
-      }).finally(function() {
-        self.saving = false
-      })
+      uni.showToast({ title: '功能正在开发中', icon: 'none' })
     }
   }
 }

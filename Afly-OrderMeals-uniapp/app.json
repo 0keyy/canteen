@@ -4,9 +4,9 @@
     "pages/logs/logs"
   ],
   "window": {
-    "navigationBarTextStyle": "black",
+    "navigationBarTextStyle": "white",
     "navigationBarTitleText": "Weixin",
-    "navigationBarBackgroundColor": "#ffffff"
+    "navigationBarBackgroundColor": "#000000"
   },
   "style": "v2",
   "componentFramework": "glass-easel",

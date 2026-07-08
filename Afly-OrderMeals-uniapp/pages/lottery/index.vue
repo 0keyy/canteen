@@ -289,7 +289,7 @@
 		}
 
 		&__back-icon {
-			font-size: 80rpx;
+			font-size: 86rpx;
 			color: #312626;
 			font-weight: 300;
 			line-height: 1;
