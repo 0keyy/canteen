@@ -3,7 +3,7 @@
     <view class="signin-page__header" :style="headerStyle">
       <view class="signin-page__nav-bar">
         <view class="signin-page__back-btn" @tap="goBack">
-          <text class="signin-page__back-icon">‹</text>
+          <image class="signin-page__back-icon" :src="staticImgPrefix + '/tabbar/返回 2.png'" mode="aspectFit" />
         </view>
         <view class="signin-page__nav-placeholder"></view>
       </view>
@@ -251,10 +251,8 @@ export default {
   }
 
   &__back-icon {
-    font-size: 80rpx;
-    color: #312626;
-    font-weight: 300;
-    line-height: 1;
+    width: 44rpx;
+    height: 44rpx;
   }
 
   &__header-body {

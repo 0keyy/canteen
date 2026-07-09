@@ -1,18 +1,5 @@
 <template>
   <view class="orders-page">
-    <!-- 顶部导航 -->
-    <view class="orders-page__navbar" :style="navbarStyle">
-      <view class="orders-page__navbar-left" @tap="goBack">
-        <text class="orders-page__navbar-back">‹</text>
-      </view>
-      <view class="orders-page__navbar-title">
-        <!-- <text class="orders-page__navbar-title-text">我的订单</text> -->
-      </view>
-      <view class="orders-page__navbar-right">
-        <text class="orders-page__navbar-search">⌕</text>
-      </view>
-    </view>
-
     <!-- Tabs -->
     <view class="orders-page__tabs">
       <view
@@ -81,15 +68,10 @@ export default {
       tabs: TABS,
       activeTab: 0,
       allList: [],
-      navHeight: 0,
-      statusBarHeight: 0,
       staticImgPrefix: STATIC_IMAGE_PREFIX
     }
   },
   computed: {
-    navbarStyle() {
-      return `padding-top: ${this.statusBarHeight}px; height: ${44 + this.statusBarHeight}px;`
-    },
     currentList() {
       if (this.activeTab === 0) return this.allList
       const key = TABS[this.activeTab].key
@@ -97,8 +79,6 @@ export default {
     }
   },
   onLoad(options) {
-    const sys = uni.getSystemInfoSync()
-    this.statusBarHeight = sys.statusBarHeight || 20
     if (options && options.tab !== undefined) {
       const tabIdx = parseInt(options.tab)
       if (!isNaN(tabIdx) && tabIdx >= 0 && tabIdx < TABS.length) {
@@ -266,14 +246,6 @@ export default {
     switchTab(idx) {
       this.activeTab = idx
     },
-    goBack() {
-      const pages = getCurrentPages()
-      if (pages.length > 1) {
-        uni.navigateBack()
-      } else {
-        uni.switchTab({ url: '/pages/mine/index' })
-      }
-    },
     goDetail(orderId) {
       uni.navigateTo({ url: `/pages/order/detail?orderId=${orderId}` })
     },
@@ -312,48 +284,6 @@ $border-light: #EEEEEE;
   flex-direction: column;
   height: 100vh;
   background: $bg-gray;
-
-  &__navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24rpx;
-    box-sizing: border-box;
-    flex-shrink: 0;
-  }
-
-  &__navbar-left,
-  &__navbar-right {
-    width: 64rpx;
-    height: 64rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__navbar-back {
-    font-size: 64rpx;
-    color: $text-primary;
-    line-height: 1;
-    font-weight: 300;
-  }
-
-  &__navbar-search {
-    font-size: 36rpx;
-    color: $text-primary;
-    line-height: 1;
-  }
-
-  &__navbar-title {
-    flex: 1;
-    text-align: center;
-  }
-
-  &__navbar-title-text {
-    font-size: 32rpx;
-    font-weight: 600;
-    color: $text-primary;
-  }
 
   &__tabs {
     display: flex;

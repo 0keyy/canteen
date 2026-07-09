@@ -1,13 +1,5 @@
 <template>
   <view class="wallet-page">
-    <view class="wallet-page__header">
-      <view class="wallet-page__back-btn" @tap="goBack">
-        <text class="wallet-page__back-icon">‹</text>
-      </view>
-      <text class="wallet-page__title">我的卡券</text>
-      <view class="wallet-page__header-right"></view>
-    </view>
-
     <view class="wallet-page__tabs">
       <view
         v-for="tab in tabs"
@@ -103,9 +95,6 @@ export default {
     this.loadCoupons()
   },
   methods: {
-    goBack() {
-      uni.navigateBack()
-    },
     formatTime(ts) {
       if (!ts || ts === 0) return '不限'
       const d = new Date(ts * 1000)
@@ -152,40 +141,6 @@ export default {
   background: #F5F5F5;
   display: flex;
   flex-direction: column;
-
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 60rpx 32rpx 24rpx;
-    background: #FFFFFF;
-	margin-top: 38rpx;
-  }
-
-  &__back-btn {
-    width: 64rpx;
-    height: 64rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__back-icon {
-    font-size: 80rpx;
-    color: #333333;
-    font-weight: 300;
-    line-height: 1;
-  }
-
-  &__title {
-    font-size: 30rpx;
-    font-weight: 600;
-    color: #333333;
-  }
-
-  &__header-right {
-    width: 64rpx;
-  }
 
   &__tabs {
     display: flex;

@@ -1,14 +1,7 @@
 <template>
   <view class="checkout" v-if="order">
-    <view class="checkout__header">
-      <view class="checkout__nav">
-        <view class="checkout__back-btn" @tap="goBack">
-          <text class="checkout__back-icon">‹</text>
-        </view>
-        <image class="checkout__logo" :src="staticImgPrefix + '/logo.png'" mode="aspectFit" />
-        <view class="checkout__nav-empty"></view>
-      </view>
-      <text class="checkout__header-title">{{ isDeliveryMode ? '请选择配送方式' : '请确认用餐方式' }}</text>
+    <view class="checkout__sub-header">
+      <text class="checkout__sub-title">{{ isDeliveryMode ? '请选择配送方式' : '请确认用餐方式' }}</text>
     </view>
 
     <scroll-view class="checkout__scroll" scroll-y :show-scrollbar="false">
@@ -340,9 +333,6 @@ export default {
     this.loadDeliveryAddress()
   },
   methods: {
-    goBack() {
-      uni.navigateBack()
-    },
     goToAddress() {
       uni.navigateTo({ url: '/pages/address/list?select=1' })
     },
@@ -525,50 +515,17 @@ export default {
   display: flex;
   flex-direction: column;
 
-  &__header {
+  &__sub-header {
     background: linear-gradient(180deg, #FFECEC 0%, #FFF5F5 100%);
     flex-shrink: 0;
-    padding-top: calc(var(--status-bar-height, 88rpx) + 30rpx);
+    padding: 20rpx 0;
   }
 
-  &__nav {
-    display: flex;
-    align-items: center;
-    height: 88rpx;
-    padding: 0 24rpx;
-  }
-
-  &__back-btn {
-    width: 64rpx;
-    height: 64rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__back-icon {
-    font-size: 72rpx;
-    color: #333333;
-    font-weight: 400;
-    line-height: 1;
-  }
-
-  &__logo {
-    height: 300rpx;
-    width: 300rpx;
-    margin: 0 auto;
-  }
-
-  &__nav-empty {
-    width: 64rpx;
-  }
-
-  &__header-title {
+  &__sub-title {
     display: block;
     text-align: center;
     font-size: 28rpx;
     color: #666666;
-    padding-bottom: 20rpx;
   }
 
   &__scroll {

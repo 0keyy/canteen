@@ -23,7 +23,6 @@
     {
       "path": "pages/cart/confirm",
       "style": {
-        "navigationStyle": "custom",
         "navigationBarTitleText": "确认订单",
         "navigationBarBackgroundColor": "#FFFCF8",
         "navigationBarTextStyle": "black",
@@ -42,16 +41,19 @@
     {
       "path": "pages/address/edit",
       "style": {
-		  "navigationBarTitleText": "编辑地址",
-        "navigationStyle": "custom",
+        "navigationBarTitleText": "编辑地址",
+        "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black",
         "animationType": "slide-in-right"
       }
     },
     {
       "path": "pages/order/list",
       "style": {
-		  "navigationBarTitleText": "点单",
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "我的订单",
+        "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black",
+        "animationType": "slide-in-right"
       }
     },
     {
@@ -82,23 +84,27 @@
     {
       "path": "pages/mine/profile",
       "style": {
-		"navigationBarTitleText": "个人资料",
-        "navigationStyle": "custom",
+        "navigationBarTitleText": "个人资料",
+        "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black",
         "animationType": "slide-in-right"
       }
     },
     {
       "path": "pages/coupon/center",
       "style": {
-        "navigationStyle": "custom",
+        "navigationBarTitleText": "领券中心",
+        "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black",
         "animationType": "slide-in-right"
       }
     },
     {
       "path": "pages/coupon/wallet",
       "style": {
-		  "navigationBarTitleText": "红包卡券",
-        "navigationStyle": "custom",
+        "navigationBarTitleText": "红包卡券",
+        "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black",
         "animationType": "slide-in-right"
       }
     },
@@ -179,7 +185,9 @@
     {
       "path": "pages/mine/service/index",
       "style": {
-        "navigationStyle": "custom",
+        "navigationBarTitleText": "客服中心",
+        "navigationBarBackgroundColor": "#FFFCF8",
+        "navigationBarTextStyle": "black",
         "animationType": "slide-in-right"
       }
     }

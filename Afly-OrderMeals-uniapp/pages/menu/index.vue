@@ -2,9 +2,7 @@
   <view class="order-page" @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
     <view class="order-page__header" :style="headerPaddingStyle">
       <view class="order-page__back-btn" @tap="goBack">
-        <view class="order-page__back-icon-wrap">
-          <text class="order-page__back-icon">‹</text>
-        </view>
+        <image class="order-page__back-icon" :src="staticImgPrefix + '/tabbar/返回 2.png'" mode="aspectFit" />
       </view>
       <!-- 轮播图 -->
       <view class="order-page__banner" v-if="displayBanners.length">
@@ -764,21 +762,9 @@ page {
     z-index: 10;
   }
 
-  &__back-icon-wrap {
-    height: 53rpx;
-    padding: 0 24rpx 0 32rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
   &__back-icon {
-    font-size: 75rpx;
-    color: #333333;
-    font-weight: 350;
-    line-height: 1;
-	margin-top: -7px;
-	margin-left: -3px;
+    width: 44rpx;
+    height: 44rpx;
   }
 
  

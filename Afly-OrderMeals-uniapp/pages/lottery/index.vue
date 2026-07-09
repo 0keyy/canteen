@@ -6,7 +6,7 @@
 			</view>
 			<view class="lottery-page__nav-bar">
 				<view class="lottery-page__back-btn" @tap="goBack">
-					<text class="lottery-page__back-icon">‹</text>
+					<image class="lottery-page__back-icon" :src="staticImgPrefix + '/tabbar/返回 2.png'" mode="aspectFit" />
 				</view>
 				<view class="lottery-page__nav-placeholder"></view>
 			</view>
@@ -289,10 +289,8 @@
 		}
 
 		&__back-icon {
-			font-size: 86rpx;
-			color: #312626;
-			font-weight: 300;
-			line-height: 1;
+			width: 44rpx;
+			height: 44rpx;
 		}
 
 		&__header-body {

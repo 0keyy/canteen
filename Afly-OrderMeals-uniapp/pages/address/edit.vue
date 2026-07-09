@@ -1,12 +1,5 @@
 <template>
   <view class="edit-page">
-    <view class="edit-page__header">
-      <view class="edit-page__back-btn" @tap="goBack">
-        <text class="edit-page__back-icon">‹</text>
-      </view>
-      <text class="edit-page__title">编辑地址</text>
-      <view class="edit-page__header-right"></view>
-    </view>
     <scroll-view class="edit-page__content" scroll-y :show-scrollbar="false">
       <view class="edit-page__map-card" @tap="selectLocation">
         <view class="edit-page__map-main">
@@ -132,10 +125,6 @@ onLoad(async (options) => {
   }
 })
 
-function goBack() {
-  uni.navigateBack()
-}
-
 function selectLocation() {
   uni.chooseLocation({
     success: (res) => {
@@ -199,43 +188,9 @@ function validatePhone() {
   display: flex;
   flex-direction: column;
 
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 38rpx;
-    padding: 60rpx 32rpx 24rpx;
-    background: #FFFFFF;
-  }
-
-  &__back-btn {
-    width: 64rpx;
-    height: 64rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__back-icon {
-    font-size: 80rpx;
-    color: #333333;
-    font-weight: 300;
-    line-height: 1;
-  }
-
-  &__title {
-    font-size: 34rpx;
-    font-weight: 600;
-    color: #333333;
-  }
-
-  &__header-right {
-    width: 64rpx;
-  }
-
   &__content {
     flex: 1;
-    padding: 0 24rpx;
+    padding: 24rpx 24rpx 0;
   }
 
   &__map-card {

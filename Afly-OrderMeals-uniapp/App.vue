@@ -67,7 +67,9 @@ export default {
 <style lang="scss">
 page {
   background-color: $bg-page;
-  font-family: 'PingFang SC', 'HarmonyOS Sans SC', 'Noto Sans CJK SC', 'Microsoft YaHei', 'HarmonyOS Sans', sans-serif;
+  page {
+    font-family: "Times New Roman", Georgia, serif;
+  }
   font-size: 28rpx;
   color: $text-primary;
   -webkit-font-smoothing: antialiased;

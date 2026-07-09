@@ -1,18 +1,5 @@
 <template>
   <view class="coupon-center">
-    <!-- 自定义导航栏 -->
-    <view class="coupon-center__nav" :style="{ paddingTop: navMetrics.statusBarHeight + 'px' }">
-      <view class="coupon-center__nav-bar" :style="{ height: navMetrics.navBarHeight + 'px' }">
-        <view class="coupon-center__nav-left" @tap="goBack">
-          <text class="coupon-center__nav-arrow" decode="{{true}}">&#8249;</text>
-        </view>
-        <text class="coupon-center__nav-title">领券中心</text>
-        <view class="coupon-center__nav-right">
-          <text class="coupon-center__nav-dot">⋯</text>
-        </view>
-      </view>
-    </view>
-
     <!-- 列表区域 -->
     <view v-if="loading" class="coupon-center__status">
       <text class="coupon-center__status-text">加载中...</text>
@@ -83,24 +70,18 @@
 
 <script>
 import { couponApi } from '../../api/index'
-import { getNavMetrics } from '../../utils/navbar'
 
 export default {
   data() {
     return {
-      navMetrics: getNavMetrics(),
       loading: false,
       coupons: []
     }
   },
   onShow() {
-    this.navMetrics = getNavMetrics()
     this.loadCoupons()
   },
   methods: {
-    goBack() {
-      uni.navigateBack({ delta: 1 })
-    },
     formatDate(dateStr) {
       if (!dateStr) return ''
       // 将 2026-6-1 格式转为 2026.6.1
@@ -165,57 +146,6 @@ export default {
 .coupon-center {
   min-height: 100vh;
   background: #e7e7e7;
-
-  &__nav {
-    background: #ffffff;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  &__nav-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24rpx;
-    position: relative;
-  }
-
-  &__nav-left {
-    width: 80rpx;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-  }
-
-  &__nav-arrow {
-    font-size: 80rpx;
-    color: #333;
-  }
-
-  &__nav-title {
-    font-size: 34rpx;
-    font-weight: 700;
-    color: #333;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  &__nav-right {
-    width: 80rpx;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-  }
-
-  &__nav-dot {
-    font-size: 36rpx;
-    color: #333;
-    font-weight: 600;
-  }
 
   &__status {
     padding: 200rpx 32rpx;

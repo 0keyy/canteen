@@ -1,13 +1,5 @@
 <template>
   <view class="profile-page">
-    <view class="profile-page__nav" :style="navPaddingStyle">
-      <view class="profile-page__nav-back" @tap="goBack">
-      <image class="profile-page__nav-icon" :src="staticImgPrefix + '/tabbar/返回 2.png'" mode="aspectFit" />
-    </view>
-      <text class="profile-page__nav-title">会员资料</text>
-      <view class="profile-page__nav-placeholder"></view>
-    </view>
-
     <view class="profile-page__card">
       <view class="profile-page__avatar-row" @tap="chooseAvatar">
         <view class="profile-page__avatar-wrap">
@@ -111,7 +103,6 @@ export default {
   data: function() {
     return {
       staticImgPrefix: STATIC_IMAGE_PREFIX,
-      navPaddingStyle: {},
       defaultAvatar: STATIC_IMAGE_PREFIX + '/2.png',
       defaultAvatars: [
         STATIC_IMAGE_PREFIX + '/2.png',
@@ -151,18 +142,9 @@ export default {
     }
   },
   onLoad: function() {
-    const sysInfo = uni.getSystemInfoSync()
-    this.navPaddingStyle = { paddingTop: sysInfo.statusBarHeight + 'px' }
     this.loadProfile()
   },
   methods: {
-    goBack: function() {
-      uni.navigateBack({
-        fail: function() {
-          uni.switchTab({ url: '/pages/mine/index' })
-        }
-      })
-    },
     loadProfile: function() {
       const self = this
       authApi.profile().then(function(res) {
@@ -220,45 +202,6 @@ export default {
   background: #DEDEDE;
   display: flex;
   flex-direction: column;
-
-  &__nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 170rpx;
-    padding: 0 24rpx;
-    background: #FFFFFF;
-    border-bottom: 1rpx solid #F0F0F0;
-  }
-
-  &__nav-back {
-    width: 60rpx;
-    height: 60rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__nav-arrow {
-    font-size: 40rpx;
-    color: #030303;
-    font-weight: 300;
-  }
-
-  &__nav-icon {
-    width: 44rpx;
-    height: 44rpx;
-  }
-
-  &__nav-title {
-    font-size: 28rpx;
-    font-weight: 600;
-    color: #030303;
-  }
-
-  &__nav-placeholder {
-    width: 60rpx;
-  }
 
   &__avatar-row {
     display: flex;

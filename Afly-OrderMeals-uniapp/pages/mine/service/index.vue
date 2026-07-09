@@ -1,16 +1,5 @@
 <template>
   <view class="service-page">
-    <!-- 自定义导航栏 -->
-    <view class="service-page__nav" :style="navPaddingStyle">
-      <view class="service-page__nav-back" @tap="goBack">
-        <text class="service-page__nav-back-icon">&#8249;</text>
-      </view>
-      <text class="service-page__nav-title">客服中心</text>
-      <view class="service-page__nav-right">
-        <view class="service-page__nav-circle"></view>
-      </view>
-    </view>
-
     <!-- 聊天区域 -->
     <scroll-view
       class="service-page__chat"
@@ -102,7 +91,6 @@
 </template>
 
 <script>
-import { getNavMetrics } from '../../../utils/navbar'
 import { STATIC_IMAGE_PREFIX } from '../../../utils/image'
 import { chatApi } from '../../../api/index'
 
@@ -120,7 +108,6 @@ function genId() {
 export default {
   data() {
     return {
-      navMetrics: getNavMetrics(),
       staticImgPrefix: STATIC_IMAGE_PREFIX,
       inputText: '',
       currentTime: formatChatTime(),
@@ -135,16 +122,8 @@ export default {
       isConnected: false
     }
   },
-  computed: {
-    navPaddingStyle() {
-      return { paddingTop: `${this.navMetrics.statusBarHeight}px` }
-    }
-  },
   onLoad() {
     this.initChat()
-  },
-  onShow() {
-    this.navMetrics = getNavMetrics()
   },
   onUnload() {
     this.disconnect()
@@ -362,10 +341,6 @@ export default {
       uni.previewImage({ urls: [url] })
     },
 
-    goBack() {
-      uni.navigateBack()
-    },
-
     onVoiceTap() {
       uni.showToast({ title: '语音功能开发中', icon: 'none' })
       // 预留：调用 chatApi.upload 上传语音文件
@@ -385,57 +360,6 @@ export default {
   flex-direction: column;
   height: 100vh;
   background: #e0e0e0;
-
-  /* ===== 导航栏 ===== */
-  &__nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 175rpx;
-    padding: 0 24rpx;
-    background: #ffffff;
-    border-bottom: 1rpx solid #eeeeee;
-    flex-shrink: 0;
-
-    &-back {
-      width: 60rpx;
-      display: flex;
-      align-items: center;
-    }
-
-    &-back-icon {
-      font-size: 48rpx;
-      color: #333333;
-      line-height: 1;
-    }
-
-    &-title {
-      font-size: 34rpx;
-      font-weight: 500;
-	  padding-left: -30rpx;
-      color: #333333;
-    }
-
-    &-right {
-      display: flex;
-      align-items: center;
-      gap: 16rpx;
-    }
-
-    &-more {
-      font-size: 40rpx;
-      color: #333333;
-      line-height: 1;
-      font-weight: bold;
-    }
-
-    &-circle {
-      width: 36rpx;
-      height: 36rpx;
-      border-radius: 50%;
-      border: 4rpx solid #333333;
-    }
-  }
 
   /* ===== 聊天区域 ===== */
   &__chat {
