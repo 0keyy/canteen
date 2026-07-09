@@ -92,3 +92,8 @@ sa-token:
   token-style: random-64  # token生成的风格
   is-print: false         # 打印版本字符画
   is-log: false           # 是否输出操作日志
+
+# 腾讯地图配置
+tencent:
+  map:
+    key: "MAGBZ-GSSCW-I5XRG-YHTIF-26IUZ-YYBZD"

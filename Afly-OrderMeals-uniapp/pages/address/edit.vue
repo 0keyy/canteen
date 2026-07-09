@@ -1,56 +1,58 @@
 <template>
   <view class="edit-page">
     <view class="edit-page__header">
-        <view class="edit-page__back-btn" @tap="goBack">
-          <text class="edit-page__back-icon">‹</text>
-        </view>
-        <text class="edit-page__title">编辑地址</text>
-        <view class="edit-page__header-right"></view>
+      <view class="edit-page__back-btn" @tap="goBack">
+        <text class="edit-page__back-icon">‹</text>
       </view>
-      <view class="edit-page__content" scroll-y :show-scrollbar="false">
-      <view class="edit-page__address-card" @tap="selectAddress">
-        <view class="edit-page__address-main">
-          <text class="edit-page__address-name">{{ form.companyName || '请选择地址' }}</text>
-          <text class="edit-page__address-detail">{{ form.address || '请选择详细地址' }}</text>
+      <text class="edit-page__title">编辑地址</text>
+      <view class="edit-page__header-right"></view>
+    </view>
+    <scroll-view class="edit-page__content" scroll-y :show-scrollbar="false">
+      <view class="edit-page__map-card" @tap="selectLocation">
+        <view class="edit-page__map-main">
+          <text class="edit-page__map-title">点击地图选择位置</text>
+          <text v-if="fullAddress" class="edit-page__map-selected">
+            {{ fullAddress }}
+          </text>
+          <text v-else class="edit-page__map-placeholder">请选择收货地址</text>
         </view>
-        <text class="edit-page__address-change">更换地址</text>
+        <text class="edit-page__map-change">更改</text>
       </view>
 
       <view class="edit-page__section">
         <view class="edit-page__form-item">
           <text class="edit-page__label">详细地址</text>
-          <view class="edit-page__input-wrap">
-            <input 
-              v-model="form.detail" 
-              class="edit-page__input" 
-              placeholder="例：1幢101" 
+          <input
+              v-model="form.detail"
+              class="edit-page__input"
+              placeholder="例：XX大厦1幢101室"
               placeholder-class="edit-page__placeholder"
-            />
-          </view>
+              maxlength="50"
+          />
         </view>
 
         <view class="edit-page__form-item">
           <text class="edit-page__label">联系人</text>
           <view class="edit-page__contact-row">
-            <input 
-              v-model="form.contactName" 
-              class="edit-page__input edit-page__input--name" 
-              placeholder="请填写" 
-              placeholder-class="edit-page__placeholder"
+            <input
+                v-model="form.contactName"
+                class="edit-page__input edit-page__input--name"
+                placeholder="请填写姓名"
+                placeholder-class="edit-page__placeholder"
+                maxlength="20"
             />
             <view class="edit-page__gender-radio">
-              <view 
-                class="edit-page__radio-option" 
-                :class="{ 'edit-page__radio-option--active': gender === '先生' }"
-                @tap="selectGender('先生')"
+              <view class="edit-page__radio-option"
+                  :class="{ 'edit-page__radio-option--active': form.gender === '先生' }"
+                  @tap="form.gender = '先生'"
               >
                 <view class="edit-page__radio-dot"></view>
                 <text class="edit-page__radio-text">先生</text>
               </view>
-              <view 
-                class="edit-page__radio-option" 
-                :class="{ 'edit-page__radio-option--active': gender === '女士' }"
-                @tap="selectGender('女士')"
+              <view
+                  class="edit-page__radio-option"
+                  :class="{ 'edit-page__radio-option--active': form.gender === '女士' }"
+                  @tap="form.gender = '女士'"
               >
                 <view class="edit-page__radio-dot"></view>
                 <text class="edit-page__radio-text">女士</text>
@@ -61,28 +63,29 @@
 
         <view class="edit-page__form-item">
           <text class="edit-page__label">手机号</text>
-          <input 
-            v-model="form.contactMobile" 
-            class="edit-page__input" 
-            type="number" 
-            placeholder="请填写" 
-            placeholder-class="edit-page__placeholder"
-            maxlength="11"
+          <input
+              v-model="form.contactMobile"
+              class="edit-page__input"
+              type="number"
+              placeholder="请填写手机号"
+              placeholder-class="edit-page__placeholder"
+              maxlength="11"
+              @blur="validatePhone"
           />
         </view>
 
         <view class="edit-page__form-item">
           <text class="edit-page__label">设置为默认</text>
-          <switch 
-            :checked="form.isDefault === 1" 
-            color="#D00000" 
-            @change="onDefaultChange" 
+          <switch
+              :checked="form.isDefault === 1"
+              color="#D00000"
+              @change="(e) => { form.isDefault = e.detail.value ? 1 : 0 }"
           />
         </view>
       </view>
 
       <view class="edit-page__bottom-space"></view>
-    </view>
+    </scroll-view>
 
     <view class="edit-page__footer safe-area-bottom">
       <view class="edit-page__save-btn" @tap="save">
@@ -92,71 +95,99 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { reactive, computed } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 import { addressApi } from '../../api/index'
 
-export default {
-  data() {
-    return {
-      form: {
-        id: null,
-        companyName: '',
-        address: '',
-        province: '',
-        city: '',
-        district: '',
-        detail: '',
-        contactName: '',
-        contactMobile: '',
-        isDefault: 0
-      },
-      gender: ''
-    }
-  },
-  async onLoad(options) {
-    if (options.id) {
-      const detail = await addressApi.detail(Number(options.id))
-      this.form = { ...detail }
-      this.extractGender()
-    }
-  },
-  methods: {
-    goBack() {
-      uni.navigateBack()
+const form = reactive({
+  id: null,
+  province: '',
+  city: '',
+  district: '',
+  address: '',
+  detail: '',
+  contactName: '',
+  contactMobile: '',
+  gender: '',
+  label: 0,
+  lat: '',
+  lng: '',
+  isDefault: 0
+})
+
+const fullAddress = computed(() => {
+  // 编辑中实时显示：前端拼接
+  return [form.province, form.city, form.district, form.address, form.detail]
+    .filter(Boolean)
+    .join(' ')
+})
+
+onLoad(async (options) => {
+  if (options.id) {
+    const detail = await addressApi.detail(Number(options.id))
+    Object.assign(form, detail)
+  } else {
+    form.isDefault = 1
+  }
+})
+
+function goBack() {
+  uni.navigateBack()
+}
+
+function selectLocation() {
+  uni.chooseLocation({
+    success: (res) => {
+      form.lat = String(res.latitude)
+      form.lng = String(res.longitude)
+      form.address = res.name
     },
-    extractGender() {
-      if (this.form.contactName) {
-        if (this.form.contactName.endsWith('先生')) {
-          this.gender = '先生'
-          this.form.contactName = this.form.contactName.replace('先生', '')
-        } else if (this.form.contactName.endsWith('女士')) {
-          this.gender = '女士'
-          this.form.contactName = this.form.contactName.replace('女士', '')
-        }
+    fail: (err) => {
+      // 用户主动取消，不提示
+      if (err.errMsg && err.errMsg.includes('cancel')) {
+        uni.showToast({ title: '已取消', icon: 'none' })
+        return
       }
-    },
-    selectGender(gender) {
-      this.gender = gender
-    },
-    onDefaultChange(e) {
-      this.form.isDefault = e.detail.value ? 1 : 0
-    },
-    selectAddress() {
-      uni.showToast({ title: '地址选择功能开发中', icon: 'none' })
-    },
-    buildContactName() {
-      if (this.form.contactName && this.gender) {
-        return this.form.contactName + this.gender
-      }
-      return this.form.contactName
-    },
-    async save() {
-      const originalName = this.form.contactName
-      this.form.contactName = this.buildContactName()
-      await addressApi.save(this.form)
-      this.form.contactName = originalName
-      uni.navigateBack()
+      // 真正的错误才提示
+      uni.showToast({ title: '无法打开地图，请重试', icon: 'none' })
     }
+  })
+}
+
+const phoneRegex = /^1[3-9]\d{9}$/
+
+async function save() {
+  if (!form.address) {
+    uni.showToast({ title: '请先选择地址', icon: 'none' })
+    return
+  }
+  if (!form.contactName) {
+    uni.showToast({ title: '请填写联系人姓名', icon: 'none' })
+    return
+  }
+  if (!form.contactMobile || !phoneRegex.test(form.contactMobile)) {
+    uni.showToast({ title: '请填写正确手机号', icon: 'none' })
+    return
+  }
+
+  uni.showLoading({ title: '保存中...' })
+  try {
+    await addressApi.save(form)
+    uni.hideLoading()
+    uni.showToast({ title: '保存成功', icon: 'success' })
+    setTimeout(() => {
+      uni.navigateBack()
+    }, 800)
+  } catch (e) {
+    uni.hideLoading()
+    uni.showToast({ title: e || '保存失败', icon: 'none' })
+  }
+}
+
+function validatePhone() {
+  if (form.contactMobile && !phoneRegex.test(form.contactMobile)) {
+    uni.showToast({ title: '手机号格式不正确', icon: 'none' })
   }
 }
 </script>
@@ -172,7 +203,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-	margin-top: 38rpx;
+    margin-top: 38rpx;
     padding: 60rpx 32rpx 24rpx;
     background: #FFFFFF;
   }
@@ -207,42 +238,44 @@ export default {
     padding: 0 24rpx;
   }
 
-  &__address-card {
+  &__map-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 28rpx;
     background: #FFFFFF;
-    border: 1rpx solid #E8E8E8;
+    border: 2rpx solid #b6b5b5;
     border-radius: 16rpx;
     margin-bottom: 24rpx;
     margin-top: 32rpx;
-	border: 2px solid #b6b5b5;
   }
 
-  &__address-main {
+  &__map-main {
     flex: 1;
     min-width: 0;
   }
 
-  &__address-name {
+  &__map-title {
     display: block;
-    font-size: 32rpx;
-    font-weight: 600;
-    color: #333333;
+    font-size: 26rpx;
+    color: #666;
     margin-bottom: 8rpx;
   }
 
-  &__address-detail {
+  &__map-selected {
     display: block;
-    font-size: 24rpx;
-    color: #999999;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #333;
   }
 
-  &__address-change {
+  &__map-placeholder {
+    display: block;
+    font-size: 28rpx;
+    color: #CCC;
+  }
+
+  &__map-change {
     font-size: 26rpx;
     color: #a01e1e;
     font-weight: 500;
@@ -277,11 +310,6 @@ export default {
     width: 140rpx;
   }
 
-  &__input-wrap {
-    flex: 1;
-    text-align: left;
-  }
-
   &__input {
     flex: 1;
     text-align: left;
@@ -302,81 +330,71 @@ export default {
   &__contact-row {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    flex: 1;
-    gap: 16rpx;
+    justify-content: space-between;
   }
 
   &__gender-radio {
     display: flex;
-    align-items: center;
-    gap: 24rpx;
+    gap: 16rpx;
   }
 
   &__radio-option {
     display: flex;
     align-items: center;
-    gap: 8rpx;
+    gap: 6rpx;
+    padding: 6rpx 12rpx;
+    border: 1rpx solid #DDD;
+    border-radius: 999rpx;
+
+    &--active {
+      border-color: #a01e1e;
+      background: #FFEBEB;
+    }
   }
 
   &__radio-dot {
-    width: 28rpx;
-    height: 28rpx;
-    border: 2rpx solid #CCCCCC;
+    width: 12rpx;
+    height: 12rpx;
     border-radius: 50%;
-    position: relative;
-  }
+    background: #fff;
+    border: 1rpx solid #DDD;
 
-  &__radio-option--active &__radio-dot {
-    border-color: #a01e1e;
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 14rpx;
-      height: 14rpx;
-      background:#a01e1e;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
+    .edit-page__radio-option--active & {
+      background: #a01e1e;
+      border-color: #a01e1e;
     }
   }
 
   &__radio-text {
-    font-size: 26rpx;
-    color: #666666;
-  }
+    font-size: 24rpx;
+    color: #666;
 
-  &__radio-option--active &__radio-text {
-    color: #333333;
-  }
-
-  &__footer {
-    padding: 24rpx;
-    flex-shrink: 0;
-  }
-
-  &__save-btn {
-    background: #a01e1e;
-    border-radius: 8rpx;
-    padding: 26rpx;
-    text-align: center;
-	margin-bottom: 48rpx;
-
-    &:active {
-      opacity: 0.9;
+    .edit-page__radio-option--active & {
+      color: #a01e1e;
     }
-  }
-
-  &__save-text {
-    color: #FFFFFF;
-    font-size: 32rpx;
-    font-weight: 600;
   }
 
   &__bottom-space {
     height: 40rpx;
+  }
+
+  &__footer {
+    padding: 24rpx;
+    background: #fff;
+  }
+
+  &__save-btn {
+    width: 100%;
+    padding: 24rpx;
+    background: #a01e1e;
+    border-radius: 999rpx;
+    text-align: center;
+  }
+
+  &__save-text {
+    font-size: 30rpx;
+    color: #fff;
+    font-weight: 600;
   }
 }
 </style>
