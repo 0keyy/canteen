@@ -760,23 +760,20 @@ page {
   &__back-btn {
     position: absolute;
     left: 20rpx;
-    top: 190rpx;
+    top: 210rpx;
     z-index: 10;
   }
 
   &__back-icon-wrap {
     height: 53rpx;
     padding: 0 24rpx 0 32rpx;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 32rpx 0 0 32rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
   }
 
   &__back-icon {
-    font-size: 60rpx;
+    font-size: 75rpx;
     color: #333333;
     font-weight: 350;
     line-height: 1;
