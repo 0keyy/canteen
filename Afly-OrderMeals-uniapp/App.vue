@@ -32,7 +32,7 @@ function loadCustomFonts() {
       {
         family: 'Alimama DongFangDaKai',
         source: 'url("https://canteen.zhongtang-group.com/api/uploads/font/AlimamaDongFangDaKai.ttf")'
-      }
+      },
     ]
     
     fonts.forEach(font => {

@@ -553,7 +553,8 @@ $section-gap: 20rpx;
     color: #000000;
     letter-spacing: 4rpx;
     font-family: 'Alimama ShuHei Ti', 'ZCOOL QingKe HuangYou', 'PingFang SC', sans-serif;
-  }
+	// font-family: "ZCOOL QingKe HuangYou", sans-serif;
+}
 
   /* ===== 内容区 ===== */
   &__sections {

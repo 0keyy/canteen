@@ -136,6 +136,7 @@ const PRIMARY_ACTIONS = [
 
 const SECONDARY_ACTIONS = [
   { title: '公司认证', icon: 'company', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/公司认证.png' },
+  { title: '领券中心', icon: 'crown', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.png' },
   { title: '我的订单', icon: 'check', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/全部订单 1.png' },
   { title: '地址管理', icon: 'wallet', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/地址管理 1.png' },
   { title: '客服中心', icon: 'coins', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/客服 1.png' },
@@ -260,6 +261,10 @@ export default {
       }
       if (item.title === '公司认证') {
         uni.navigateTo({ url: '/pages/mine/company-auth' })
+        return
+      }
+      if (item.title === '领券中心') {
+        uni.navigateTo({ url: '/pages/coupon/center' })
         return
       }
       if (item.title === '优惠券包' || item.title === '红包卡券') {
@@ -673,16 +678,15 @@ export default {
 
   &__sections {
     padding: 20rpx 20rpx 0;
-	background: #f8f8f8;
-    // margin-top: -16rpx;
+    background: #f8f8f8;
   }
 
   &__card {
     background: #ffffff;
     border-radius: 16rpx;
     padding: 24rpx;
-    box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
-	margin-top: 20rpx;
+    box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+    margin-top: 20rpx;
     margin-bottom: 20rpx;
 
     &--grid {
@@ -732,12 +736,9 @@ export default {
     width: 80rpx;
     height: 80rpx;
     border-radius: 24rpx;
-    // background: rgba(177, 10, 15, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-
-
   }
 
   &__grid-label {
@@ -817,12 +818,6 @@ export default {
     width: 44rpx;
     height: 44rpx;
     display: block;
-  }
-
-
-  &__footer-sub {
-    font-size: 24rpx;
-    color: #999999;
   }
 
   &__bottom-space {
