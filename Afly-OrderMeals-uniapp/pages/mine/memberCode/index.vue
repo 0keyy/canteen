@@ -49,7 +49,7 @@
 import { memberApi, authApi } from '../../../api/index'
 import { STATIC_IMAGE_PREFIX } from '../../../utils/image'
 import { BASE_URL } from '../../../utils/config'
-import QRCode from '../../../node_modules/qrcode/lib/core/qrcode'
+import uQRCode from 'uqrcodejs'
 
 export default {
   data() {
@@ -87,7 +87,7 @@ export default {
       try {
         const profile = await authApi.profile()
         if (profile) {
-          this.nickname = profile.nickname || profile.name || '会员'
+          this.nickname = profile.companyNickName || profile.nickname || profile.name || '会员'
           this.balance = profile.balance != null ? profile.balance : '0.00'
           this.memberId = profile.memberId || profile.id || profile.userId || ''
           this.level = profile.level || '普通会员'
@@ -109,33 +109,26 @@ export default {
       }
       this.refreshQrCode()
     },
-    refreshQrCode() {
+    async refreshQrCode() {
       if (!this.memberId) return
       const timeStamp = Date.now()
       this.qrCodeContent = `${BASE_URL}/front/member/verify?uid=${this.memberId}&ts=${timeStamp}`
-      this.generateQrImage()
+      await this.generateQrImage()
     },
-    generateQrImage() {
+    async generateQrImage() {
       try {
-        const qr = QRCode.create(this.qrCodeContent, { errorCorrectionLevel: 'M' })
-        const size = qr.modules.size
-        const scale = 8
-        const imageSize = size * scale
+        const qrcode = new uQRCode()
+        qrcode.data = this.qrCodeContent
+        qrcode.errorLevel = 'M'
+        qrcode.size = 300
+        qrcode.foregroundColor = '#000000'
+        qrcode.backgroundColor = '#ffffff'
+        qrcode.margin = 10
+        qrcode.make()
 
         const canvas = uni.createCanvasContext('tempQrCanvas')
-        canvas.setFillStyle('#ffffff')
-        canvas.fillRect(0, 0, imageSize, imageSize)
-
-        canvas.setFillStyle('#000000')
-        for (let row = 0; row < size; row++) {
-          for (let col = 0; col < size; col++) {
-            if (qr.modules.get(row, col)) {
-              canvas.fillRect(col * scale, row * scale, scale, scale)
-            }
-          }
-        }
-
-        canvas.draw()
+        qrcode.canvasContext = canvas
+        await qrcode.drawCanvas()
       } catch (e) {
         console.error('二维码生成失败', e)
       }

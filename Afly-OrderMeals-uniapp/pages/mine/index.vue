@@ -195,7 +195,7 @@ export default {
       try {
         const profile = await authApi.profile()
         if (profile) {
-          this.nickname = profile.nickname || this.nickname
+          this.nickname = profile.companyNickName || profile.nickname || this.nickname
           this.mobile = profile.mobile || this.mobile
           this.companyVerified = !!profile.companyVerified
           this.companyDeptName = profile.companyDeptName || ''

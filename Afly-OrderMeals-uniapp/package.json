@@ -18,6 +18,7 @@
     "@dcloudio/uni-mp-alipay": "3.0.0-4010520240507001",
     "@dcloudio/uni-mp-weixin": "3.0.0-4010520240507001",
     "qrcode": "^1.5.4",
+    "uqrcodejs": "^4.0.7",
     "vue": "^3.4.21"
   },
   "devDependencies": {

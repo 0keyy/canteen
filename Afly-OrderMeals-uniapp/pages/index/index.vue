@@ -251,7 +251,7 @@ export default {
       try {
         const profile = await authApi.profile()
         if (profile) {
-          this.nickname = profile.nickname || uni.getStorageSync('nickname') || ''
+          this.nickname = profile.companyNickName || profile.nickname || uni.getStorageSync('nickname') || ''
           this.pointCount = profile.point ?? 0
           uni.setStorageSync('nickname', this.nickname)
         } else {
