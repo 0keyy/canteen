@@ -2,7 +2,9 @@
   <view class="order-page" @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
     <view class="order-page__header" :style="headerPaddingStyle">
       <view class="order-page__back-btn" @tap="goBack">
-        <text class="order-page__back-icon">‹</text>
+        <view class="order-page__back-icon-wrap">
+          <text class="order-page__back-icon">‹</text>
+        </view>
       </view>
       <!-- 轮播图 -->
       <view class="order-page__banner" v-if="displayBanners.length">
@@ -117,7 +119,7 @@
       </view>
       <text class="cart-bar__price">{{ cartSummary }}</text>
       <view class="cart-bar__btn"
-        :class="{ 'cart-bar__btn--disabled': !cartReady || cartItemCount === 0 }"
+        :class="{ 'cart-bar--disabled': !cartReady || cartItemCount === 0 }"
       >
         <text class="cart-bar__btn-text">去结算</text>
       </view>
@@ -184,7 +186,7 @@
       </view>
     </view>
 
-    </view>
+  </view>
 </template>
 
 <script>
@@ -286,6 +288,7 @@ export default {
   onShow() {
     this.updateNavPadding()
     this.setupTabbar(1)
+    // 页面显示时加载花体字体
     this.loadCustomFonts()
     const mode = Number(uni.getStorageSync('diningMode') || 1)
     if (mode !== this.diningMode) {
@@ -298,6 +301,7 @@ export default {
     }
   },
   methods: {
+    // 阿里东方大楷 花体字体加载方法
     loadCustomFonts() {
       if (typeof wx !== 'undefined' && wx.loadFontFace) {
         wx.loadFontFace({
@@ -758,18 +762,26 @@ page {
     left: 20rpx;
     top: 190rpx;
     z-index: 10;
-    width: 64rpx;
-    height: 64rpx;
+  }
+
+  &__back-icon-wrap {
+    height: 53rpx;
+    padding: 0 24rpx 0 32rpx;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 32rpx 0 0 32rpx;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
   }
 
   &__back-icon {
-    font-size: 80rpx;
-    color: #FFFFFF;
-    font-weight: 300;
+    font-size: 60rpx;
+    color: #333333;
+    font-weight: 350;
     line-height: 1;
+	margin-top: -7px;
+	margin-left: -3px;
   }
 
  
@@ -876,6 +888,8 @@ page {
     flex: 1;
     min-width: 0;
   }
+
+  // 花字样式配置
   &__store-open {
     display: block;
     font-size: 32rpx;
@@ -896,7 +910,7 @@ page {
     width: 122rpx;
     height: 110rpx;
     flex-shrink: 0;
-    margin-top: -10rpx;
+    margin-top: -23rpx;
     display: flex;
     align-items: center;
     justify-content: center;
