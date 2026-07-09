@@ -21,7 +21,7 @@
       
       <view class="order-page__store-card">
         <view class="order-page__store-info">
-          <image class="order-page__store-open-img" :src="staticImgPrefix + '/font-images/粮兴坊正在营业中.png'" mode="aspectFit" />
+          <text class="order-page__store-open">{{ shopName }}正在营业中</text>
           <text class="order-page__store-time">营业时间：6:00-22:00</text>
         </view>
         <view class="order-page__mode-board" @tap="toggleMode">
@@ -286,6 +286,7 @@ export default {
   onShow() {
     this.updateNavPadding()
     this.setupTabbar(1)
+    this.loadCustomFonts()
     const mode = Number(uni.getStorageSync('diningMode') || 1)
     if (mode !== this.diningMode) {
       this.diningMode = mode
@@ -297,6 +298,21 @@ export default {
     }
   },
   methods: {
+    loadCustomFonts() {
+      if (typeof wx !== 'undefined' && wx.loadFontFace) {
+        wx.loadFontFace({
+          family: 'Alimama DongFangDaKai',
+          source: 'url("https://canteen.zhongtang-group.com/api/uploads/font/AlimamaDongFangDaKai.ttf")',
+          version: 'v1',
+          success: () => {
+            this.$forceUpdate()
+          },
+          fail: (err) => {
+            console.error('东方大楷字体加载失败', err)
+          }
+        })
+      }
+    },
     goBack() {
       const pages = getCurrentPages()
       if (pages.length <= 1) {
@@ -860,16 +876,12 @@ page {
     flex: 1;
     min-width: 0;
   }
-  &__store-open-img {
-      width: 240rpx;
-      height: 48rpx;
-    }
-
   &__store-open {
     display: block;
     font-size: 32rpx;
     color: #111111;
-    font-weight: 900;
+    font-weight: normal;
+    font-family: 'Alimama DongFangDaKai', 'Alimama ShuHei Ti', 'PingFang SC', sans-serif;
   }
 
   &__store-time {

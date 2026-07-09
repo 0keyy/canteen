@@ -22,6 +22,35 @@ async function preloadTabbar() {
   }
 }
 
+function loadCustomFonts() {
+  if (typeof wx !== 'undefined' && wx.loadFontFace) {
+    const fonts = [
+      {
+        family: 'Alimama ShuHei Ti',
+        source: 'url("https://canteen.zhongtang-group.com/api/uploads/font/AlimamaShuHeiTi.ttf")'
+      },
+      {
+        family: 'Alimama DongFangDaKai',
+        source: 'url("https://canteen.zhongtang-group.com/api/uploads/font/AlimamaDongFangDaKai.ttf")'
+      }
+    ]
+    
+    fonts.forEach(font => {
+      wx.loadFontFace({
+        family: font.family,
+        source: font.source,
+        version: 'v1',
+        success: () => {
+          console.log(`字体 ${font.family} 加载成功`)
+        },
+        fail: (err) => {
+          console.error(`字体 ${font.family} 加载失败，将回退到系统字体`, err)
+        }
+      })
+    })
+  }
+}
+
 export default {
   onLaunch() {
     const token = uni.getStorageSync('token')
@@ -30,6 +59,7 @@ export default {
       return
     }
     preloadTabbar()
+    loadCustomFonts()
   }
 }
 </script>

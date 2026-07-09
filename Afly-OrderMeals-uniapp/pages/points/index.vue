@@ -36,7 +36,7 @@
           <view class="points-page__promo-card points-page__promo-card--lottery" @tap="goLottery">
             <view class="points-page__promo-main">
               <view class="points-page__promo-title-row">
-                <image class="points-page__promo-title-img" :src="staticImgPrefix + '/积分抽奖.png'" mode="aspectFit" />
+                <text class="points-page__promo-title">积分抽奖</text>
                 <image src="/static/tabbar/右箭头.png" mode="aspectFit" class="points-page__promo-icon"></image>
               </view>
               <view class="points-page__promo-sub-row">
@@ -48,7 +48,7 @@
           <view class="points-page__promo-card points-page__promo-card--checkin" @tap="goSignin">
             <view class="points-page__promo-main">
               <view class="points-page__promo-title-row">
-                <image class="points-page__promo-title-img" :src="staticImgPrefix + '/每日签到.png'" mode="aspectFit" />
+                <text class="points-page__promo-title">每日签到</text>
                 <image src="/static/tabbar/右箭头.png" mode="aspectFit" class="points-page__promo-icon"></image>
               </view>
               <text class="points-page__promo-sub">每天有惊喜</text>
@@ -264,11 +264,27 @@ export default {
   onShow() {
     this.navMetrics = getNavMetrics()
     this.setupTabbar(2)
+    this.loadCustomFonts()
     this.loadPoints()
     this.loadCategories()
     this.loadGoods()
   },
   methods: {
+    loadCustomFonts() {
+      if (typeof wx !== 'undefined' && wx.loadFontFace) {
+        wx.loadFontFace({
+          family: 'Alimama ShuHei Ti',
+          source: 'url("https://canteen.zhongtang-group.com/api/uploads/font/AlimamaShuHeiTi.ttf")',
+          version: 'v1',
+          success: () => {
+            this.$forceUpdate()
+          },
+          fail: (err) => {
+            console.error('数黑体字体加载失败', err)
+          }
+        })
+      }
+    },
     async loadPoints() {
       try {
         const profile = await authApi.profile()
@@ -523,9 +539,11 @@ export default {
     gap: 8rpx;
   }
 
-  &__promo-title-img {
-    width: 140rpx;
-    height: 50rpx;
+  &__promo-title {
+    font-size: 48rpx;
+    font-weight: normal;
+    color: #be0000;
+    font-family: 'Alimama ShuHei Ti', 'ZCOOL QingKe HuangYou', 'PingFang SC', sans-serif;
   }
 
   &__promo-icon {

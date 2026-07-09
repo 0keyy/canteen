@@ -70,10 +70,9 @@ export default {
       if (!path) return
       if (this.tabbarSelected === index) return
       uni.switchTab({
-        url: `/${path}`,
-        fail: () => {
-          uni.reLaunch({ url: `/${path}` })
-        }
+        url: `/${path}`
+      }).catch(() => {
+        uni.reLaunch({ url: `/${path}` }).catch(() => {})
       })
     }
   }

@@ -39,7 +39,29 @@ import { STATIC_IMAGE_PREFIX, resolveImageUrl } from '../../utils/image'
 export default {
   data() {
     return {
-      list: [],
+      list: [
+        {
+          id: '1',
+          contactName: '张三',
+          contactMobile: '138****1234',
+          fullAddress: '浙江省杭州市余杭区粮兴坊旗舰店 101室',
+          isDefault: 1
+        },
+        {
+          id: '2',
+          contactName: '李四',
+          contactMobile: '139****5678',
+          fullAddress: '浙江省杭州市西湖区文三路 478号华星时代广场A座 12楼',
+          isDefault: 0
+        },
+        {
+          id: '3',
+          contactName: '王五',
+          contactMobile: '137****9012',
+          fullAddress: '浙江省杭州市滨江区江南大道 288号星光国际广场 3幢 2201室',
+          isDefault: 0
+        }
+      ],
       selectMode: false,
       emptyImg: resolveImageUrl(STATIC_IMAGE_PREFIX + '/开心呢.png')
     }
@@ -47,9 +69,9 @@ export default {
   onLoad(options) {
     this.selectMode = options.select === '1'
   },
-  onShow() {
-    this.loadList()
-  },
+  // onShow() {
+  //   this.loadList()
+  // },
   methods: {
     async loadList() {
       this.list = await addressApi.list()

@@ -196,6 +196,7 @@
       "menu-category-sidebar": "components/menu-category-sidebar/menu-category-sidebar"
     }
   },
+
   "tabBar": {
     "color": "#999999",
     "selectedColor": "#C41E3A",
