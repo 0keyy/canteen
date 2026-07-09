@@ -1,15 +1,19 @@
 <template>
   <view class="coupon-center">
-    <view class="coupon-center__header">
-		<view class="coupon-center__header-left">
-			<text class="coupon-center__title">领券中心</text>
-			<text class="coupon-center__sub">领取优惠券，下单更优惠</text>
-		</view>
-		<view class="coupon-center__header-right">
-			<image :src="staticImgPrefix + '/拱手.png'" mode="" class="coupon-center__header-image"></image>
-		</view>
+    <!-- 自定义导航栏 -->
+    <view class="coupon-center__nav" :style="{ paddingTop: navMetrics.statusBarHeight + 'px' }">
+      <view class="coupon-center__nav-bar" :style="{ height: navMetrics.navBarHeight + 'px' }">
+        <view class="coupon-center__nav-left" @tap="goBack">
+          <text class="coupon-center__nav-arrow" decode="{{true}}">&#8249;</text>
+        </view>
+        <text class="coupon-center__nav-title">领券中心</text>
+        <view class="coupon-center__nav-right">
+          <text class="coupon-center__nav-dot">⋯</text>
+        </view>
+      </view>
     </view>
 
+    <!-- 列表区域 -->
     <view v-if="loading" class="coupon-center__status">
       <text class="coupon-center__status-text">加载中...</text>
     </view>
@@ -24,16 +28,17 @@
         :key="coupon.id"
         class="coupon-card"
         :class="{ 'coupon-card--claimed': coupon.claimed }"
-        @tap="!coupon.claimed && claimCoupon(coupon)"
       >
+        <!-- 左侧金额区 -->
         <view class="coupon-card__left">
-          <text class="coupon-card__amount">¥{{ coupon.discountAmount }}</text>
+          <text class="coupon-card__symbol">¥</text>
+          <text class="coupon-card__amount">{{ coupon.discountAmount }}</text>
           <text class="coupon-card__condition">
             <template v-if="coupon.type === 2 && coupon.minAmount > 0">
               满{{ coupon.minAmount }}元可用
             </template>
             <template v-else-if="coupon.type === 5">
-              夜间券 · {{ coupon.nightStartTime || '?' }}-{{ coupon.nightEndTime || '?' }}
+              夜间券
             </template>
             <template v-else-if="coupon.type === 3 || coupon.type === 4">
               到店核销
@@ -43,21 +48,32 @@
             </template>
           </text>
         </view>
+
+        <!-- 右侧详情区 -->
         <view class="coupon-card__right">
           <text class="coupon-card__name">{{ coupon.name }}</text>
-          <text class="coupon-card__type-tag">{{ typeLabel(coupon.type) }}</text>
           <text class="coupon-card__time" v-if="coupon.claimStartTime">
-            {{ coupon.claimStartTime }} ~ {{ coupon.claimEndTime }}
+            {{ formatDate(coupon.claimStartTime) }}~{{ formatDate(coupon.claimEndTime) }}
           </text>
-          <text class="coupon-card__stock" v-if="coupon.totalStock > 0">
-            剩余 {{ coupon.totalStock - (coupon.claimedCount || 0) }} / {{ coupon.totalStock }}
+          <text class="coupon-card__restrict" v-if="coupon.type === 3 || coupon.type === 4">
+            限到店使用
+          </text>
+          <text class="coupon-card__restrict" v-else-if="coupon.type === 5">
+            限{{ coupon.nightStartTime || '?' }}-{{ coupon.nightEndTime || '?' }}使用
           </text>
 
-          <view v-if="coupon.claimed" class="coupon-card__btn coupon-card__btn--done">
+          <view
+            v-if="coupon.claimed"
+            class="coupon-card__btn coupon-card__btn--done"
+          >
             <text>已领取</text>
           </view>
-          <view v-else class="coupon-card__btn">
-            <text>立即领取</text>
+          <view
+            v-else
+            class="coupon-card__btn"
+            @tap.stop="claimCoupon(coupon)"
+          >
+            <text>领取</text>
           </view>
         </view>
       </view>
@@ -67,23 +83,28 @@
 
 <script>
 import { couponApi } from '../../api/index'
-import { STATIC_IMAGE_PREFIX } from '../../utils/image'
+import { getNavMetrics } from '../../utils/navbar'
 
 export default {
   data() {
     return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
+      navMetrics: getNavMetrics(),
       loading: false,
       coupons: []
     }
   },
   onShow() {
+    this.navMetrics = getNavMetrics()
     this.loadCoupons()
   },
   methods: {
-    typeLabel(type) {
-      const map = { 1: '无门槛', 2: '满减', 3: '兑换券', 4: '套餐券', 5: '夜间券' }
-      return map[type] || '未知'
+    goBack() {
+      uni.navigateBack({ delta: 1 })
+    },
+    formatDate(dateStr) {
+      if (!dateStr) return ''
+      // 将 2026-6-1 格式转为 2026.6.1
+      return String(dateStr).replace(/-/g, '.')
     },
     async loadCoupons() {
       this.loading = true
@@ -94,31 +115,26 @@ export default {
         const myCoupons3 = await couponApi.myCoupons(3) || []
         const allMyCoupons = [...myCoupons1, ...myCoupons2, ...myCoupons3]
         this.coupons = coupons
-        
-        console.log('=== 领券中心数据 ===', JSON.stringify(coupons))
-        console.log('=== 用户已领券数据 ===', JSON.stringify(allMyCoupons))
-        
+
         const myCouponTemplateIds = new Set()
         allMyCoupons.forEach(c => {
           if (c.templateId) myCouponTemplateIds.add(String(c.templateId))
           if (c.couponTemplateId) myCouponTemplateIds.add(String(c.couponTemplateId))
         })
-        
+
         const claimed = uni.getStorageSync('claimedCoupons') || {}
-        console.log('=== 本地已领记录 ===', JSON.stringify(claimed))
-        
+
         this.coupons.forEach(c => {
           const centerCouponId = String(c.id)
           const centerTemplateId = String(c.templateId || c.id)
-          const isClaimed = 
-            c.claimed || 
-            c.status === 1 || 
-            !!claimed[centerCouponId] || 
+          const isClaimed =
+            c.claimed ||
+            c.status === 1 ||
+            !!claimed[centerCouponId] ||
             !!claimed[centerTemplateId] ||
             myCouponTemplateIds.has(centerCouponId) ||
             myCouponTemplateIds.has(centerTemplateId)
           c.claimed = isClaimed
-          console.log(`=== 券 ${c.name}: id=${c.id}, templateId=${c.templateId}, claimed=${isClaimed}, status=${c.status} ===`)
         })
       } catch (e) {
         uni.showToast({ title: e || '加载失败', icon: 'none' })
@@ -148,50 +164,71 @@ export default {
 <style lang="scss" scoped>
 .coupon-center {
   min-height: 100vh;
-  background: $bg-page;
-  padding-bottom: 32rpx;
+  background: #e7e7e7;
 
-  &__header {
-    padding: 40rpx 32rpx 24rpx;
-    background: linear-gradient(170deg, #c41e3a 0%, #fffcf8 100%);
-	display: flex;
-	justify-content: space-between;
-  }
-  &__header-left{
-	  line-height: 70rpx;
-  }
-  &__header-image{
-	width: 90rpx;
-	height:145rpx;
-	margin-right: 100rpx;
-  }
-	
-  &__title {
-    display: block;
-    font-size: 40rpx;
-    font-weight: 900;
-    color: #fff;
+  &__nav {
+    background: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
 
-  &__sub {
-    display: block;
-    margin-top: 8rpx;
-    font-size: 24rpx;
-    color: rgba(255, 255, 255, 0.8);
+  &__nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24rpx;
+    position: relative;
+  }
+
+  &__nav-left {
+    width: 80rpx;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  &__nav-arrow {
+    font-size: 80rpx;
+    color: #333;
+  }
+
+  &__nav-title {
+    font-size: 34rpx;
+    font-weight: 700;
+    color: #333;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &__nav-right {
+    width: 80rpx;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &__nav-dot {
+    font-size: 36rpx;
+    color: #333;
+    font-weight: 600;
   }
 
   &__status {
-    padding: 120rpx 32rpx;
+    padding: 200rpx 32rpx;
     text-align: center;
   }
 
   &__status-text {
     font-size: 28rpx;
-    color: $text-secondary;
+    color: #999;
   }
 
   &__list {
-    padding: 24rpx;
+    padding: 20rpx 24rpx;
     display: flex;
     flex-direction: column;
     gap: 20rpx;
@@ -200,13 +237,18 @@ export default {
 
 .coupon-card {
   display: flex;
-  background: #fff;
-  border-radius: $radius-card;
+  align-items: stretch;
+  background: #ffffff;
+  border-radius: 16rpx;
   overflow: hidden;
-  box-shadow: $shadow-sm;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
 
   &--claimed {
-    opacity: 0.55;
+    opacity: 0.5;
+
+    .coupon-card__btn {
+      background: #cccccc;
+    }
   }
 
   &__left {
@@ -215,64 +257,90 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 32rpx 16rpx;
-    background: rgba($brand-primary, 0.06);
-    border-right: 2rpx dashed rgba($brand-primary, 0.2);
+    padding: 28rpx 12rpx;
+    background: #fff8f0;
+    position: relative;
+    flex-shrink: 0;
+
+    // 右侧锯齿效果（用伪元素模拟）
+    &::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 1rpx;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 12rpx,
+        #f5f5f5 12rpx,
+        #f5f5f5 24rpx
+      );
+    }
+  }
+
+  &__symbol {
+    font-size: 26rpx;
+    font-weight: 700;
+    color: #be0000;
+    line-height: 1;
   }
 
   &__amount {
-    font-size: 48rpx;
+    font-size: 60rpx;
     font-weight: 900;
-    color: $brand-primary;
+    color: #be0000;
+    line-height: 1.1;
+    margin-top: 4rpx;
   }
 
   &__condition {
     margin-top: 8rpx;
     font-size: 20rpx;
-    color: $text-secondary;
+    color: #be0000;
+    font-weight: 500;
     text-align: center;
   }
 
   &__right {
     flex: 1;
-    padding: 28rpx 24rpx;
+    padding: 24rpx 28rpx;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: 8rpx;
+    min-width: 0;
   }
 
   &__name {
-    font-size: 30rpx;
-    font-weight: 700;
-    color: $text-primary;
-  }
-
-  &__type-tag {
-    display: inline-block;
-    padding: 4rpx 16rpx;
-    border-radius: 999rpx;
-    background: rgba($brand-primary, 0.1);
-    font-size: 20rpx;
-    color: $brand-primary;
-    width: fit-content;
+    font-size: 26rpx;
+    font-weight: 600;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &__time {
-    font-size: 20rpx;
-    color: $text-secondary;
+    font-size: 22rpx;
+    color: #999;
   }
 
-  &__stock {
-    font-size: 20rpx;
-    color: $text-secondary;
+  &__restrict {
+    font-size: 22rpx;
+    color: #bbb;
   }
 
   &__btn {
-    margin-top: 16rpx;
+    margin-top: 8rpx;
     align-self: flex-end;
-    padding: 12rpx 36rpx;
+    padding: 12rpx 40rpx;
     border-radius: 999rpx;
-    background: $brand-primary;
+    background: #be0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     text {
       font-size: 24rpx;
@@ -281,10 +349,10 @@ export default {
     }
 
     &--done {
-      background: $bg-gray;
+      background: #cccccc;
 
       text {
-        color: $text-secondary;
+        color: #fff;
       }
     }
   }

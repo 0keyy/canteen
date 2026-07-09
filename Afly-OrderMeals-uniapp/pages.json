@@ -90,9 +90,7 @@
     {
       "path": "pages/coupon/center",
       "style": {
-        "navigationBarTitleText": "领券中心",
-        "navigationBarBackgroundColor": "#FFFCF8",
-        "navigationBarTextStyle": "black",
+        "navigationStyle": "custom",
         "animationType": "slide-in-right"
       }
     },
