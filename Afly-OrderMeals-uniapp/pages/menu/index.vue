@@ -1,5 +1,5 @@
 <template>
-  <view class="order-page">
+  <view class="order-page" @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
     <view class="order-page__header" :style="headerPaddingStyle">
       <view class="order-page__back-btn" @tap="goBack">
         <text class="order-page__back-icon">‹</text>
@@ -21,7 +21,7 @@
       
       <view class="order-page__store-card">
         <view class="order-page__store-info">
-          <text class="order-page__store-open">{{ shopName }}正在营业中</text>
+          <image class="order-page__store-open-img" :src="staticImgPrefix + '/font-images/粮兴坊正在营业中.png'" mode="aspectFit" />
           <text class="order-page__store-time">营业时间：6:00-22:00</text>
         </view>
         <view class="order-page__mode-board" @tap="toggleMode">
@@ -219,7 +219,12 @@ export default {
       cartInitPromise: null,
       banners: [],
       showCartPopup: false,
-      showClearConfirm: false
+      showClearConfirm: false,
+      swipeStartX: 0,
+      swipeStartY: 0,
+      swipeCurrentX: 0,
+      swipeThreshold: 80,
+      isSwiping: false
     }
   },
   computed: {
@@ -299,6 +304,33 @@ export default {
       } else {
         uni.navigateBack({ delta: 1 })
       }
+    },
+    onTouchStart(e) {
+      const touch = e.touches[0]
+      this.swipeStartX = touch.clientX
+      this.swipeStartY = touch.clientY
+      this.swipeCurrentX = touch.clientX
+      this.isSwiping = false
+    },
+    onTouchMove(e) {
+      const touch = e.touches[0]
+      this.swipeCurrentX = touch.clientX
+      const diffX = this.swipeCurrentX - this.swipeStartX
+      const diffY = Math.abs(touch.clientY - this.swipeStartY)
+      if (diffX > 10 && diffY < Math.abs(diffX)) {
+        this.isSwiping = true
+      }
+    },
+    onTouchEnd() {
+      if (!this.isSwiping) return
+      const diffX = this.swipeCurrentX - this.swipeStartX
+      if (diffX > this.swipeThreshold) {
+        this.goBack()
+      }
+      this.isSwiping = false
+      this.swipeStartX = 0
+      this.swipeStartY = 0
+      this.swipeCurrentX = 0
     },
     openCart() {
       this.showCartPopup = true
@@ -828,6 +860,10 @@ page {
     flex: 1;
     min-width: 0;
   }
+  &__store-open-img {
+      width: 240rpx;
+      height: 48rpx;
+    }
 
   &__store-open {
     display: block;
@@ -900,6 +936,7 @@ page {
     overflow: hidden;
     .sidebar-scroll {
       height: 100%;
+      -webkit-overflow-scrolling: touch;
     }
   }
   .sidebar-bottom-space {

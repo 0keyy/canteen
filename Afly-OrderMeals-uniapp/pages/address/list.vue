@@ -111,9 +111,9 @@ export default {
     },
     choose(item) {
       if (!this.selectMode) return
-      uni.setStorageSync('diningMode', 3)
+      uni.setStorageSync('selectedAddress', JSON.stringify(item))
       uni.setStorageSync('addressId', item.id)
-      uni.switchTab({ url: '/pages/menu/index' })
+      uni.navigateBack()
     },
     edit(item) {
       const id = item?.id || ''

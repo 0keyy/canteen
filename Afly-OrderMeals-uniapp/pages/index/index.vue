@@ -44,7 +44,7 @@
         <view class="home__primary-cards">
           <view class="home__primary-card-item" @click="selectMode(1)">
             <view class="home__primary-card-text">
-              <text class="home__primary-name">到店堂食</text>
+              <image class="home__primary-name-img" :src="staticImgPrefix + '/到店堂食.png'" mode="aspectFit" />
             </view>
             <image class="home__primary-card-img" :src="staticImgPrefix + '/图层 2.png'" mode="aspectFit" />
           </view>
@@ -54,7 +54,7 @@
             @click="selectMode(3)"
           >
             <view class="home__primary-card-text">
-              <text class="home__primary-name">外卖配送</text>
+              <image class="home__primary-name-img" :src="staticImgPrefix + '/外卖配送.png'" mode="aspectFit" />
             </view>
             <image class="home__primary-card-img" :src="staticImgPrefix + '/小唐骑车.png'" mode="aspectFit" />
           </view>
@@ -76,7 +76,7 @@
           <view class="home__recommend">
             <view class="home__recommend-header">
               <view class="home__recommend-title-row">
-                <text class="home__recommend-title">粮兴推荐</text>
+                <image class="home__recommend-title-img" :src="staticImgPrefix + '/粮兴推荐.png'" mode="aspectFit" />
                 <text class="home__recommend-tag">限时优惠</text>
               </view>
               <view class="home__recommend-link" @tap="goMenu">
@@ -178,10 +178,10 @@ export default {
       pointCount: 0,
       couponCount: 0,
       shortcuts: [
-        { name: '充值中心', desc: '', iconPath: '/static/充值中心.png' },
-        { name: '红包卡券', desc: '', iconPath: '/static/红包卡券.png' },
-        { name: '订单详情', desc: '', iconPath: '/static/订单详情.png' },
-        { name: '客服中心', desc: '', iconPath: '/static/客服中心.png' }
+        { name: '充值中心', desc: '', iconPath: '/static/tabbar/充值 1.png' },
+        { name: '红包卡券', desc: '', iconPath: '/static/tabbar/卡券 1.png' },
+        { name: '订单详情', desc: '', iconPath: '/static/tabbar/全部订单 1.png' },
+        { name: '客服中心', desc: '', iconPath: '/static/tabbar/客服 1.png' }
       ]
     }
   },
@@ -200,7 +200,7 @@ export default {
       return [{ image: '' }]
     },
     homeRecommendDishes() {
-      return this.recommendDishes.slice(0, 2)
+      return this.recommendDishes.slice(0, 4)
     }
   },
   onLoad() {
@@ -531,13 +531,9 @@ $section-gap: 20rpx;
     padding: 20rpx 0 0 16rpx;
   }
   
-  &__primary-name {
-    font-size: 44rpx;
-    font-weight: 900;
-    color: #000000;
-    letter-spacing: 4rpx;
-    /* 放弃fantasy，使用国内设备统一黑体 */
-    font-family: "Microsoft YaHei", "PingFang SC", SimHei, sans-serif;
+  &__primary-name-img {
+    width: 200rpx;
+    height: 60rpx;
   }
 
   /* ===== 内容区 ===== */
@@ -570,7 +566,7 @@ $section-gap: 20rpx;
   }
 
   &__shortcut-img {
-    width: 30px;
+    width: 35px;
     height: 80rpx;
   }
 
@@ -817,10 +813,9 @@ $section-gap: 20rpx;
     gap: 12rpx;
   }
 
-  &__recommend-title {
-    font-size: 32rpx;
-    font-weight: 900;
-    color: $text-primary;
+  &__recommend-title-img {
+    width: 160rpx;
+    height: 40rpx;
   }
 
   &__recommend-tag {
@@ -948,7 +943,7 @@ $section-gap: 20rpx;
   }
 
   &__dish-btn {
-    background: #c82d24;
+    background: #be0000;
     border-radius: 999rpx;
     padding: 12rpx 28rpx;
     box-shadow: none;

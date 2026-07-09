@@ -38,7 +38,7 @@
                     <view class="signin-page__date-body">
                       <image
                         class="signin-page__date-icon"
-                        src="/static/tabbar/calender.png"
+                        :src="staticImgPrefix + '/tabbar/日历 1.png'"
                         mode="aspectFit"
                       />
                     </view>
@@ -73,9 +73,11 @@
               class="signin-page__reward-item"
             >
               <view class="signin-page__reward-coins">
-                <view class="coin coin--1"></view>
-                <view class="coin coin--2"></view>
-                <view class="coin coin--3"></view>
+                <image
+                  class="signin-page__reward-image"
+                  :src="staticImgPrefix + '/tabbar/签到.png'"
+                  mode="aspectFit"
+                />
               </view>
               <view class="signin-page__reward-info">
                 <text class="signin-page__reward-amount">{{ reward.amount }}积分</text>
@@ -629,51 +631,20 @@ export default {
   }
 
   &__reward-coins {
-    width: 56rpx;
-    height: 56rpx;
+    width: 80rpx;
+    height: 80rpx;
     margin-right: 20rpx;
     flex-shrink: 0;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .coin {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 48rpx;
-    height: 48rpx;
-    border-radius: 50%;
-    background: linear-gradient(180deg, #FFC14D 0%, #FF9500 100%);
-    box-shadow: inset 0 -4rpx 8rpx rgba(0, 0, 0, 0.15);
-
-    &::after {
-      content: '¥';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 20rpx;
-      font-weight: 700;
-      color: #FFFFFF;
-      opacity: 0.8;
-    }
-
-    &--1 {
-      bottom: 0;
-      z-index: 1;
-    }
-
-    &--2 {
-      bottom: 12rpx;
-      z-index: 2;
-      opacity: 0.95;
-    }
-
-    &--3 {
-      bottom: 24rpx;
-      z-index: 3;
-      opacity: 0.9;
-    }
+  &__reward-image {
+    width: 75rpx;
+    height: 75rpx;
+    display: block;
   }
 
   &__reward-info {

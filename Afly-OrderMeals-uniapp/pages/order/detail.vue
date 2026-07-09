@@ -28,7 +28,7 @@
       <view class="detail-page__section detail-page__section--delivery">
         <view class="detail-page__info-row">
           <text class="detail-page__info-label">下单时间</text>
-          <text class="detail-page__info-value">{{ order.createTime }}</text>
+          <text class="detail-page__info-value">{{ formatOrderTime(order.createTime) }}</text>
         </view>
         <view class="detail-page__info-row">
           <text class="detail-page__info-label">订单号</text>
@@ -103,14 +103,7 @@
           </view>
         </view>
       </view>
-      <view class="detail-page__cancel-bar" v-else-if="canCancel">
-        <view class="detail-page__cancel-btn" @click="cancelOrder">
-          <text class="detail-page__cancel-btn-text">取消订单</text>
-        </view>
-        <view v-if="cancelRemainingTime" class="detail-page__cancel-hint">
-          <text class="detail-page__cancel-hint-text">{{ cancelRemainingTime }}</text>
-        </view>
-      </view>
+      
     </view>
 
     <!-- 支付方式选择弹窗 -->
@@ -155,30 +148,7 @@ export default {
     isPendingPay() {
       return this.order && (this.order.payStatus === 0 || this.order.status === 4)
     },
-    canCancel() {
-      if (!this.order) return false
-      if ([2, 3].includes(this.order.status)) return false
-      return [0, 1, 4].includes(this.order.status)
-    },
-    withinCancelWindow() {
-      if (!this.order || !this.order.createTime) return false
-      const cancelMinutes = 10
-      const createTime = new Date(this.order.createTime).getTime()
-      const now = Date.now()
-      const diffMinutes = (now - createTime) / (1000 * 60)
-      return diffMinutes < cancelMinutes
-    },
-    cancelRemainingTime() {
-      if (!this.order || !this.order.createTime) return ''
-      const cancelMinutes = 10
-      const createTime = new Date(this.order.createTime).getTime()
-      const now = Date.now()
-      const diffMinutes = (now - createTime) / (1000 * 60)
-      const remaining = Math.max(0, cancelMinutes - Math.floor(diffMinutes))
-      if (remaining <= 0) return ''
-      if (remaining === 1) return '剩余1分钟内可取消'
-      return `剩余${remaining}分钟内可取消`
-    },
+    
     statusText() {
       if (!this.order) return ''
       if (this.order.payStatus === 0 || this.order.status === 4) return '待支付'
@@ -201,6 +171,24 @@ export default {
     if (this.orderId) this.loadDetail()
   },
   methods: {
+    formatOrderTime(time) {
+      if (!time) return ''
+      try {
+        const date = new Date(time)
+        if (isNaN(date.getTime())) {
+          return time
+        }
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        const hour = String(date.getHours()).padStart(2, '0')
+        const minute = String(date.getMinutes()).padStart(2, '0')
+        const second = String(date.getSeconds()).padStart(2, '0')
+        return `${year}-${month}-${day} ${hour}:${minute}:${second}`
+      } catch (e) {
+        return time
+      }
+    },
     lineAmount(dish) {
       return (Number(dish.amount || 0) * Number(dish.quantity || 1)).toFixed(2)
     },
@@ -227,20 +215,7 @@ export default {
         uni.showToast({ title: e.message || e, icon: 'none' })
       }
     },
-    async cancelOrder() {
-      const { confirm } = await uni.showModal({
-        title: '取消订单',
-        content: '确定取消该待支付订单吗？已使用的优惠券将退还至您的账户。'
-      })
-      if (!confirm) return
-      try {
-        await orderApi.cancel(this.orderId, '用户取消')
-        uni.showToast({ title: '订单已取消', icon: 'success' })
-        this.loadDetail()
-      } catch (e) {
-        uni.showToast({ title: e.message || e, icon: 'none' })
-      }
-    },
+    
     onPayMethodChange(channel) {
       this.payChannel = channel
       this.showPayPicker = false
@@ -553,11 +528,6 @@ export default {
     font-weight: 600;
   }
 
-  &__cancel-bar {
-    display: flex;
-    justify-content: center;
-  }
-
   &__cancel-btn {
     padding: 22rpx 56rpx;
     border-radius: 12rpx;
@@ -577,16 +547,6 @@ export default {
     color: #666666;
     font-size: 30rpx;
     font-weight: 600;
-  }
-
-  &__cancel-hint {
-    text-align: center;
-    margin-top: 10rpx;
-  }
-
-  &__cancel-hint-text {
-    font-size: 22rpx;
-    color: #999999;
   }
 
   &__bottom-space {
