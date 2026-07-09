@@ -14,9 +14,12 @@ public class AddressVo implements Serializable {
     private String province;
     private String city;
     private String district;
+    private String address;
     private String detail;
     private String lat;
     private String lng;
     private Integer isDefault;
     private String fullAddress;
+    private String gender;
+    private Integer label;
 }

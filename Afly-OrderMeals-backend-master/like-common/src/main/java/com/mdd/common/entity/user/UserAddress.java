@@ -15,9 +15,11 @@ public class UserAddress implements Serializable {
     private Integer userId;
     private String contactName;
     private String contactMobile;
+    private String gender;
     private String province;
     private String city;
     private String district;
+    private String address;
     private String detail;
     private String lat;
     private String lng;

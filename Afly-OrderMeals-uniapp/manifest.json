@@ -20,7 +20,8 @@
             "scope.userLocation" : {
                 "desc" : "用于外卖配送定位"
             }
-        }
+        },
+        "requiredPrivateInfos": ["chooseLocation", "getLocation"]
     },
     "mp-alipay" : {
         "usingComponents" : true
