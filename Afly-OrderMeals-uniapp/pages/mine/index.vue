@@ -128,23 +128,23 @@ import { getNavMetrics } from '../../utils/navbar'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
 const PRIMARY_ACTIONS = [
-  { title: '待支付', icon: 'orders' ,iconImg: STATIC_IMAGE_PREFIX + '/tabbar/待支付 1.png'},
-  { title: '待发货', icon: 'address',iconImg: STATIC_IMAGE_PREFIX + '/tabbar/待发货 1.png' },
-  { title: '待收货', icon: 'service',iconImg: STATIC_IMAGE_PREFIX + '/tabbar/待收货 1.png' },
-  { title: '退款售后', icon: 'code' ,iconImg: STATIC_IMAGE_PREFIX + '/tabbar/售后 1.png'}
+  { title: '待支付', icon: 'orders' ,iconImg: STATIC_IMAGE_PREFIX + '/tabbar/待支付 1.svg'},
+  { title: '待发货', icon: 'address',iconImg: STATIC_IMAGE_PREFIX + '/tabbar/待发货 1.svg' },
+  { title: '待收货', icon: 'service',iconImg: STATIC_IMAGE_PREFIX + '/tabbar/待收货 1.svg' },
+  { title: '退款售后', icon: 'code' ,iconImg: STATIC_IMAGE_PREFIX + '/tabbar/售后 1.svg'}
 ]
 
 const SECONDARY_ACTIONS = [
-  { title: '公司认证', icon: 'company', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/公司认证.png' },
-  { title: '领券中心', icon: 'crown', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.png' },
-  { title: '我的订单', icon: 'check', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/全部订单 1.png' },
-  { title: '地址管理', icon: 'wallet', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/地址管理 1.png' },
-  { title: '客服中心', icon: 'coins', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/客服 1.png' },
-  { title: '充值中心', icon: 'ticket', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/储值 1.png' },
-  { title: '红包卡券', icon: 'crown', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.png' },
-  { title: '签到中心', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/签到 1.png' },
-  { title: '积分抽奖', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/抽奖 1.png' },
-  { title: '安全退出', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/退出 1.png' }
+  { title: '公司认证', icon: 'company', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/公司认证 1.svg' },
+  { title: '领券中心', icon: 'crown', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.svg' },
+  { title: '我的订单', icon: 'check', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/全部订单 1.svg' },
+  { title: '地址管理', icon: 'wallet', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/地址管理 1.svg' },
+  { title: '客服中心', icon: 'coins', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/客服 1.svg' },
+  { title: '充值中心', icon: 'ticket', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/储值 1.svg' },
+  { title: '红包卡券', icon: 'crown', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/领券 1.svg' },
+  { title: '签到中心', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/签到 1.svg' },
+  { title: '积分抽奖', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/抽奖 1.svg' },
+  { title: '安全退出', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/退出 1.svg' }
 ]
 
 export default {
@@ -575,7 +575,7 @@ export default {
 	  position: relative;
 	  z-index: 10;
     }
-  
+
     &__stat-item {
 
       flex: 1;

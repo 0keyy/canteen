@@ -178,10 +178,10 @@ export default {
       pointCount: 0,
       couponCount: 0,
       shortcuts: [
-        { name: '充值中心', desc: '', iconPath: '/static/tabbar/充值 1.png' },
-        { name: '红包卡券', desc: '', iconPath: '/static/tabbar/卡券 1.png' },
-        { name: '订单详情', desc: '', iconPath: '/static/tabbar/全部订单 1.png' },
-        { name: '客服中心', desc: '', iconPath: '/static/tabbar/客服 1.png' }
+        { name: '充值中心', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/储值 1.svg' },
+        { name: '红包卡券', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.svg' },
+        { name: '订单详情', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/全部订单 1.svg' },
+        { name: '客服中心', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/客服 1.svg' }
       ]
     }
   },

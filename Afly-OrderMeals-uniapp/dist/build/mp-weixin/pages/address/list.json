@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "收货地址",
+  "navigationBarBackgroundColor": "#FFFCF8",
+  "navigationBarTextStyle": "black",
+  "animationType": "slide-in-right",
+  "usingComponents": {}
+}

@@ -1,0 +1,10 @@
+{
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "确认订单",
+  "navigationBarBackgroundColor": "#FFFCF8",
+  "navigationBarTextStyle": "black",
+  "animationType": "slide-in-right",
+  "usingComponents": {
+    "page-loading": "../../components/page-loading/page-loading"
+  }
+}

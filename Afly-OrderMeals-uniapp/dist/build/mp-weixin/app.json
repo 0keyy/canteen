@@ -1,0 +1,74 @@
+{
+  "pages": [
+    "pages/login/index",
+    "pages/index/index",
+    "pages/menu/index",
+    "pages/cart/confirm",
+    "pages/address/list",
+    "pages/address/edit",
+    "pages/order/list",
+    "pages/order/detail",
+    "pages/mine/index",
+    "pages/mine/company-auth",
+    "pages/mine/profile",
+    "pages/coupon/center",
+    "pages/coupon/wallet",
+    "pages/coupon/recharge",
+    "pages/coupon/verify-code",
+    "pages/points/index",
+    "pages/points/rules",
+    "pages/points/records",
+    "pages/points/point-records",
+    "pages/signin/index",
+    "pages/lottery/index",
+    "pages/mine/memberCode/index",
+    "pages/mine/service/index"
+  ],
+  "usingComponents": {
+    "menu-category-sidebar": "components/menu-category-sidebar/menu-category-sidebar"
+  },
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "点餐",
+    "navigationBarBackgroundColor": "#FFFCF8",
+    "backgroundColor": "#FFFCF8",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#C41E3A",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/tabbar/icon.png",
+        "selectedIconPath": "static/tabbar/icon-active.png"
+      },
+      {
+        "pagePath": "pages/menu/index",
+        "text": "点餐",
+        "iconPath": "static/tabbar/icon.png",
+        "selectedIconPath": "static/tabbar/icon-active.png"
+      },
+      {
+        "pagePath": "pages/points/index",
+        "text": "积分商城",
+        "iconPath": "static/tabbar/icon.png",
+        "selectedIconPath": "static/tabbar/icon-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "static/tabbar/icon.png",
+        "selectedIconPath": "static/tabbar/icon-active.png"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于外卖配送定位"
+    }
+  }
+}
