@@ -1,4 +1,5 @@
-<script>
+<script setup>
+import { onLaunch } from '@dcloudio/uni-app'
 import { decorateApi } from './api/index'
 import {
   filterTabbarList,
@@ -51,17 +52,15 @@ function loadCustomFonts() {
   }
 }
 
-export default {
-  onLaunch() {
-    const token = uni.getStorageSync('token')
-    if (!token) {
-      uni.reLaunch({ url: '/pages/login/index' })
-      return
-    }
-    preloadTabbar()
-    loadCustomFonts()
+onLaunch(() => {
+  const token = uni.getStorageSync('token')
+  if (!token) {
+    uni.reLaunch({ url: '/pages/login/index' })
+    return
   }
-}
+  preloadTabbar()
+  loadCustomFonts()
+})
 </script>
 
 <style lang="scss">

@@ -45,98 +45,95 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue'
+import { onLoad, onUnload } from '@dcloudio/uni-app'
 import { memberApi, authApi } from '../../../api/index'
 import { STATIC_IMAGE_PREFIX } from '../../../utils/image'
 import { BASE_URL } from '../../../utils/config'
 import uQRCode from 'uqrcodejs'
 
-export default {
-  data() {
-    return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      memberId: "",
-      nickname: "",
-      level: "",
-      balance: "",
-      avatarKey: "1",
-      qrCodeContent: "",
-      qrImageBase64: "",
-      timer: null
-    }
-  },
-  computed: {
-    avatarSrc() {
-      return `${this.staticImgPrefix}/${this.avatarKey || '1'}.png`
-    }
-  },
-  onLoad() {
-    this.avatarKey = uni.getStorageSync('avatarKey') || '1'
-    this.loadMemberCode()
-    this.timer = setInterval(() => {
-      this.refreshQrCode()
-    }, 30000)
-  },
-  onUnload() {
-    if (this.timer) {
-      clearInterval(this.timer)
-    }
-  },
-  methods: {
-    async loadMemberCode() {
-      try {
-        const profile = await authApi.profile()
-        if (profile) {
-          this.nickname = profile.companyNickName || profile.nickname || profile.name || '会员'
-          this.balance = profile.balance != null ? profile.balance : '0.00'
-          this.memberId = profile.memberId || profile.id || profile.userId || ''
-          this.level = profile.level || '普通会员'
-        }
-      } catch (e) {
-        console.log('获取用户信息失败', e)
-      }
-      try {
-        const res = await memberApi.code()
-        if (res && res.code === 200 && res.data) {
-          const data = res.data
-          if (data.memberId) this.memberId = data.memberId
-          if (data.nickname) this.nickname = data.nickname
-          if (data.level) this.level = data.level
-          if (data.balance != null) this.balance = data.balance
-        }
-      } catch (e) {
-        console.log('会员码接口暂未开发', e)
-      }
-      this.refreshQrCode()
-    },
-    async refreshQrCode() {
-      if (!this.memberId) return
-      const timeStamp = Date.now()
-      this.qrCodeContent = `${BASE_URL}/front/member/verify?uid=${this.memberId}&ts=${timeStamp}`
-      await this.generateQrImage()
-    },
-    async generateQrImage() {
-      try {
-        const qrcode = new uQRCode()
-        qrcode.data = this.qrCodeContent
-        qrcode.errorLevel = 'M'
-        qrcode.size = 300
-        qrcode.foregroundColor = '#000000'
-        qrcode.backgroundColor = '#ffffff'
-        qrcode.margin = 10
-        qrcode.make()
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const memberId = ref("")
+const nickname = ref("")
+const level = ref("")
+const balance = ref("")
+const avatarKey = ref("1")
+const qrCodeContent = ref("")
+const qrImageBase64 = ref("")
+const timer = ref(null)
 
-        const canvas = uni.createCanvasContext('tempQrCanvas')
-        qrcode.canvasContext = canvas
-        await qrcode.drawCanvas()
-      } catch (e) {
-        console.error('二维码生成失败', e)
-      }
-    },
-    goBack() {
-      uni.navigateBack()
-    }
+const avatarSrc = computed(() => `${staticImgPrefix.value}/${avatarKey.value || '1'}.png`)
+
+onLoad(() => {
+  avatarKey.value = uni.getStorageSync('avatarKey') || '1'
+  loadMemberCode()
+  timer.value = setInterval(() => {
+    refreshQrCode()
+  }, 30000)
+})
+
+onUnload(() => {
+  if (timer.value) {
+    clearInterval(timer.value)
   }
+})
+
+async function loadMemberCode() {
+  try {
+    const profile = await authApi.profile()
+    if (profile) {
+      nickname.value = profile.companyNickName || profile.nickname || profile.name || '会员'
+      balance.value = profile.balance != null ? profile.balance : '0.00'
+      memberId.value = profile.memberId || profile.id || profile.userId || ''
+      level.value = profile.level || '普通会员'
+    }
+  } catch (e) {
+    console.log('获取用户信息失败', e)
+  }
+  try {
+    const res = await memberApi.code()
+    if (res && res.code === 200 && res.data) {
+      const data = res.data
+      if (data.memberId) memberId.value = data.memberId
+      if (data.nickname) nickname.value = data.nickname
+      if (data.level) level.value = data.level
+      if (data.balance != null) balance.value = data.balance
+    }
+  } catch (e) {
+    console.log('会员码接口暂未开发', e)
+  }
+  refreshQrCode()
+}
+
+async function refreshQrCode() {
+  if (!memberId.value) return
+  const timeStamp = Date.now()
+  qrCodeContent.value = `${BASE_URL}/front/member/verify?uid=${memberId.value}&ts=${timeStamp}`
+  await generateQrImage()
+}
+
+async function generateQrImage() {
+  try {
+    const qrcode = new uQRCode()
+    qrcode.data = qrCodeContent.value
+    qrcode.errorLevel = 'M'
+    qrcode.size = 300
+    qrcode.foregroundColor = '#000000'
+    qrcode.backgroundColor = '#ffffff'
+    qrcode.margin = 10
+    qrcode.make()
+
+    const canvas = uni.createCanvasContext('tempQrCanvas')
+    qrcode.canvasContext = canvas
+    await qrcode.drawCanvas()
+  } catch (e) {
+    console.error('二维码生成失败', e)
+  }
+}
+
+function goBack() {
+  uni.navigateBack()
 }
 </script>
 

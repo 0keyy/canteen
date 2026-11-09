@@ -129,9 +129,11 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { authApi, integralApi } from '../../api/index'
-import tabbarPageMixin from '../../mixins/tabbar-page'
+import { usePageTabbar } from '../../composables/use-page-tabbar'
 import { getNavMetrics } from '../../utils/navbar'
 import { resolveImageUrl, STATIC_IMAGE_PREFIX } from '../../utils/image'
 
@@ -241,131 +243,136 @@ const DEFAULT_PRODUCTS = [
   }
 ]
 
-export default {
-  mixins: [tabbarPageMixin],
-  data() {
-    return {
-      navMetrics: getNavMetrics(),
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      pointsBalance: 0,
-      activeTab: 1,
-      activeCategory: 0,
-      navTabs: ['积分规则', '积分明细', '兑换记录'],
-      categories: DEFAULT_CATEGORIES,
-      products: DEFAULT_PRODUCTS,
-      goodsLoading: false
-    }
-  },
-  computed: {
-    heroPaddingStyle() {
-      return { paddingTop: `${this.navMetrics.statusBarHeight + 8}px` }
-    }
-  },
-  onShow() {
-    this.navMetrics = getNavMetrics()
-    this.setupTabbar(2)
-    this.loadCustomFonts()
-    this.loadPoints()
-    this.loadCategories()
-    this.loadGoods()
-  },
-  methods: {
-    loadCustomFonts() {
-      if (typeof wx !== 'undefined' && wx.loadFontFace) {
-        wx.loadFontFace({
-          family: 'Alimama ShuHei Ti',
-          source: 'url("https://canteen.zhongtang-group.com/api/uploads/font/AlimamaShuHeiTi.ttf")',
-          version: 'v1',
-          success: () => {
-            this.$forceUpdate()
-          },
-          fail: (err) => {
-            console.error('数黑体字体加载失败', err)
-          }
-        })
+const {
+  tabbarSelected,
+  tabbarDefaultColor,
+  tabbarSelectedColor,
+  tabbarList,
+  setupTabbar,
+  switchTabbar
+} = usePageTabbar()
+
+const navMetrics = ref(getNavMetrics())
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const pointsBalance = ref(0)
+const activeTab = ref(1)
+const activeCategory = ref(0)
+const navTabs = ref(['积分规则', '积分明细', '兑换记录'])
+const categories = ref(DEFAULT_CATEGORIES)
+const products = ref(DEFAULT_PRODUCTS)
+const goodsLoading = ref(false)
+
+const heroPaddingStyle = computed(() => ({ paddingTop: `${navMetrics.value.statusBarHeight + 8}px` }))
+
+onShow(() => {
+  navMetrics.value = getNavMetrics()
+  setupTabbar(2)
+  loadCustomFonts()
+  loadPoints()
+  loadCategories()
+  loadGoods()
+})
+
+function loadCustomFonts() {
+  if (typeof wx !== 'undefined' && wx.loadFontFace) {
+    wx.loadFontFace({
+      family: 'Alimama ShuHei Ti',
+      source: 'url("https://canteen.zhongtang-group.com/api/uploads/font/AlimamaShuHeiTi.ttf")',
+      version: 'v1',
+      fail: (err) => {
+        console.error('数黑体字体加载失败', err)
       }
-    },
-    async loadPoints() {
-      try {
-        const profile = await authApi.profile()
-        if (profile && profile.points != null) {
-          this.pointsBalance = profile.points
-        }
-      } catch (e) {}
-    },
-    async loadCategories() {
-      try {
-        const list = await integralApi.categoryList()
-        if (Array.isArray(list) && list.length) {
-          const serverCategories = [{ id: 0, name: '全部' }, ...list.map(item => ({
-            id: item.id ?? item.categoryId ?? item.key,
-            name: item.name ?? item.categoryName ?? item.title
-          }))]
-          this.categories = serverCategories
-        }
-      } catch (e) {}
-    },
-    normalizeGoodsItem(item) {
-      return {
-        id: item.id ?? item.goodsId,
-        image: resolveImageUrl(item.image ?? item.cover ?? item.img),
-        title: item.title ?? item.name ?? item.goodsName,
-        points: item.points ?? item.integral ?? item.point,
-        redeemed: item.redeemed ?? item.exchangeCount ?? item.sales ?? 0
-      }
-    },
-    async loadGoods() {
-      const categoryId = this.categories[this.activeCategory]?.id
-      if (categoryId == null) return
-      this.goodsLoading = true
-      try {
-        const data = await integralApi.goodsList(categoryId || null)
-        const list = data?.list || data || []
-        if (Array.isArray(list) && list.length) {
-          this.products = list.map(item => this.normalizeGoodsItem(item))
-        } else {
-          this.products = []
-        }
-      } catch (e) {
-        if (categoryId === 0) {
-          this.products = DEFAULT_PRODUCTS
-        } else {
-          this.products = DEFAULT_PRODUCTS.filter(p => p.category === categoryId)
-        }
-      } finally {
-        this.goodsLoading = false
-      }
-    },
-    selectCategory(index) {
-      if (this.activeCategory === index) return
-      this.activeCategory = index
-      const categoryId = this.categories[index]?.id || 0
-      if (categoryId === 0) {
-        this.products = DEFAULT_PRODUCTS
-      } else {
-        this.products = DEFAULT_PRODUCTS.filter(p => p.category === categoryId)
-      }
-    },
-    selectTab(index) {
-      this.activeTab = index
-      if (index === 0) {
-        uni.navigateTo({ url: '/pages/points/rules' })
-      } else if (index === 1) {
-        uni.navigateTo({ url: '/pages/points/point-records' })
-      } else if (index === 2) {
-        uni.navigateTo({ url: '/pages/points/records' })
-      }
-    },
-    goLottery() {
-      uni.navigateTo({ url: '/pages/lottery/index' })
-    },
-    goSignin() {
-      uni.navigateTo({ url: '/pages/signin/index' })
-    },
-    onScan() {
-      uni.showToast({ title: '扫码功能开发中', icon: 'none' })
-    }
+    })
   }
+}
+
+async function loadPoints() {
+  try {
+    const profile = await authApi.profile()
+    if (profile && profile.points != null) {
+      pointsBalance.value = profile.points
+    }
+  } catch (e) {}
+}
+
+async function loadCategories() {
+  try {
+    const list = await integralApi.categoryList()
+    if (Array.isArray(list) && list.length) {
+      const serverCategories = [{ id: 0, name: '全部' }, ...list.map(item => ({
+        id: item.id ?? item.categoryId ?? item.key,
+        name: item.name ?? item.categoryName ?? item.title
+      }))]
+      categories.value = serverCategories
+    }
+  } catch (e) {}
+}
+
+function normalizeGoodsItem(item) {
+  return {
+    id: item.id ?? item.goodsId,
+    image: resolveImageUrl(item.image ?? item.cover ?? item.img),
+    title: item.title ?? item.name ?? item.goodsName,
+    points: item.points ?? item.integral ?? item.point,
+    redeemed: item.redeemed ?? item.exchangeCount ?? item.sales ?? 0
+  }
+}
+
+async function loadGoods() {
+  const categoryId = categories.value[activeCategory.value]?.id
+  if (categoryId == null) return
+  goodsLoading.value = true
+  try {
+    const data = await integralApi.goodsList(categoryId || null)
+    const list = data?.list || data || []
+    if (Array.isArray(list) && list.length) {
+      products.value = list.map(item => normalizeGoodsItem(item))
+    } else {
+      products.value = []
+    }
+  } catch (e) {
+    if (categoryId === 0) {
+      products.value = DEFAULT_PRODUCTS
+    } else {
+      products.value = DEFAULT_PRODUCTS.filter(p => p.category === categoryId)
+    }
+  } finally {
+    goodsLoading.value = false
+  }
+}
+
+function selectCategory(index) {
+  if (activeCategory.value === index) return
+  activeCategory.value = index
+  const categoryId = categories.value[index]?.id || 0
+  if (categoryId === 0) {
+    products.value = DEFAULT_PRODUCTS
+  } else {
+    products.value = DEFAULT_PRODUCTS.filter(p => p.category === categoryId)
+  }
+}
+
+function selectTab(index) {
+  activeTab.value = index
+  if (index === 0) {
+    uni.navigateTo({ url: '/pages/points/rules' })
+  } else if (index === 1) {
+    uni.navigateTo({ url: '/pages/points/point-records' })
+  } else if (index === 2) {
+    uni.navigateTo({ url: '/pages/points/records' })
+  }
+}
+
+function goLottery() {
+  uni.navigateTo({ url: '/pages/lottery/index' })
+}
+
+function goSignin() {
+  uni.navigateTo({ url: '/pages/signin/index' })
+}
+
+function onScan() {
+  uni.showToast({ title: '扫码功能开发中', icon: 'none' })
 }
 </script>
 

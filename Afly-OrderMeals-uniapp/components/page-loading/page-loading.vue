@@ -10,105 +10,109 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 const MIN_DURATION = 300
 
-export default {
-  name: 'PageLoading',
-  props: {
-    visible: {
-      type: Boolean,
-      default: false
-    },
-    tip: {
-      type: String,
-      default: ''
-    }
+defineOptions({ name: 'PageLoading' })
+
+const props = defineProps({
+  visible: {
+    type: Boolean,
+    default: false
   },
-  data() {
-    return {
-      showContent: false,
-      progress: 0,
-      startTime: 0,
-      progressTimer: null,
-      localTip: ''
-    }
-  },
-  watch: {
-    visible(val) {
-      if (val) {
-        this.doShow()
-      } else {
-        this.doHide()
-      }
-    },
-    tip(val) {
-      this.localTip = val
-    }
-  },
-  mounted() {
-    this.localTip = this.tip
-    uni.$on('__global_loading_show__', this.onGlobalShow)
-    uni.$on('__global_loading_hide__', this.onGlobalHide)
-  },
-  beforeUnmount() {
-    uni.$off('__global_loading_show__', this.onGlobalShow)
-    uni.$off('__global_loading_hide__', this.onGlobalHide)
-    this.clearTimers()
-  },
-  methods: {
-    doShow() {
-      this.showContent = true
-      this.progress = 0
-      this.startTime = Date.now()
-      this.startProgress()
-    },
-    doHide() {
-      const elapsed = Date.now() - this.startTime
-      const remaining = MIN_DURATION - elapsed
-      if (remaining > 0) {
-        setTimeout(() => {
-          this.finishProgress()
-        }, remaining)
-      } else {
-        this.finishProgress()
-      }
-    },
-    startProgress() {
-      this.clearTimers()
-      let p = 0
-      this.progressTimer = setInterval(() => {
-        p += Math.random() * 15 + 5
-        if (p >= 90) {
-          p = 90
-          clearInterval(this.progressTimer)
-          this.progressTimer = null
-        }
-        this.progress = Math.min(p, 90)
-      }, 200)
-    },
-    finishProgress() {
-      this.clearTimers()
-      this.progress = 100
-      setTimeout(() => {
-        this.showContent = false
-        this.progress = 0
-      }, 150)
-    },
-    clearTimers() {
-      if (this.progressTimer) {
-        clearInterval(this.progressTimer)
-        this.progressTimer = null
-      }
-    },
-    onGlobalShow(tip) {
-      if (tip) this.localTip = tip
-      this.doShow()
-    },
-    onGlobalHide() {
-      this.doHide()
-    }
+  tip: {
+    type: String,
+    default: ''
   }
+})
+
+const showContent = ref(false)
+const progress = ref(0)
+const startTime = ref(0)
+const progressTimer = ref(null)
+const localTip = ref('')
+
+onMounted(() => {
+  localTip.value = props.tip
+  uni.$on('__global_loading_show__', onGlobalShow)
+  uni.$on('__global_loading_hide__', onGlobalHide)
+})
+
+onBeforeUnmount(() => {
+  uni.$off('__global_loading_show__', onGlobalShow)
+  uni.$off('__global_loading_hide__', onGlobalHide)
+  clearTimers()
+})
+
+watch(() => props.visible, (val) => {
+  if (val) {
+    doShow()
+  } else {
+    doHide()
+  }
+})
+
+watch(() => props.tip, (val) => {
+  localTip.value = val
+})
+
+function doShow() {
+  showContent.value = true
+  progress.value = 0
+  startTime.value = Date.now()
+  startProgress()
+}
+
+function doHide() {
+  const elapsed = Date.now() - startTime.value
+  const remaining = MIN_DURATION - elapsed
+  if (remaining > 0) {
+    setTimeout(() => {
+      finishProgress()
+    }, remaining)
+  } else {
+    finishProgress()
+  }
+}
+
+function startProgress() {
+  clearTimers()
+  let p = 0
+  progressTimer.value = setInterval(() => {
+    p += Math.random() * 15 + 5
+    if (p >= 90) {
+      p = 90
+      clearInterval(progressTimer.value)
+      progressTimer.value = null
+    }
+    progress.value = Math.min(p, 90)
+  }, 200)
+}
+
+function finishProgress() {
+  clearTimers()
+  progress.value = 100
+  setTimeout(() => {
+    showContent.value = false
+    progress.value = 0
+  }, 150)
+}
+
+function clearTimers() {
+  if (progressTimer.value) {
+    clearInterval(progressTimer.value)
+    progressTimer.value = null
+  }
+}
+
+function onGlobalShow(tip) {
+  if (tip) localTip.value = tip
+  doShow()
+}
+
+function onGlobalHide() {
+  doHide()
 }
 </script>
 

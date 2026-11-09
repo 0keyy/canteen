@@ -1,118 +1,60 @@
 <template>
-  <transition name="fade" appear>
-    <cube-popup
-      :mask-closable=true
-      v-show="visible"
-      @mask-click="maskClick"
-      position="bottom"
-      type="shop-cart-list"
-      :z-index=90
-    >
-      <transition
-        name="move"
-        appear
-        @after-leave="afterLeave"
-      >
-        <div v-if="visible">
-          <div class="list-header">
-            <h1 class="title">购物车</h1>
-            <span class="empty" @click="empty">清空</span>
-          </div>
-          <cube-scroll class="list-content" ref="listContent">
-            <ul>
-              <li
-                class="food"
-                v-for="(food,index) in selectFoods"
-                :key="index"
-              >
-                <span class="name">{{food.title}}</span>
-                <div class="price">
-                  <span>￥{{food.price*food.count}}</span>
-                </div>
-                <div class="cart-control-wrapper">
-                  <cart-control @add="onAdd" :food="food"></cart-control>
-                </div>
-              </li>
-            </ul>
-          </cube-scroll>
+  <Transition name="fade">
+    <div v-if="open" class="cart-overlay" @click.self="$emit('close')">
+      <section class="cart-list" aria-label="购物车">
+        <div class="list-header">
+          <h2 class="title">购物车</h2>
+          <button type="button" class="empty" :disabled="disabled" @click="$emit('empty')">清空</button>
         </div>
-      </transition>
-    </cube-popup>
-  </transition>
+        <div class="list-content">
+          <ul>
+            <li v-for="food in foods" :key="food.id" class="food">
+              <span class="name">{{ food.title }}</span>
+              <div class="price">￥{{ food.price * food.count }}</div>
+              <div class="cart-control-wrapper">
+                <CartControl
+                  :food="food"
+                  :disabled="disabled"
+                  @add="$emit('add', food, 1, $event)"
+                  @decrease="$emit('decrease', food)"
+                />
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </Transition>
 </template>
 
-<script>
-  import CartControl from 'components/cart-control/cart-control'
-  import popupMixin from 'common/mixins/popup'
-import { toEmpty } from '../../api'
+<script setup>
+import CartControl from 'components/cart-control/cart-control.vue'
 
-  const EVENT_SHOW = 'show'
-  const EVENT_ADD = 'add'
-  const EVENT_LEAVE = 'leave'
-
-  export default {
-    name: 'shop-cart-list',
-    mixins: [popupMixin],
-    props: {
-      selectFoods: {
-        type: Array,
-        default() {
-          return []
-        }
-      }
-    },
-    created() {
-      this.$on(EVENT_SHOW, () => {
-        this.$nextTick(() => {
-          this.$refs.listContent.refresh()
-        })
-      })
-    },
-    methods: {
-      onAdd(target) {
-        this.$emit(EVENT_ADD, target)
-      },
-      afterLeave() {
-        this.$emit(EVENT_LEAVE)
-      },
-      maskClick() {
-        this.hide()
-      },
-      empty() {
-        this.dialogComp = this.$createDialog({
-          type: 'confirm',
-          content: '清空购物车？',
-          $events: {
-            confirm: () => {
-              this.selectFoods.forEach((food) => {
-                food.count = 0
-              })
-              this.hide()
-              toEmpty({id: sessionStorage.getItem('oid')})
-            }
-          }
-        })
-        this.dialogComp.show()
-      }
-    },
-    components: {
-      CartControl
-    }
-  }
+defineProps({
+  open: Boolean,
+  foods: { type: Array, required: true },
+  disabled: Boolean
+})
+defineEmits(['add', 'decrease', 'empty', 'close'])
 </script>
 
-<style lang="stylus" scoped>
-  @import "~common/stylus/variable"
-  .cube-shop-cart-list
-    bottom: 48px
-    &.fade-enter, &.fade-leave-active
-      opacity: 0
+<style lang="sass" scoped>
+  @use "common/stylus/variable" as *
+  .cart-overlay
+    position: fixed
+    inset: 0 0 48px
+    background: rgba(7, 17, 27, .6)
     &.fade-enter-active, &.fade-leave-active
-      transition: all .3s ease-in-out
-    .move-enter, .move-leave-active
-      transform: translate3d(0, 100%, 0)
-    .move-enter-active, .move-leave-active
-      transition: all .3s ease-in-out
+      transition: opacity .3s ease-in-out
+      .cart-list
+        transition: transform .3s ease-in-out
+    &.fade-enter-from, &.fade-leave-to
+      opacity: 0
+      .cart-list
+        transform: translateY(100%)
+  .cart-list
+    position: absolute
+    inset: auto 0 0
     .list-header
       height: 40px
       line-height: 40px
@@ -124,13 +66,16 @@ import { toEmpty } from '../../api'
         color: $color-dark-grey
       .empty
         float: right
+        border: 0
+        background: none
+        line-height: inherit
         font-size: $fontsize-small
         color: $color-blue
 
     .list-content
       padding: 0 18px
       max-height: 217px
-      overflow: hidden
+      overflow-y: auto
       background: $color-white
       .food
         position: relative

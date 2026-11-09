@@ -96,103 +96,106 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 import { authApi } from '../../api/index'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
-export default {
-  data: function() {
-    return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      defaultAvatar: STATIC_IMAGE_PREFIX + '/2.png',
-      defaultAvatars: [
-        STATIC_IMAGE_PREFIX + '/2.png',
-        STATIC_IMAGE_PREFIX + '/1.png',
-		STATIC_IMAGE_PREFIX + '/3.png',
-		STATIC_IMAGE_PREFIX + '/4.png',
-		
-      ],
-      form: {
-        nickname: '',
-        gender: 0,
-        birthday: ''
-      },
-      avatarUrl: '',
-      mobile: '',
-      saving: false,
-      showNicknameModal: false,
-      showAvatarModal: false,
-      tempNickname: '',
-      birthdayPickerVisible: false,
-      pickerDate: '2000-01-01'
-    }
-  },
-  computed: {
-    maskedPhone: function() {
-      if (!this.mobile) return ''
-      const m = String(this.mobile)
-      if (m.length >= 11) {
-        return m.substring(0, 3) + '****' + m.substring(7)
-      }
-      return m
-    },
-    genderText: function() {
-      if (this.form.gender === 1) return '男'
-      if (this.form.gender === 2) return '女'
-      return '请选择'
-    }
-  },
-  onLoad: function() {
-    this.loadProfile()
-  },
-  methods: {
-    loadProfile: function() {
-      const self = this
-      authApi.profile().then(function(res) {
-        self.form.nickname = res.nickname || res.userName || ''
-        self.form.gender = res.gender || 0
-        self.form.birthday = res.birthday || ''
-        self.avatarUrl = res.avatar || res.headImg || ''
-        self.mobile = res.mobile || res.phone || ''
-        if (self.form.birthday) {
-          self.pickerDate = self.form.birthday
-        }
-      }).catch(function() {
-        self.form.nickname = uni.getStorageSync('nickname') || ''
-        self.mobile = uni.getStorageSync('mobile') || ''
-      })
-    },
-    chooseAvatar: function() {
-      this.showAvatarModal = true
-    },
-    selectAvatar: function(url) {
-      this.avatarUrl = url
-      this.showAvatarModal = false
-    },
-    editNickname: function() {
-      this.tempNickname = this.form.nickname
-      this.showNicknameModal = true
-    },
-    closeNicknameModal: function() {
-      this.showNicknameModal = false
-    },
-    confirmNickname: function() {
-      if (!this.tempNickname.trim()) {
-        uni.showToast({ title: '昵称不能为空', icon: 'none' })
-        return
-      }
-      this.form.nickname = this.tempNickname.trim()
-      this.showNicknameModal = false
-    },
-    setGender: function(g) {
-      this.form.gender = g
-    },
-    onBirthdayChange: function(e) {
-      this.form.birthday = e.detail.value
-    },
-    saveProfile: function() {
-      uni.showToast({ title: '功能正在开发中', icon: 'none' })
-    }
+
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const defaultAvatar = ref(STATIC_IMAGE_PREFIX + '/2.png')
+const defaultAvatars = ref([
+  STATIC_IMAGE_PREFIX + '/2.png',
+  STATIC_IMAGE_PREFIX + '/1.png',
+  STATIC_IMAGE_PREFIX + '/3.png',
+  STATIC_IMAGE_PREFIX + '/4.png'
+])
+const form = ref({
+  nickname: '',
+  gender: 0,
+  birthday: ''
+})
+const avatarUrl = ref('')
+const mobile = ref('')
+const saving = ref(false)
+const showNicknameModal = ref(false)
+const showAvatarModal = ref(false)
+const tempNickname = ref('')
+const birthdayPickerVisible = ref(false)
+const pickerDate = ref('2000-01-01')
+
+const maskedPhone = computed(() => {
+  if (!mobile.value) return ''
+  const m = String(mobile.value)
+  if (m.length >= 11) {
+    return m.substring(0, 3) + '****' + m.substring(7)
   }
+  return m
+})
+
+const genderText = computed(() => {
+  if (form.value.gender === 1) return '男'
+  if (form.value.gender === 2) return '女'
+  return '请选择'
+})
+
+onLoad(() => {
+  loadProfile()
+})
+
+function loadProfile() {
+  authApi.profile().then(function(res) {
+    form.value.nickname = res.nickname || res.userName || ''
+    form.value.gender = res.gender || 0
+    form.value.birthday = res.birthday || ''
+    avatarUrl.value = res.avatar || res.headImg || ''
+    mobile.value = res.mobile || res.phone || ''
+    if (form.value.birthday) {
+      pickerDate.value = form.value.birthday
+    }
+  }).catch(function() {
+    form.value.nickname = uni.getStorageSync('nickname') || ''
+    mobile.value = uni.getStorageSync('mobile') || ''
+  })
+}
+
+function chooseAvatar() {
+  showAvatarModal.value = true
+}
+
+function selectAvatar(url) {
+  avatarUrl.value = url
+  showAvatarModal.value = false
+}
+
+function editNickname() {
+  tempNickname.value = form.value.nickname
+  showNicknameModal.value = true
+}
+
+function closeNicknameModal() {
+  showNicknameModal.value = false
+}
+
+function confirmNickname() {
+  if (!tempNickname.value.trim()) {
+    uni.showToast({ title: '昵称不能为空', icon: 'none' })
+    return
+  }
+  form.value.nickname = tempNickname.value.trim()
+  showNicknameModal.value = false
+}
+
+function setGender(g) {
+  form.value.gender = g
+}
+
+function onBirthdayChange(e) {
+  form.value.birthday = e.detail.value
+}
+
+function saveProfile() {
+  uni.showToast({ title: '功能正在开发中', icon: 'none' })
 }
 </script>
 

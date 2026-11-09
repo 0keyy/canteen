@@ -1,94 +1,46 @@
 <template>
-  <div class="cartcontrol">
-    <transition name="move">
-      <div class="cart-decrease" v-show="food.count > 0" @click.stop="decrease">
+  <div class="cartcontrol" @click.stop>
+    <Transition name="move">
+      <button
+        v-show="food.count > 0"
+        type="button"
+        class="cart-decrease"
+        aria-label="减少菜品"
+        :disabled="disabled"
+        @click="$emit('decrease')"
+      >
         <span class="inner icon-remove_circle_outline"></span>
-      </div>
-    </transition>
-    <div class="cart-count" v-show="food.count > 0">{{ food.count }}</div>
-    <div class="cart-add icon-add_circle" @click.stop="add"></div>
+      </button>
+    </Transition>
+    <div v-show="food.count > 0" class="cart-count">{{ food.count }}</div>
+    <button
+      type="button"
+      class="cart-add icon-add_circle"
+      aria-label="添加菜品"
+      :disabled="disabled"
+      @click="$emit('add', $event.currentTarget.getBoundingClientRect())"
+    ></button>
   </div>
 </template>
 
-<script>
-import { dishAdd, dishDec, dishDel, dishInc } from '../../api'
-import { socketClient } from '../../socket'
-
-const EVENT_ADD = 'add'
-
-export default {
-  name: 'cart-control',
-  data() {
-    return {
-      orderDishId: '',
-      msg: {
-        id: '',
-        dishId: '',
-        count: '',
-        type: ''
-      }
-    }
-  },
-  props: {
-    food: {
-      type: Object
-    },
-    oid: {
-      type: Number
-    }
-  },
-  methods: {
-    add(event) {
-      if (!this.food.count) {
-        this.$set(this.food, 'count', 1)
-        console.log(this.oid)
-        dishAdd({ dishId: this.food.id, orderId: this.oid }).then((res) => {
-          this.orderDishId = res
-          this.msg.id = res
-          this.msg.dishId = this.food.id
-          this.msg.count = 1
-          socketClient.socket.send(JSON.stringify(this.msg))
-        })
-      } else {
-        this.food.count++
-        dishInc({ id: this.orderDishId || this.food.odid }).then(() => {
-          this.msg.id = this.orderDishId || this.food.odid
-          this.msg.dishId = this.food.id
-          this.msg.count = this.food.count
-          socketClient.socket.send(JSON.stringify(this.msg))
-        })
-      }
-      this.$emit(EVENT_ADD, event.target)
-    },
-    decrease() {
-      if (this.food.count > 1) {
-        this.food.count--
-        dishDec({ id: this.orderDishId || this.food.odid }).then(() => {
-          this.msg.id = this.orderDishId || this.food.odid
-          this.msg.dishId = this.food.id
-          this.msg.count = this.food.count
-          socketClient.socket.send(JSON.stringify(this.msg))
-        })
-      } else {
-        this.food.count--
-        dishDel({ id: this.orderDishId || this.food.odid }).then(() => {
-          this.msg.id = this.orderDishId || this.food.odid
-          this.msg.dishId = this.food.id
-          this.msg.count = this.food.count
-          socketClient.socket.send(JSON.stringify(this.msg))
-        })
-      }
-    }
-  }
-}
+<script setup>
+defineProps({
+  food: { type: Object, required: true },
+  disabled: Boolean
+})
+defineEmits(['add', 'decrease'])
 </script>
 
-<style lang="stylus" scoped>
-  @import "~common/stylus/variable"
+<style lang="sass" scoped>
+  @use "common/stylus/variable" as *
 
   .cartcontrol
     display: flex
     align-items: center
+    button
+      border: 0
+      background: none
+      padding: 6px
     .cart-decrease
       display: inline-block
       padding: 6px
@@ -102,7 +54,7 @@ export default {
         transform: rotate(0)
       &.move-enter-active, &.move-leave-active
         transition: all 0.4s linear
-      &.move-enter, &.move-leave-active
+      &.move-enter-from, &.move-leave-to
         opacity: 0
         transform: translate3d(24px, 0, 0)
         .inner

@@ -1,5 +1,5 @@
 <template>
-  <div class="header" @click="showDetail">
+  <div class="header" @click="showDetail = true">
     <div class="content-wrapper">
       <div class="avatar">
         <img width="64" height="64" :src="seller.image">
@@ -30,40 +30,23 @@
       <img :src="seller.image" width="100%" height="100%">
     </div>
   </div>
+  <Teleport to="body">
+    <HeaderDetail :seller="seller" :visible="showDetail" @close="showDetail = false" />
+  </Teleport>
 </template>
 
-<script type="text/ecmascript-6">
-  import SupportIco from 'components/support-ico/support-ico'
+<script setup>
+import { ref } from 'vue'
+import HeaderDetail from 'components/header-detail/header-detail.vue'
 
-  export default {
-    name: 'v-header',
-    props: {
-      seller: {
-        type: Object,
-        default() {
-          return {}
-        }
-      }
-    },
-    methods: {
-      showDetail() {
-        this.headerDetailComp = this.headerDetailComp || this.$createHeaderDetail({
-          $props: {
-            seller: 'seller'
-          }
-        })
-        this.headerDetailComp.show()
-      }
-    },
-    components: {
-      SupportIco
-    }
-  }
+defineProps({ seller: { type: Object, default: () => ({}) } })
+
+const showDetail = ref(false)
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/mixin"
-  @import "~common/stylus/variable"
+<style lang="sass">
+  @use "common/stylus/mixin" as *
+  @use "common/stylus/variable" as *
 
   .header
     position: relative
@@ -90,7 +73,7 @@
           .brand
             width: 30px
             height: 18px
-            bg-image('brand')
+            @include bg-image('brand')
             background-size: 30px 18px
             background-repeat: no-repeat
           .name
@@ -142,7 +125,7 @@
         width: 22px
         height: 12px
         margin-right: 4px
-        bg-image('bulletin')
+        @include bg-image('bulletin')
         background-size: 22px 12px
         background-repeat: no-repeat
       .bulletin-text

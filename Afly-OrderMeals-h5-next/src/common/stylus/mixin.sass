@@ -1,0 +1,7 @@
+@mixin bg-image($name)
+  background-image: url('#{$name}@2x.png')
+  @media (min-resolution: 3dppx)
+    background-image: url('#{$name}@3x.png')
+
+@mixin border-none()
+  border: 0

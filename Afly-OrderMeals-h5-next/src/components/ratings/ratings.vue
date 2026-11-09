@@ -1,5 +1,5 @@
 <template>
-  <cube-scroll ref="scroll" class="ratings" :options="scrollOptions">
+  <div class="ratings">
     <div class="ratings-content">
       <div class="overview">
         <div class="overview-left">
@@ -68,16 +68,15 @@
         </ul>
       </div>
     </div>
-  </cube-scroll>
+  </div>
 </template>
 
 <script>
-  import Star from 'components/star/star'
-  import RatingSelect from 'components/rating-select/rating-select'
-  import Split from 'components/split/split'
+  import Star from 'components/star/star.vue'
+  import RatingSelect from 'components/rating-select/rating-select.vue'
+  import Split from 'components/split/split.vue'
   import ratingMixin from 'common/mixins/rating'
   import { getRatings } from 'api'
-  import moment from 'moment'
 
   export default {
     name: 'ratings',
@@ -90,10 +89,7 @@
     data () {
       return {
         ratings: [],
-        scrollOptions: {
-          click: false,
-          directionLockThreshold: 0
-        }
+        fetched: false
       }
     },
     computed: {
@@ -113,29 +109,26 @@
         }
       },
       format (time) {
-        return moment(time).format('YYYY-MM-DD hh:mm')
+        const date = new Date(time)
+        const pad = (value) => String(value).padStart(2, '0')
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours() % 12 || 12)}:${pad(date.getMinutes())}`
       }
     },
     components: {
       Star,
       Split,
       RatingSelect
-    },
-    watch: {
-      selectType () {
-        this.$nextTick(() => {
-          this.$refs.scroll.refresh()
-        })
-      }
     }
   }
 </script>
 
-<style lang="stylus" scoped>
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
+<style lang="sass" scoped>
+  @use "common/stylus/variable" as *
+  @use "common/stylus/mixin" as *
 
   .ratings
+    height: 100%
+    overflow-y: auto
     position: relative
     text-align: left
     white-space: normal
@@ -202,7 +195,7 @@
         display: flex
         padding: 18px 0
         &:last-child
-          border-none()
+          @include border-none()
         .avatar
           flex: 0 0 28px
           width: 28px

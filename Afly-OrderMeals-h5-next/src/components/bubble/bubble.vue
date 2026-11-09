@@ -15,8 +15,8 @@
   }
 </script>
 
-<style lang="stylus" scoped>
-  @import "~common/stylus/variable"
+<style lang="sass" scoped>
+  @use "common/stylus/variable" as *
 
   .bubble
     display: inline-block

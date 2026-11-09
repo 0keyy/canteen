@@ -68,171 +68,172 @@
 	</view>
 </template>
 
-<script>
-	import {
-		lotteryApi
-	} from '../../api/index'
-	import {
-		STATIC_IMAGE_PREFIX
-	} from '../../utils/image'
-	import {
-		getNavMetrics
-	} from '../../utils/navbar'
+<script setup>
+import { computed, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import {
+lotteryApi
+} from '../../api/index'
+import {
+STATIC_IMAGE_PREFIX
+} from '../../utils/image'
+import {
+getNavMetrics
+} from '../../utils/navbar'
 
-	export default {
-		data() {
-			return {
-				staticImgPrefix: STATIC_IMAGE_PREFIX,
-				navMetrics: getNavMetrics(),
-				userPoints: 0,
-				prizeList: [],
-				activeIndex: -1,
-				isDrawing: false,
-				showModal: false,
-				modalPrize: ''
-			}
-		},
-		computed: {
-			headerStyle() {
-				return {
-					paddingTop: `${this.navMetrics.statusBarHeight}px`
-				}
-			}
-		},
-		onShow() {
-			this.navMetrics = getNavMetrics()
-			this.loadLotteryInfo()
-		},
-		methods: {
-			goBack() {
-				uni.navigateBack()
-			},
-			async loadLotteryInfo() {
-				try {
-					const data = await lotteryApi.info()
-					if (data) {
-						this.userPoints = data.points || 0
-					}
-				} catch (e) {
-					this.userPoints = 0
-				}
-				this.loadPrizes()
-			},
-			async loadPrizes() {
-				try {
-					const data = await lotteryApi.prizes()
-					if (Array.isArray(data)) {
-						this.prizeList = data
-					} else {
-						this.prizeList = this.getMockPrizes()
-					}
-				} catch (e) {
-					this.prizeList = this.getMockPrizes()
-				}
-			},
-			getMockPrizes() {
-				return [{
-						value: '15',
-						unit: '积分',
-						name: '15积分'
-					},
-					{
-						value: '立减3',
-						unit: '元',
-						name: '3元优惠券'
-					},
-					{
-						value: '满20减',
-						unit: '5元',
-						name: '5元满减券'
-					},
-					{
-						value: '10',
-						unit: '积分',
-						name: '10积分'
-					},
-					{
-						value: '',
-						unit: '',
-						name: ''
-					},
-					{
-						value: '立减1',
-						unit: '元',
-						name: '1元优惠券'
-					},
-					{
-						value: '立减1',
-						unit: '元',
-						name: '1元优惠券'
-					},
-					{
-						value: '5',
-						unit: '积分',
-						name: '5积分'
-					},
-					{
-						value: '满20减',
-						unit: '3元',
-						name: '3元满减券'
-					}
-				]
-			},
-			async handleDraw() {
-				if (this.isDrawing) return
-				if (this.userPoints < 10) {
-					uni.showToast({
-						title: '积分不足',
-						icon: 'none'
-					})
-					return
-				}
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const navMetrics = ref(getNavMetrics())
+const userPoints = ref(0)
+const prizeList = ref([])
+const activeIndex = ref(-1)
+const isDrawing = ref(false)
+const showModal = ref(false)
+const modalPrize = ref('')
 
-				this.isDrawing = true
-				this.activeIndex = 0
+const headerStyle = computed(() => {
+  return {
+    paddingTop: `${navMetrics.value.statusBarHeight}px`
+  }
+})
 
-				const order = [0, 1, 2, 5, 8, 7, 6, 3]
-				let step = 0
-				const totalSteps = order.length * 2 + Math.floor(Math.random() * order.length)
+onShow(() => {
+  navMetrics.value = getNavMetrics()
+  loadLotteryInfo()
+})
 
-				const timer = setInterval(() => {
-					step++
-					if (step > totalSteps) {
-						clearInterval(timer)
-						const finalIndex = order[(totalSteps - 1) % order.length]
-						this.activeIndex = finalIndex
-						this.handleDrawResult(finalIndex)
-					} else {
-						const idx = order[(step - 1) % order.length]
-						this.activeIndex = idx
-					}
-				}, 80)
-			},
-			async handleDrawResult(index) {
-				const prize = this.prizeList[index]
-				try {
-					const data = await lotteryApi.draw()
-					if (data && data.prize) {
-						this.modalPrize = data.prize
-					} else {
-						this.modalPrize = `${prize.value}${prize.unit} - ${prize.name}`
-					}
-				} catch (e) {
-					this.modalPrize = `${prize.value}${prize.unit} - ${prize.name}`
-				}
+function goBack() {
+  uni.navigateBack()
+}
 
-				setTimeout(() => {
-					this.showModal = true
-					this.isDrawing = false
-					this.loadLotteryInfo()
-				}, 500)
-			},
-			closeModal() {
-				this.showModal = false
-				this.activeIndex = -1
-			}
-		}
-	}
+async function loadLotteryInfo() {
+  try {
+    const data = await lotteryApi.info()
+    if (data) {
+      userPoints.value = data.points || 0
+    }
+  } catch (e) {
+    userPoints.value = 0
+  }
+  loadPrizes()
+}
+
+async function loadPrizes() {
+  try {
+    const data = await lotteryApi.prizes()
+    if (Array.isArray(data)) {
+      prizeList.value = data
+    } else {
+      prizeList.value = getMockPrizes()
+    }
+  } catch (e) {
+    prizeList.value = getMockPrizes()
+  }
+}
+
+function getMockPrizes() {
+  return [{
+      value: '15',
+      unit: '积分',
+      name: '15积分'
+    },
+    {
+      value: '立减3',
+      unit: '元',
+      name: '3元优惠券'
+    },
+    {
+      value: '满20减',
+      unit: '5元',
+      name: '5元满减券'
+    },
+    {
+      value: '10',
+      unit: '积分',
+      name: '10积分'
+    },
+    {
+      value: '',
+      unit: '',
+      name: ''
+    },
+    {
+      value: '立减1',
+      unit: '元',
+      name: '1元优惠券'
+    },
+    {
+      value: '立减1',
+      unit: '元',
+      name: '1元优惠券'
+    },
+    {
+      value: '5',
+      unit: '积分',
+      name: '5积分'
+    },
+    {
+      value: '满20减',
+      unit: '3元',
+      name: '3元满减券'
+    }
+  ]
+}
+
+async function handleDraw() {
+  if (isDrawing.value) return
+  if (userPoints.value < 10) {
+    uni.showToast({
+      title: '积分不足',
+      icon: 'none'
+    })
+    return
+  }
+
+  isDrawing.value = true
+  activeIndex.value = 0
+
+  const order = [0, 1, 2, 5, 8, 7, 6, 3]
+  let step = 0
+  const totalSteps = order.length * 2 + Math.floor(Math.random() * order.length)
+
+  const timer = setInterval(() => {
+    step++
+    if (step > totalSteps) {
+      clearInterval(timer)
+      const finalIndex = order[(totalSteps - 1) % order.length]
+      activeIndex.value = finalIndex
+      handleDrawResult(finalIndex)
+    } else {
+      const idx = order[(step - 1) % order.length]
+      activeIndex.value = idx
+    }
+  }, 80)
+}
+
+async function handleDrawResult(index) {
+  const prize = prizeList.value[index]
+  try {
+    const data = await lotteryApi.draw()
+    if (data && data.prize) {
+      modalPrize.value = data.prize
+    } else {
+      modalPrize.value = `${prize.value}${prize.unit} - ${prize.name}`
+    }
+  } catch (e) {
+    modalPrize.value = `${prize.value}${prize.unit} - ${prize.name}`
+  }
+
+  setTimeout(() => {
+    showModal.value = true
+    isDrawing.value = false
+    loadLotteryInfo()
+  }, 500)
+}
+
+function closeModal() {
+  showModal.value = false
+  activeIndex.value = -1
+}
 </script>
 
 <style lang="scss" scoped>

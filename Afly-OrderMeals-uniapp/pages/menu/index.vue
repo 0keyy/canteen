@@ -189,548 +189,583 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { orderApi, decorateApi } from '../../api/index'
 import { DEFAULT_SHOP_ID } from '../../utils/config'
 import { resolveImageUrl, STATIC_IMAGE_PREFIX } from '../../utils/image'
-import tabbarPageMixin from '../../mixins/tabbar-page'
+import { usePageTabbar } from '../../composables/use-page-tabbar'
 import { getMenuButtonMarginRight, getNavMetrics } from '../../utils/navbar'
 import PageLoading from '../../components/page-loading/page-loading.vue'
 import MenuCategorySidebar from '../../components/menu-category-sidebar/menu-category-sidebar.vue'
 
-export default {
-  mixins: [tabbarPageMixin],
-  components: { PageLoading, MenuCategorySidebar },
-  data() {
+const {
+  tabbarSelected,
+  tabbarDefaultColor,
+  tabbarSelectedColor,
+  tabbarList,
+  setupTabbar,
+  switchTabbar
+} = usePageTabbar()
+
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const navMetrics = ref(getNavMetrics())
+const menuButtonRight = ref(96)
+const aid = ref(DEFAULT_SHOP_ID)
+const shop = ref(null)
+const diningMode = ref(1)
+const orderId = ref(0)
+const menu = ref([])
+const activeIndex = ref(0)
+const cartMap = ref({})
+const loading = ref(true)
+const pageLoading = ref(false)
+const pageLoadingTip = ref('')
+const cartReady = ref(false)
+const cartBusy = ref(false)
+const cartInitPromise = ref(null)
+const banners = ref([])
+const showCartPopup = ref(false)
+const showClearConfirm = ref(false)
+const swipeStartX = ref(0)
+const swipeStartY = ref(0)
+const swipeCurrentX = ref(0)
+const swipeThreshold = ref(80)
+const isSwiping = ref(false)
+
+const headerPaddingStyle = computed(() => ({ paddingTop: `${navMetrics.value.statusBarHeight + 8}px` }))
+
+const searchRowStyle = computed(() => ({ paddingRight: `${menuButtonRight.value}px` }))
+
+const shopName = computed(() => shop.value?.name || '粮兴坊')
+
+const distanceText = computed(() => {
+  if (shop.value?.distance) return `距离您${shop.value.distance}km`
+  return '欢迎到店用餐'
+})
+
+const currentFoods = computed(() => menu.value[activeIndex.value]?.foods || [])
+
+const currentCategoryName = computed(() => menu.value[activeIndex.value]?.name || '推荐')
+
+const displayBanners = computed(() => {
+  if (banners.value.length) return banners.value
+  return [{ image: staticImgPrefix.value + '/首页广告.png' }]
+})
+
+const totalPrice = computed(() => {
+  let total = 0
+  Object.values(cartMap.value).forEach((item) => {
+    total += Number(item.price) * item.count
+  })
+  return total.toFixed(2)
+})
+
+const cartItemCount = computed(() => Object.values(cartMap.value).reduce((sum, item) => sum + item.count, 0))
+
+const cartSummary = computed(() => {
+  if (!cartReady.value) return '¥0.00'
+  if (cartItemCount.value === 0) return '¥0.00'
+  return `¥ ${totalPrice.value}`
+})
+
+const cartList = computed(() => {
+  return Object.values(cartMap.value).map((item) => {
+    const food = findFood(item.dishId)
     return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      navMetrics: getNavMetrics(),
-      menuButtonRight: 96,
-      aid: DEFAULT_SHOP_ID,
-      shop: null,
-      diningMode: 1,
-      orderId: 0,
-      menu: [],
-      activeIndex: 0,
-      cartMap: {},
-      loading: true,
-      pageLoading: false,
-      pageLoadingTip: '',
-      cartReady: false,
-      cartBusy: false,
-      cartInitPromise: null,
-      banners: [],
-      showCartPopup: false,
-      showClearConfirm: false,
-      swipeStartX: 0,
-      swipeStartY: 0,
-      swipeCurrentX: 0,
-      swipeThreshold: 80,
-      isSwiping: false
+      ...item,
+      food
     }
-  },
-  computed: {
-    headerPaddingStyle() {
-      return { paddingTop: `${this.navMetrics.statusBarHeight + 8}px` }
-    },
-    searchRowStyle() {
-      return { paddingRight: `${this.menuButtonRight}px` }
-    },
-    shopName() {
-      return this.shop?.name || '粮兴坊'
-    },
-    distanceText() {
-      if (this.shop?.distance) return `距离您${this.shop.distance}km`
-      return '欢迎到店用餐'
-    },
-    currentFoods() {
-      return this.menu[this.activeIndex]?.foods || []
-    },
-    currentCategoryName() {
-      return this.menu[this.activeIndex]?.name || '推荐'
-    },
-    displayBanners() {
-      if (this.banners.length) return this.banners
-      return [{ image: this.staticImgPrefix + '/首页广告.png' }]
-    },
-    totalPrice() {
-      let total = 0
-      Object.values(this.cartMap).forEach((item) => {
-        total += Number(item.price) * item.count
-      })
-      return total.toFixed(2)
-    },
-    cartItemCount() {
-      return Object.values(this.cartMap).reduce((sum, item) => sum + item.count, 0)
-    },
-    cartSummary() {
-      if (!this.cartReady) return '¥0.00'
-      if (this.cartItemCount === 0) return '¥0.00'
-      return `¥ ${this.totalPrice}`
-    },
-    cartList() {
-      return Object.values(this.cartMap).map((item) => {
-        const food = this.findFood(item.dishId)
-        return {
-          ...item,
-          food
-        }
-      }).filter(item => item.food)
-    }
-  },
-  onLoad() {
-    this.diningMode = Number(uni.getStorageSync('diningMode') || 1)
-    this.updateNavPadding()
-    this.loadShop()
-    this.loadBanners()
-    this.bootstrap()
-  },
-  onShow() {
-    this.updateNavPadding()
-    this.setupTabbar(1)
-    // 页面显示时加载花体字体
-    this.loadCustomFonts()
-    const mode = Number(uni.getStorageSync('diningMode') || 1)
-    if (mode !== this.diningMode) {
-      this.diningMode = mode
-      this.bootstrap()
+  }).filter(item => item.food)
+})
+
+onLoad(() => {
+  diningMode.value = Number(uni.getStorageSync('diningMode') || 1)
+  updateNavPadding()
+  loadShop()
+  loadBanners()
+  bootstrap()
+})
+
+onShow(() => {
+  updateNavPadding()
+  setupTabbar(1)
+  // 页面显示时加载花体字体
+  loadCustomFonts()
+  const mode = Number(uni.getStorageSync('diningMode') || 1)
+  if (mode !== diningMode.value) {
+    diningMode.value = mode
+    bootstrap()
+    return
+  }
+  if (!loading.value && !cartBusy.value) {
+    refreshCartState()
+  }
+})
+
+// 阿里东方大楷 花体字体加载方法
+function loadCustomFonts() {
+  if (typeof wx !== 'undefined' && wx.loadFontFace) {
+    wx.loadFontFace({
+      family: 'Alimama DongFangDaKai',
+      source: 'url("https://canteen.zhongtang-group.com/api/uploads/font/AlimamaDongFangDaKai.ttf")',
+      version: 'v1',
+      fail: (err) => {
+        console.error('东方大楷字体加载失败', err)
+      }
+    })
+  }
+}
+
+function goBack() {
+  const pages = getCurrentPages()
+  if (pages.length <= 1) {
+    uni.switchTab({ url: '/pages/index/index' })
+  } else {
+    uni.navigateBack({ delta: 1 })
+  }
+}
+
+function onTouchStart(e) {
+  const touch = e.touches[0]
+  swipeStartX.value = touch.clientX
+  swipeStartY.value = touch.clientY
+  swipeCurrentX.value = touch.clientX
+  isSwiping.value = false
+}
+
+function onTouchMove(e) {
+  const touch = e.touches[0]
+  swipeCurrentX.value = touch.clientX
+  const diffX = swipeCurrentX.value - swipeStartX.value
+  const diffY = Math.abs(touch.clientY - swipeStartY.value)
+  if (diffX > 10 && diffY < Math.abs(diffX)) {
+    isSwiping.value = true
+  }
+}
+
+function onTouchEnd() {
+  if (!isSwiping.value) return
+  const diffX = swipeCurrentX.value - swipeStartX.value
+  if (diffX > swipeThreshold.value) {
+    goBack()
+  }
+  isSwiping.value = false
+  swipeStartX.value = 0
+  swipeStartY.value = 0
+  swipeCurrentX.value = 0
+}
+
+function openCart() {
+  showCartPopup.value = true
+}
+
+function closeCart() {
+  showCartPopup.value = false
+}
+
+function clearCart() {
+  showClearConfirm.value = true
+}
+
+async function confirmClearCart() {
+  showClearConfirm.value = false
+  if (!orderId.value || cartItemCount.value === 0) return
+  try {
+    await orderApi.toEmpty(orderId.value)
+    await syncCart()
+    uni.showToast({ title: '已清空购物车', icon: 'success' })
+  } catch (e) {
+    uni.showToast({ title: '清空失败', icon: 'none' })
+  }
+}
+
+function updateNavPadding() {
+  navMetrics.value = getNavMetrics()
+  menuButtonRight.value = getMenuButtonMarginRight(96)
+}
+
+function selectCategory(index) {
+  activeIndex.value = index
+}
+
+function goSearch() {
+  uni.showToast({ title: '搜索功能开发中', icon: 'none' })
+}
+
+function goToConfirm() {
+  if (cartItemCount.value === 0) {
+    uni.showToast({ title: '请先选择菜品', icon: 'none' })
+    return
+  }
+  if (diningMode.value === 3) {
+    const addr = uni.getStorageSync('selectedAddress')
+    if (!addr) {
+      uni.navigateTo({ url: '/pages/address/list?select=1' })
       return
     }
-    if (!this.loading && !this.cartBusy) {
-      this.refreshCartState()
-    }
-  },
-  methods: {
-    // 阿里东方大楷 花体字体加载方法
-    loadCustomFonts() {
-      if (typeof wx !== 'undefined' && wx.loadFontFace) {
-        wx.loadFontFace({
-          family: 'Alimama DongFangDaKai',
-          source: 'url("https://canteen.zhongtang-group.com/api/uploads/font/AlimamaDongFangDaKai.ttf")',
-          version: 'v1',
-          success: () => {
-            this.$forceUpdate()
-          },
-          fail: (err) => {
-            console.error('东方大楷字体加载失败', err)
-          }
-        })
-      }
-    },
-    goBack() {
-      const pages = getCurrentPages()
-      if (pages.length <= 1) {
-        uni.switchTab({ url: '/pages/index/index' })
-      } else {
-        uni.navigateBack({ delta: 1 })
-      }
-    },
-    onTouchStart(e) {
-      const touch = e.touches[0]
-      this.swipeStartX = touch.clientX
-      this.swipeStartY = touch.clientY
-      this.swipeCurrentX = touch.clientX
-      this.isSwiping = false
-    },
-    onTouchMove(e) {
-      const touch = e.touches[0]
-      this.swipeCurrentX = touch.clientX
-      const diffX = this.swipeCurrentX - this.swipeStartX
-      const diffY = Math.abs(touch.clientY - this.swipeStartY)
-      if (diffX > 10 && diffY < Math.abs(diffX)) {
-        this.isSwiping = true
-      }
-    },
-    onTouchEnd() {
-      if (!this.isSwiping) return
-      const diffX = this.swipeCurrentX - this.swipeStartX
-      if (diffX > this.swipeThreshold) {
-        this.goBack()
-      }
-      this.isSwiping = false
-      this.swipeStartX = 0
-      this.swipeStartY = 0
-      this.swipeCurrentX = 0
-    },
-    openCart() {
-      this.showCartPopup = true
-    },
-    closeCart() {
-      this.showCartPopup = false
-    },
-    clearCart() {
-      this.showClearConfirm = true
-    },
-    async confirmClearCart() {
-      this.showClearConfirm = false
-      if (!this.orderId || this.cartItemCount === 0) return
-      try {
-        await orderApi.toEmpty(this.orderId)
-        await this.syncCart()
-        uni.showToast({ title: '已清空购物车', icon: 'success' })
-      } catch (e) {
-        uni.showToast({ title: '清空失败', icon: 'none' })
-      }
-    },
-    updateNavPadding() {
-      this.navMetrics = getNavMetrics()
-      this.menuButtonRight = getMenuButtonMarginRight(96)
-    },
-    selectCategory(index) {
-      this.activeIndex = index
-    },
-    goSearch() {
-      uni.showToast({ title: '搜索功能开发中', icon: 'none' })
-    },
-    goToConfirm() {
-      if (this.cartItemCount === 0) {
-        uni.showToast({ title: '请先选择菜品', icon: 'none' })
-        return
-      }
-      if (this.diningMode === 3) {
-        const addr = uni.getStorageSync('selectedAddress')
-        if (!addr) {
-          uni.navigateTo({ url: '/pages/address/list?select=1' })
-          return
-        }
-      }
-      uni.navigateTo({ url: '/pages/cart/confirm' })
-    },
-    toggleMode() {
-      const next = this.diningMode === 3 ? 1 : 3
-      this.switchMode(next)
-    },
-    async switchMode(mode) {
-      if (mode === this.diningMode) return
-      if (mode === 3 && this.shop && this.shop.deliveryEnable !== 1) {
-        uni.showToast({ title: '暂未开启外卖', icon: 'none' })
-        return
-      }
-      uni.setStorageSync('diningMode', mode)
-      this.diningMode = mode
-      if (mode === 3) {
-        uni.navigateTo({ url: '/pages/address/list?select=1' })
-        return
-      }
-      await this.bootstrap()
-    },
-    async loadShop() {
-      try {
-        this.shop = await orderApi.shop(this.aid)
-      } catch (e) {
-        this.shop = null
-      }
-    },
-    async loadBanners() {
-      try {
-        const page = await decorateApi.page(1)
-        const widgets = this.parsePageWidgets(page?.pageData)
-        const bannerWidget = widgets.find((item) => item.name === 'banner')
-        const data = bannerWidget?.content?.data
-        if (bannerWidget && this.isWidgetEnabled(bannerWidget.content?.enabled) && Array.isArray(data)) {
-          this.banners = data
-            .map((item) => this.normalizeBannerItem(item))
-            .filter(Boolean)
-        } else {
-          this.banners = []
-        }
-      } catch (e) {
-        this.banners = []
-      }
-    },
-    parsePageWidgets(pageData) {
-      if (!pageData) return []
-      if (Array.isArray(pageData)) return pageData
-      try {
-        const parsed = JSON.parse(pageData)
-        return Array.isArray(parsed) ? parsed : []
-      } catch (e) {
-        return []
-      }
-    },
-    isWidgetEnabled(enabled) {
-      if (enabled === undefined || enabled === null) return true
-      return enabled !== 0 && enabled !== false && enabled !== '0'
-    },
-    normalizeBannerItem(item) {
-      const rawImage = item?.image || item?.img || item?.url || ''
-      const image = resolveImageUrl(rawImage)
-      return image ? { ...item, image } : null
-    },
-    foodTag(index) {
-      const tags = ['热销', '新品', '特价']
-      return index < 3 ? tags[index] : ''
-    },
-    dishKey(dishId) {
-      return String(dishId)
-    },
-    getCount(dishId) {
-      return this.cartMap[this.dishKey(dishId)]?.count || 0
-    },
-    findFood(dishId) {
-      const targetId = Number(dishId)
-      for (const cate of this.menu) {
-        const food = cate.foods.find((f) => Number(f.id) === targetId)
-        if (food) return food
-      }
-      return null
-    },
-    setCartMap(map) {
-      this.cartMap = { ...map }
-    },
-    parseCartHasId(has) {
-      if (!has) return null
-      const id = has.oid ? Number(has.oid) : (has.id ? Number(has.id) : null)
-      return id || null
-    },
-    isCartHasSubmitted(has) {
-      if (!has) return false
-      return !!(has.submitTime || (has.status !== undefined && Number(has.status) > 0))
-    },
-    parseCartHasItems(has) {
-      if (!has) return []
-      return has.dish || has.dishes || []
-    },
-    async bootstrap() {
-      this.pageLoading = true
-      this.pageLoadingTip = '加载中...'
-      this.loading = true
-      this.cartReady = false
-      try {
-        await this.loadMenu()
-        await this.initCart()
-      } catch (e) {
-        this.cartReady = false
-        console.error('菜单页加载失败:', e)
-        uni.showToast({ title: e.message || e || '页面加载失败', icon: 'none', duration: 3000 })
-      } finally {
-        this.loading = false
-        this.pageLoading = false
-      }
-    },
-    async loadMenu() {
-      const list = await orderApi.menu(this.aid)
-      console.log('menu raw data type:', typeof list)
-      console.log('menu raw count:', Array.isArray(list) ? list.length : 0)
-      if (Array.isArray(list)) {
-        console.log('menu raw names:', list.map(c => c.name).join(', '))
-        list.forEach((c, i) => {
-          const keys = Object.keys(c)
-          console.log(`category ${i}: name=${c.name}, sort=${c.sort}, order=${c.order}, seq=${c.seq}, keys=${keys.join(',')}, foods=${(c.foods || []).length}, dishes=${(c.dishes || []).length}, items=${(c.items || []).length}`)
-        })
-      }
-      this.menu = (Array.isArray(list) ? list : [])
-        .sort((a, b) => {
-          const sortA = Number(a.sort || a.order || a.seq || 0)
-          const sortB = Number(b.sort || b.order || b.seq || 0)
-          return sortA - sortB
-        })
-        .map((cate) => {
-          const foods = cate.foods || cate.dishes || cate.items || []
-          return {
-            ...cate,
-            foods: foods.map((food) => ({
-              ...food,
-              image: resolveImageUrl(food.image)
-            }))
-          }
-        })
-      console.log('menu after process:', JSON.stringify(this.menu.map(c => ({name: c.name, sort: c.sort, foodCount: (c.foods || []).length}))))
-      this.activeIndex = 0
-    },
-    async initOrder() {
-      const has = await orderApi.cartHas(this.aid)
-      const existingId = this.parseCartHasId(has)
-      const existingMode = has?.diningMode !== undefined ? Number(has.diningMode) : null
-      const isSubmitted = this.isCartHasSubmitted(has)
-      if (existingId && existingMode === this.diningMode && !isSubmitted) {
-        this.orderId = existingId
-        return
-      }
-      const orderId = await orderApi.cartCreate({
-        aid: this.aid,
-        diningMode: this.diningMode,
-        deskId: this.diningMode === 1 ? 1 : 0,
-        userNum: 1,
-        source: 2
-      })
-      this.orderId = Number(orderId)
-      if (!this.orderId) {
-        throw new Error('购物车创建失败')
-      }
-    },
-    async initCart() {
-      if (this.cartInitPromise) {
-        await this.cartInitPromise
-        return
-      }
-      this.cartInitPromise = (async () => {
-        await this.initOrder()
-        await this.syncCart()
-        this.cartReady = !!this.orderId
-      })()
-      try {
-        await this.cartInitPromise
-      } finally {
-        this.cartInitPromise = null
-      }
-    },
-    async refreshCartState() {
-      if (this.cartInitPromise) {
-        await this.cartInitPromise
-        return
-      }
-      try {
-        const has = await orderApi.cartHas(this.aid)
-        const activeCartId = this.parseCartHasId(has)
-        const isSubmitted = this.isCartHasSubmitted(has)
-        const validCartId = activeCartId && !isSubmitted ? activeCartId : null
+  }
+  uni.navigateTo({ url: '/pages/cart/confirm' })
+}
 
-        if (!validCartId) {
-          if (this.orderId) {
-            this.orderId = 0
-            this.setCartMap({})
-          }
-          await this.initCart()
-          return
-        }
+function toggleMode() {
+  const next = diningMode.value === 3 ? 1 : 3
+  switchMode(next)
+}
 
-        if (this.orderId !== validCartId) {
-          this.orderId = validCartId
-        }
-        await this.syncCart()
-        this.cartReady = true
-      } catch (e) {
-        console.error('购物车刷新失败:', e)
-      }
-    },
-    async ensureCart() {
-      if (this.cartInitPromise) {
-        await this.cartInitPromise
-      }
-      if (!this.cartReady || !this.orderId) {
-        await this.initCart()
-      }
-      if (!this.orderId) {
-        throw new Error('购物车未就绪')
-      }
-      return this.orderId
-    },
-    async syncCart() {
-      if (!this.orderId) {
-        this.setCartMap({})
-        return
-      }
-      const has = await orderApi.cartHas(this.aid)
-      const hasId = this.parseCartHasId(has)
-      if (!hasId || hasId !== this.orderId || this.isCartHasSubmitted(has)) {
-        this.setCartMap({})
-        return
-      }
-      const items = this.parseCartHasItems(has)
-      const map = {}
-      items.forEach((item) => {
-        const dishId = Number(item.dishId)
-        const food = this.findFood(dishId)
-        const key = this.dishKey(dishId)
-        const count = Number(item.count || item.quantity) || 0
-        const existing = map[key]
-        if (existing) {
-          existing.count += count
-          return
-        }
-        map[key] = {
-          odid: Number(item.id),
-          dishId,
-          count,
-          price: food?.price || 0
-        }
-      })
-      this.setCartMap(map)
-    },
-    async addFood(food, _isRetry = false) {
-      if (this.cartBusy || !this.cartReady) return
-      this.cartBusy = true
-      try {
-        await this.ensureCart()
-        const dishId = Number(food.id)
-        const key = this.dishKey(dishId)
-        const current = this.cartMap[key]
-        if (!current) {
-          await orderApi.dishAdd(this.orderId, dishId)
-        } else {
-          await orderApi.dishInc(current.odid)
-        }
-        await this.syncCart()
-      } catch (e) {
-        const errMsg = e.message || String(e) || ''
-        if (!_isRetry && (errMsg.includes('不可用') || errMsg.includes('购物车'))) {
-          this.orderId = 0
-          this.cartReady = false
-          this.cartBusy = false
-          return this.addFood(food, true)
-        }
-        if (errMsg === '成功' || errMsg.includes('操作成功')) {
-          await this.syncCart()
-          return
-        }
-        uni.showToast({ title: errMsg || '加购失败', icon: 'none' })
-        await this.syncCart()
-      } finally {
-        this.cartBusy = false
-      }
-    },
-    async decFood(food, _isRetry = false) {
-      if (this.cartBusy || !this.cartReady) return
-      const dishId = Number(food.id)
-      const key = this.dishKey(dishId)
-      const current = this.cartMap[key]
-      if (!current) return
-      this.cartBusy = true
-      try {
-        await this.ensureCart()
-        if (current.count <= 1) {
-          await orderApi.dishDel(current.odid)
-        } else {
-          await orderApi.dishDec(current.odid)
-        }
-        await this.syncCart()
-      } catch (e) {
-        const errMsg = e.message || String(e) || ''
-        if (!_isRetry && (errMsg.includes('不可用') || errMsg.includes('购物车'))) {
-          this.orderId = 0
-          this.cartReady = false
-          this.cartBusy = false
-          return this.decFood(food, true)
-        }
-        if (errMsg === '成功' || errMsg.includes('操作成功')) {
-          await this.syncCart()
-          return
-        }
-        uni.showToast({ title: errMsg || '操作失败', icon: 'none' })
-        await this.syncCart()
-      } finally {
-        this.cartBusy = false
-      }
-    },
-    async goConfirm() {
-      if (this.cartItemCount === 0) {
-        uni.showToast({ title: '请先选择菜品', icon: 'none' })
-        return
-      }
-      try {
-        await this.ensureCart()
-        await this.syncCart()
-        if (this.cartItemCount === 0) {
-          uni.showToast({ title: '请先选择菜品', icon: 'none' })
-          return
-        }
-        uni.setStorageSync('orderId', this.orderId)
-        uni.navigateTo({ url: '/pages/cart/confirm' })
-      } catch (e) {
-        uni.showToast({ title: e.message || e || '购物车未就绪', icon: 'none' })
-      }
+async function switchMode(mode) {
+  if (mode === diningMode.value) return
+  if (mode === 3 && shop.value && shop.value.deliveryEnable !== 1) {
+    uni.showToast({ title: '暂未开启外卖', icon: 'none' })
+    return
+  }
+  uni.setStorageSync('diningMode', mode)
+  diningMode.value = mode
+  if (mode === 3) {
+    uni.navigateTo({ url: '/pages/address/list?select=1' })
+    return
+  }
+  await bootstrap()
+}
+
+async function loadShop() {
+  try {
+    shop.value = await orderApi.shop(aid.value)
+  } catch (e) {
+    shop.value = null
+  }
+}
+
+async function loadBanners() {
+  try {
+    const page = await decorateApi.page(1)
+    const widgets = parsePageWidgets(page?.pageData)
+    const bannerWidget = widgets.find((item) => item.name === 'banner')
+    const data = bannerWidget?.content?.data
+    if (bannerWidget && isWidgetEnabled(bannerWidget.content?.enabled) && Array.isArray(data)) {
+      banners.value = data
+        .map((item) => normalizeBannerItem(item))
+        .filter(Boolean)
+    } else {
+      banners.value = []
     }
+  } catch (e) {
+    banners.value = []
+  }
+}
+
+function parsePageWidgets(pageData) {
+  if (!pageData) return []
+  if (Array.isArray(pageData)) return pageData
+  try {
+    const parsed = JSON.parse(pageData)
+    return Array.isArray(parsed) ? parsed : []
+  } catch (e) {
+    return []
+  }
+}
+
+function isWidgetEnabled(enabled) {
+  if (enabled === undefined || enabled === null) return true
+  return enabled !== 0 && enabled !== false && enabled !== '0'
+}
+
+function normalizeBannerItem(item) {
+  const rawImage = item?.image || item?.img || item?.url || ''
+  const image = resolveImageUrl(rawImage)
+  return image ? { ...item, image } : null
+}
+
+function foodTag(index) {
+  const tags = ['热销', '新品', '特价']
+  return index < 3 ? tags[index] : ''
+}
+
+function dishKey(dishId) {
+  return String(dishId)
+}
+
+function getCount(dishId) {
+  return cartMap.value[dishKey(dishId)]?.count || 0
+}
+
+function findFood(dishId) {
+  const targetId = Number(dishId)
+  for (const cate of menu.value) {
+    const food = cate.foods.find((f) => Number(f.id) === targetId)
+    if (food) return food
+  }
+  return null
+}
+
+function setCartMap(map) {
+  cartMap.value = { ...map }
+}
+
+function parseCartHasId(has) {
+  if (!has) return null
+  const id = has.oid ? Number(has.oid) : (has.id ? Number(has.id) : null)
+  return id || null
+}
+
+function isCartHasSubmitted(has) {
+  if (!has) return false
+  return !!(has.submitTime || (has.status !== undefined && Number(has.status) > 0))
+}
+
+function parseCartHasItems(has) {
+  if (!has) return []
+  return has.dish || has.dishes || []
+}
+
+async function bootstrap() {
+  pageLoading.value = true
+  pageLoadingTip.value = '加载中...'
+  loading.value = true
+  cartReady.value = false
+  try {
+    await loadMenu()
+    await initCart()
+  } catch (e) {
+    cartReady.value = false
+    console.error('菜单页加载失败:', e)
+    uni.showToast({ title: e.message || e || '页面加载失败', icon: 'none', duration: 3000 })
+  } finally {
+    loading.value = false
+    pageLoading.value = false
+  }
+}
+
+async function loadMenu() {
+  const list = await orderApi.menu(aid.value)
+  console.log('menu raw data type:', typeof list)
+  console.log('menu raw count:', Array.isArray(list) ? list.length : 0)
+  if (Array.isArray(list)) {
+    console.log('menu raw names:', list.map(c => c.name).join(', '))
+    list.forEach((c, i) => {
+      const keys = Object.keys(c)
+      console.log(`category ${i}: name=${c.name}, sort=${c.sort}, order=${c.order}, seq=${c.seq}, keys=${keys.join(',')}, foods=${(c.foods || []).length}, dishes=${(c.dishes || []).length}, items=${(c.items || []).length}`)
+    })
+  }
+  menu.value = (Array.isArray(list) ? list : [])
+    .sort((a, b) => {
+      const sortA = Number(a.sort || a.order || a.seq || 0)
+      const sortB = Number(b.sort || b.order || b.seq || 0)
+      return sortA - sortB
+    })
+    .map((cate) => {
+      const foods = cate.foods || cate.dishes || cate.items || []
+      return {
+        ...cate,
+        foods: foods.map((food) => ({
+          ...food,
+          image: resolveImageUrl(food.image)
+        }))
+      }
+    })
+  console.log('menu after process:', JSON.stringify(menu.value.map(c => ({name: c.name, sort: c.sort, foodCount: (c.foods || []).length}))))
+  activeIndex.value = 0
+}
+
+async function initOrder() {
+  const has = await orderApi.cartHas(aid.value)
+  const existingId = parseCartHasId(has)
+  const existingMode = has?.diningMode !== undefined ? Number(has.diningMode) : null
+  const isSubmitted = isCartHasSubmitted(has)
+  if (existingId && existingMode === diningMode.value && !isSubmitted) {
+    orderId.value = existingId
+    return
+  }
+  const createdOrderId = await orderApi.cartCreate({
+    aid: aid.value,
+    diningMode: diningMode.value,
+    deskId: diningMode.value === 1 ? 1 : 0,
+    userNum: 1,
+    source: 2
+  })
+  orderId.value = Number(createdOrderId)
+  if (!orderId.value) {
+    throw new Error('购物车创建失败')
+  }
+}
+
+async function initCart() {
+  if (cartInitPromise.value) {
+    await cartInitPromise.value
+    return
+  }
+  cartInitPromise.value = (async () => {
+    await initOrder()
+    await syncCart()
+    cartReady.value = !!orderId.value
+  })()
+  try {
+    await cartInitPromise.value
+  } finally {
+    cartInitPromise.value = null
+  }
+}
+
+async function refreshCartState() {
+  if (cartInitPromise.value) {
+    await cartInitPromise.value
+    return
+  }
+  try {
+    const has = await orderApi.cartHas(aid.value)
+    const activeCartId = parseCartHasId(has)
+    const isSubmitted = isCartHasSubmitted(has)
+    const validCartId = activeCartId && !isSubmitted ? activeCartId : null
+
+    if (!validCartId) {
+      if (orderId.value) {
+        orderId.value = 0
+        setCartMap({})
+      }
+      await initCart()
+      return
+    }
+
+    if (orderId.value !== validCartId) {
+      orderId.value = validCartId
+    }
+    await syncCart()
+    cartReady.value = true
+  } catch (e) {
+    console.error('购物车刷新失败:', e)
+  }
+}
+
+async function ensureCart() {
+  if (cartInitPromise.value) {
+    await cartInitPromise.value
+  }
+  if (!cartReady.value || !orderId.value) {
+    await initCart()
+  }
+  if (!orderId.value) {
+    throw new Error('购物车未就绪')
+  }
+  return orderId.value
+}
+
+async function syncCart() {
+  if (!orderId.value) {
+    setCartMap({})
+    return
+  }
+  const has = await orderApi.cartHas(aid.value)
+  const hasId = parseCartHasId(has)
+  if (!hasId || hasId !== orderId.value || isCartHasSubmitted(has)) {
+    setCartMap({})
+    return
+  }
+  const items = parseCartHasItems(has)
+  const map = {}
+  items.forEach((item) => {
+    const dishId = Number(item.dishId)
+    const food = findFood(dishId)
+    const key = dishKey(dishId)
+    const count = Number(item.count || item.quantity) || 0
+    const existing = map[key]
+    if (existing) {
+      existing.count += count
+      return
+    }
+    map[key] = {
+      odid: Number(item.id),
+      dishId,
+      count,
+      price: food?.price || 0
+    }
+  })
+  setCartMap(map)
+}
+
+async function addFood(food, _isRetry = false) {
+  if (cartBusy.value || !cartReady.value) return
+  cartBusy.value = true
+  try {
+    await ensureCart()
+    const dishId = Number(food.id)
+    const key = dishKey(dishId)
+    const current = cartMap.value[key]
+    if (!current) {
+      await orderApi.dishAdd(orderId.value, dishId)
+    } else {
+      await orderApi.dishInc(current.odid)
+    }
+    await syncCart()
+  } catch (e) {
+    const errMsg = e.message || String(e) || ''
+    if (!_isRetry && (errMsg.includes('不可用') || errMsg.includes('购物车'))) {
+      orderId.value = 0
+      cartReady.value = false
+      cartBusy.value = false
+      return addFood(food, true)
+    }
+    if (errMsg === '成功' || errMsg.includes('操作成功')) {
+      await syncCart()
+      return
+    }
+    uni.showToast({ title: errMsg || '加购失败', icon: 'none' })
+    await syncCart()
+  } finally {
+    cartBusy.value = false
+  }
+}
+
+async function decFood(food, _isRetry = false) {
+  if (cartBusy.value || !cartReady.value) return
+  const dishId = Number(food.id)
+  const key = dishKey(dishId)
+  const current = cartMap.value[key]
+  if (!current) return
+  cartBusy.value = true
+  try {
+    await ensureCart()
+    if (current.count <= 1) {
+      await orderApi.dishDel(current.odid)
+    } else {
+      await orderApi.dishDec(current.odid)
+    }
+    await syncCart()
+  } catch (e) {
+    const errMsg = e.message || String(e) || ''
+    if (!_isRetry && (errMsg.includes('不可用') || errMsg.includes('购物车'))) {
+      orderId.value = 0
+      cartReady.value = false
+      cartBusy.value = false
+      return decFood(food, true)
+    }
+    if (errMsg === '成功' || errMsg.includes('操作成功')) {
+      await syncCart()
+      return
+    }
+    uni.showToast({ title: errMsg || '操作失败', icon: 'none' })
+    await syncCart()
+  } finally {
+    cartBusy.value = false
+  }
+}
+
+async function goConfirm() {
+  if (cartItemCount.value === 0) {
+    uni.showToast({ title: '请先选择菜品', icon: 'none' })
+    return
+  }
+  try {
+    await ensureCart()
+    await syncCart()
+    if (cartItemCount.value === 0) {
+      uni.showToast({ title: '请先选择菜品', icon: 'none' })
+      return
+    }
+    uni.setStorageSync('orderId', orderId.value)
+    uni.navigateTo({ url: '/pages/cart/confirm' })
+  } catch (e) {
+    uni.showToast({ title: e.message || e || '购物车未就绪', icon: 'none' })
   }
 }
 </script>

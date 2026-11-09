@@ -35,56 +35,54 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { integralApi, authApi } from '../../api/index'
 
-export default {
-  data() {
-    return {
-      loading: false,
-      pointsBalance: 0,
-      list: []
+const loading = ref(false)
+const pointsBalance = ref(0)
+const list = ref([])
+
+onShow(() => {
+  loadBalance()
+  loadList()
+})
+
+function goBack() {
+  uni.navigateBack()
+}
+
+async function loadBalance() {
+  try {
+    const profile = await authApi.profile()
+    if (profile && profile.points != null) {
+      pointsBalance.value = profile.points
+    } else if (profile && profile.data && profile.data.point != null) {
+      pointsBalance.value = profile.data.point
     }
-  },
-  onShow() {
-    this.loadBalance()
-    this.loadList()
-  },
-  methods: {
-    goBack() {
-      uni.navigateBack()
-    },
-    async loadBalance() {
-      try {
-        const profile = await authApi.profile()
-        if (profile && profile.points != null) {
-          this.pointsBalance = profile.points
-        } else if (profile && profile.data && profile.data.point != null) {
-          this.pointsBalance = profile.data.point
-        }
-      } catch (e) {}
-    },
-    async loadList() {
-      this.loading = true
-      try {
-        const data = await integralApi.recordList()
-        const arr = data?.list || data?.data || data || []
-        if (Array.isArray(arr) && arr.length) {
-          this.list = arr.map(item => ({
-            id: item.id || item.recordId,
-            title: item.title || item.desc || item.remark || item.source || '积分变动',
-            points: item.points ?? item.integral ?? item.point ?? 0,
-            time: item.createTime || item.time || item.updateTime || ''
-          }))
-        } else {
-          this.list = []
-        }
-      } catch (e) {
-        this.list = []
-      } finally {
-        this.loading = false
-      }
+  } catch (e) {}
+}
+
+async function loadList() {
+  loading.value = true
+  try {
+    const data = await integralApi.recordList()
+    const arr = data?.list || data?.data || data || []
+    if (Array.isArray(arr) && arr.length) {
+      list.value = arr.map(item => ({
+        id: item.id || item.recordId,
+        title: item.title || item.desc || item.remark || item.source || '积分变动',
+        points: item.points ?? item.integral ?? item.point ?? 0,
+        time: item.createTime || item.time || item.updateTime || ''
+      }))
+    } else {
+      list.value = []
     }
+  } catch (e) {
+    list.value = []
+  } finally {
+    loading.value = false
   }
 }
 </script>

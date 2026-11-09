@@ -94,123 +94,120 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { signinApi } from '../../api/index'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 import { getNavMetrics } from '../../utils/navbar'
 
-export default {
-  data() {
-    return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      navMetrics: getNavMetrics(),
-      signinInfo: {
-        avatar: '',
-        continuousDays: 0
-      },
-      hasSigned: false,
-      dateList: [],
-      rewardList: []
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const navMetrics = ref(getNavMetrics())
+const signinInfo = ref({
+  avatar: '',
+  continuousDays: 0
+})
+const hasSigned = ref(false)
+const dateList = ref([])
+const rewardList = ref([])
+
+const headerStyle = computed(() => ({ paddingTop: `${navMetrics.value.statusBarHeight}px` }))
+
+onShow(() => {
+  navMetrics.value = getNavMetrics()
+  loadSigninStatus()
+  loadRewardList()
+  generateDateList()
+})
+
+function goBack() {
+  uni.navigateBack()
+}
+
+function generateDateList() {
+  const today = new Date()
+  const list = []
+  const continuousDays = signinInfo.value.continuousDays || 0
+  for (let i = 0; i < 6; i++) {
+    const date = new Date(today)
+    date.setDate(today.getDate() + i - (continuousDays > 0 ? 1 : 0))
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    let status = 'future'
+    let signed = false
+    let isToday = false
+    if (i === 0 && continuousDays > 0) {
+      status = 'past'
+      signed = true
+    } else if (i === 1 || (i === 0 && continuousDays === 0)) {
+      status = 'active'
+      isToday = true
+      if (hasSigned.value) {
+        signed = true
+        status = 'signed'
+      }
+    } else {
+      status = 'future'
     }
-  },
-  computed: {
-    headerStyle() {
-      return { paddingTop: `${this.navMetrics.statusBarHeight}px` }
+    list.push({
+      month: `${month}.${day}`,
+      day: day,
+      isToday: isToday,
+      signed: signed,
+      status: status
+    })
+  }
+  dateList.value = list
+}
+
+async function loadSigninStatus() {
+  try {
+    const data = await signinApi.status()
+    if (data) {
+      signinInfo.value = { ...data, avatar: data.avatar || '' }
+      hasSigned.value = data.hasSigned || false
     }
-  },
-  onShow() {
-    this.navMetrics = getNavMetrics()
-    this.loadSigninStatus()
-    this.loadRewardList()
-    this.generateDateList()
-  },
-  methods: {
-    goBack() {
-      uni.navigateBack()
-    },
-    generateDateList() {
-      const today = new Date()
-      const list = []
-      const continuousDays = this.signinInfo.continuousDays || 0
-      for (let i = 0; i < 6; i++) {
-        const date = new Date(today)
-        date.setDate(today.getDate() + i - (continuousDays > 0 ? 1 : 0))
-        const month = date.getMonth() + 1
-        const day = date.getDate()
-        let status = 'future'
-        let signed = false
-        let isToday = false
-        if (i === 0 && continuousDays > 0) {
-          status = 'past'
-          signed = true
-        } else if (i === 1 || (i === 0 && continuousDays === 0)) {
-          status = 'active'
-          isToday = true
-          if (this.hasSigned) {
-            signed = true
-            status = 'signed'
-          }
-        } else {
-          status = 'future'
-        }
-        list.push({
-          month: `${month}.${day}`,
-          day: day,
-          isToday: isToday,
-          signed: signed,
-          status: status
-        })
-      }
-      this.dateList = list
-    },
-    async loadSigninStatus() {
-      try {
-        const data = await signinApi.status()
-        if (data) {
-          this.signinInfo = { ...data, avatar: data.avatar || '' }
-          this.hasSigned = data.hasSigned || false
-        }
-      } catch (e) {
-        this.signinInfo = { avatar: '', continuousDays: 1 }
-        this.hasSigned = false
-      }
-    },
-    async loadRewardList() {
-      try {
-        const data = await signinApi.rewards()
-        if (Array.isArray(data)) {
-          this.rewardList = data.map(item => ({
-            amount: item.amount || 0,
-            condition: item.condition || '',
-            completed: item.completed || false
-          }))
-        }
-      } catch (e) {
-        this.rewardList = [
-          { amount: 5, condition: '连续签到1天', completed: false },
-          { amount: 10, condition: '连续签到2天', completed: false },
-          { amount: 15, condition: '连续签到4天', completed: false },
-          { amount: 20, condition: '连续签到5天', completed: false }
-        ]
-      }
-    },
-    async handleSign() {
-      if (this.hasSigned) return
-      try {
-        const data = await signinApi.sign()
-        if (data && data.success) {
-          uni.showToast({ title: '签到成功', icon: 'success' })
-          this.hasSigned = true
-          this.signinInfo.continuousDays = (this.signinInfo.continuousDays || 0) + 1
-          this.generateDateList()
-          this.loadRewardList()
-        } else {
-          uni.showToast({ title: data?.message || '签到失败', icon: 'none' })
-        }
-      } catch (e) {
-        uni.showToast({ title: '签到失败', icon: 'none' })
-      }
+  } catch (e) {
+    signinInfo.value = { avatar: '', continuousDays: 1 }
+    hasSigned.value = false
+  }
+}
+
+async function loadRewardList() {
+  try {
+    const data = await signinApi.rewards()
+    if (Array.isArray(data)) {
+      rewardList.value = data.map(item => ({
+        amount: item.amount || 0,
+        condition: item.condition || '',
+        completed: item.completed || false
+      }))
     }
+  } catch (e) {
+    rewardList.value = [
+      { amount: 5, condition: '连续签到1天', completed: false },
+      { amount: 10, condition: '连续签到2天', completed: false },
+      { amount: 15, condition: '连续签到4天', completed: false },
+      { amount: 20, condition: '连续签到5天', completed: false }
+    ]
+  }
+}
+
+async function handleSign() {
+  if (hasSigned.value) return
+  try {
+    const data = await signinApi.sign()
+    if (data && data.success) {
+      uni.showToast({ title: '签到成功', icon: 'success' })
+      hasSigned.value = true
+      signinInfo.value.continuousDays = (signinInfo.value.continuousDays || 0) + 1
+      generateDateList()
+      loadRewardList()
+    } else {
+      uni.showToast({ title: data?.message || '签到失败', icon: 'none' })
+    }
+  } catch (e) {
+    uni.showToast({ title: '签到失败', icon: 'none' })
   }
 }
 </script>

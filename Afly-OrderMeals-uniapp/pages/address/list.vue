@@ -69,103 +69,102 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 import { addressApi } from '../../api/index'
 import { STATIC_IMAGE_PREFIX, resolveImageUrl } from '../../utils/image'
 
-export default {
-  data() {
-    return {
-      list: [
-        {
-          id: '1',
-          contactName: '张三',
-          contactMobile: '138****1234',
-          fullAddress: '浙江省杭州市余杭区粮兴坊旗舰店 101室',
-          isDefault: 1
-        },
-        {
-          id: '2',
-          contactName: '李四',
-          contactMobile: '139****5678',
-          fullAddress: '浙江省杭州市西湖区文三路 478号华星时代广场A座 12楼',
-          isDefault: 0
-        },
-        {
-          id: '3',
-          contactName: '王五',
-          contactMobile: '137****9012',
-          fullAddress: '浙江省杭州市滨江区江南大道 288号星光国际广场 3幢 2201室',
-          isDefault: 0
-        }
-      ],
-      selectMode: false,
-      refreshing: false,
-      emptyImg: resolveImageUrl(STATIC_IMAGE_PREFIX + '/开心呢.png')
-    }
+const list = ref([
+  {
+    id: '1',
+    contactName: '张三',
+    contactMobile: '138****1234',
+    fullAddress: '浙江省杭州市余杭区粮兴坊旗舰店 101室',
+    isDefault: 1
   },
-  onLoad(options) {
-    this.selectMode = options.select === '1'
+  {
+    id: '2',
+    contactName: '李四',
+    contactMobile: '139****5678',
+    fullAddress: '浙江省杭州市西湖区文三路 478号华星时代广场A座 12楼',
+    isDefault: 0
   },
-  // onShow() {
-  //   this.loadList()
-  // },
-  methods: {
-    async loadList() {
-      try {
-        this.list = await addressApi.list()
-      } catch (e) {
-        uni.showToast({ title: e || '加载失败', icon: 'none' })
-      }
-    },
-    async onRefresh() {
-      this.refreshing = true
-      await this.loadList()
-      this.refreshing = false
-    },
-    maskMobile(mobile) {
-      if (!mobile) return ''
-      const str = String(mobile)
-      if (str.length >= 7) {
-        return str.slice(0, 3) + '****' + str.slice(-4)
-      }
-      return str
-    },
-    choose(item) {
-      if (!this.selectMode) return
-      uni.setStorageSync('selectedAddress', JSON.stringify(item))
-      uni.setStorageSync('addressId', item.id)
-      uni.navigateBack()
-    },
-    edit(item) {
-      const id = item?.id || ''
-      uni.navigateTo({ url: `/pages/address/edit?id=${id}` })
-    },
-    async setDefault(item) {
-      try {
-        await addressApi.setDefault(item.id)
-        this.loadList()
-      } catch (e) {
-        uni.showToast({ title: e || '操作失败', icon: 'none' })
-      }
-    },
-    async remove(id) {
-      const res = await new Promise((resolve) => {
-        uni.showModal({
-          title: '提示',
-          content: '确定要删除这个地址吗？',
-          success: resolve
-        })
-      })
-      if (!res.confirm) return
-      try {
-        await addressApi.delete(id)
-        uni.showToast({ title: '删除成功', icon: 'success' })
-        this.loadList()
-      } catch (e) {
-        uni.showToast({ title: e || '删除失败', icon: 'none' })
-      }
-    }
+  {
+    id: '3',
+    contactName: '王五',
+    contactMobile: '137****9012',
+    fullAddress: '浙江省杭州市滨江区江南大道 288号星光国际广场 3幢 2201室',
+    isDefault: 0
+  }
+])
+const selectMode = ref(false)
+const refreshing = ref(false)
+const emptyImg = ref(resolveImageUrl(STATIC_IMAGE_PREFIX + '/开心呢.png'))
+
+onLoad((options) => {
+  selectMode.value = options.select === '1'
+})
+
+async function loadList() {
+  try {
+    list.value = await addressApi.list()
+  } catch (e) {
+    uni.showToast({ title: e || '加载失败', icon: 'none' })
+  }
+}
+
+async function onRefresh() {
+  refreshing.value = true
+  await loadList()
+  refreshing.value = false
+}
+
+function maskMobile(mobile) {
+  if (!mobile) return ''
+  const str = String(mobile)
+  if (str.length >= 7) {
+    return str.slice(0, 3) + '****' + str.slice(-4)
+  }
+  return str
+}
+
+function choose(item) {
+  if (!selectMode.value) return
+  uni.setStorageSync('selectedAddress', JSON.stringify(item))
+  uni.setStorageSync('addressId', item.id)
+  uni.navigateBack()
+}
+
+function edit(item) {
+  const id = item?.id || ''
+  uni.navigateTo({ url: `/pages/address/edit?id=${id}` })
+}
+
+async function setDefault(item) {
+  try {
+    await addressApi.setDefault(item.id)
+    loadList()
+  } catch (e) {
+    uni.showToast({ title: e || '操作失败', icon: 'none' })
+  }
+}
+
+async function remove(id) {
+  const res = await new Promise((resolve) => {
+    uni.showModal({
+      title: '提示',
+      content: '确定要删除这个地址吗？',
+      success: resolve
+    })
+  })
+  if (!res.confirm) return
+  try {
+    await addressApi.delete(id)
+    uni.showToast({ title: '删除成功', icon: 'success' })
+    loadList()
+  } catch (e) {
+    uni.showToast({ title: e || '删除失败', icon: 'none' })
   }
 }
 </script>

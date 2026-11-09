@@ -42,7 +42,8 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref, watch } from 'vue'
 import {
   buildDeptTree,
   collectAllExpanded,
@@ -50,97 +51,92 @@ import {
   flattenDeptTree
 } from '../../utils/dept-tree'
 
-export default {
-  name: 'DeptTreePicker',
-  props: {
-    modelValue: {
-      type: [Number, String],
-      default: null
-    },
-    deptList: {
-      type: Array,
-      default: () => []
-    },
-    placeholder: {
-      type: String,
-      default: '请选择部门'
-    }
+defineOptions({ name: 'DeptTreePicker' })
+
+const props = defineProps({
+  modelValue: {
+    type: [Number, String],
+    default: null
   },
-  emits: ['update:modelValue', 'change'],
-  data() {
-    return {
-      visible: false,
-      expandedIds: {},
-      innerValue: null
-    }
+  deptList: {
+    type: Array,
+    default: () => []
   },
-  computed: {
-    currentValue() {
-      return this.innerValue != null ? this.innerValue : this.modelValue
-    },
-    tree() {
-      return buildDeptTree(this.deptList)
-    },
-    visibleList() {
-      return flattenDeptTree(this.tree, this.expandedIds)
-    },
-    displayName() {
-      const dept = findDeptById(this.deptList, this.currentValue)
-      return dept ? dept.deptName : ''
-    }
-  },
-  watch: {
-    modelValue(val) {
-      this.innerValue = val
-    },
-    deptList: {
-      immediate: true,
-      handler(list) {
-        if (Array.isArray(list) && list.length > 0) {
-          this.expandedIds = collectAllExpanded(buildDeptTree(list))
-        }
-      }
-    }
-  },
-  methods: {
-    isSelected(deptId) {
-      return Number(this.currentValue) === Number(deptId)
-    },
-    rowPadding(level) {
-      return `${24 + level * 32}rpx`
-    },
-    isExpanded(deptId) {
-      return !!this.expandedIds[String(deptId)]
-    },
-    toggleExpand(deptId) {
-      const key = String(deptId)
-      const next = { ...this.expandedIds }
-      if (next[key]) {
-        delete next[key]
-      } else {
-        next[key] = true
-      }
-      this.expandedIds = next
-    },
-    openPopup() {
-      if (!this.deptList.length) {
-        uni.showToast({ title: '暂无部门数据', icon: 'none' })
-        return
-      }
-      this.expandedIds = collectAllExpanded(this.tree)
-      this.visible = true
-    },
-    closePopup() {
-      this.visible = false
-    },
-    onSelect(item) {
-      if (!item || item.deptId == null) return
-      this.innerValue = item.deptId
-      this.$emit('update:modelValue', item.deptId)
-      this.$emit('change', item)
-      this.closePopup()
-    }
+  placeholder: {
+    type: String,
+    default: '请选择部门'
   }
+})
+
+const emit = defineEmits(['update:modelValue', 'change'])
+
+const visible = ref(false)
+const expandedIds = ref({})
+const innerValue = ref(null)
+
+const currentValue = computed(() => innerValue.value != null ? innerValue.value : props.modelValue)
+
+const tree = computed(() => buildDeptTree(props.deptList))
+
+const visibleList = computed(() => flattenDeptTree(tree.value, expandedIds.value))
+
+const displayName = computed(() => {
+  const dept = findDeptById(props.deptList, currentValue.value)
+  return dept ? dept.deptName : ''
+})
+
+watch(() => props.modelValue, (val) => {
+  innerValue.value = val
+})
+
+watch(() => props.deptList, (list) => {
+  if (Array.isArray(list) && list.length > 0) {
+    expandedIds.value = collectAllExpanded(buildDeptTree(list))
+  }
+}, { immediate: true })
+
+function isSelected(deptId) {
+  return Number(currentValue.value) === Number(deptId)
+}
+
+function rowPadding(level) {
+  return `${24 + level * 32}rpx`
+}
+
+function isExpanded(deptId) {
+  return !!expandedIds.value[String(deptId)]
+}
+
+function toggleExpand(deptId) {
+  const key = String(deptId)
+  const next = { ...expandedIds.value }
+  if (next[key]) {
+    delete next[key]
+  } else {
+    next[key] = true
+  }
+  expandedIds.value = next
+}
+
+function openPopup() {
+  if (!props.deptList.length) {
+    uni.showToast({ title: '暂无部门数据', icon: 'none' })
+    return
+  }
+  expandedIds.value = collectAllExpanded(tree.value)
+  visible.value = true
+}
+
+function closePopup() {
+  visible.value = false
+}
+
+function onSelect(item) {
+  if (!item || item.deptId == null) return
+  innerValue.value = item.deptId
+  emit('update:modelValue', item.deptId)
+  emit('change', item)
+  closePopup()
 }
 </script>
 

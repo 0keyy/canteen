@@ -74,64 +74,65 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { couponApi } from '../../api/index'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
-export default {
-  data() {
-    return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      tabs: [
-        { label: '到店堂食', value: 'instore' },
-        { label: '外卖配送', value: 'delivery' }
-      ],
-      activeTab: 'instore',
-      loading: false,
-      coupons: []
-    }
-  },
-  onShow() {
-    this.loadCoupons()
-  },
-  methods: {
-    formatTime(ts) {
-      if (!ts || ts === 0) return '不限'
-      const d = new Date(ts * 1000)
-      const y = d.getFullYear()
-      const M = String(d.getMonth() + 1).padStart(2, '0')
-      const D = String(d.getDate()).padStart(2, '0')
-      return `${y}.${M}.${D}`
-    },
-    switchTab(value) {
-      this.activeTab = value
-      this.loadCoupons()
-    },
-    async loadCoupons() {
-      this.loading = true
-      try {
-        const list = await couponApi.myCoupons(1) || []
-        this.coupons = list
-      } catch (e) {
-        this.coupons = []
-      } finally {
-        this.loading = false
-      }
-    },
-    getMockCoupons() {
-      return []
-    },
-    useCoupon(coupon) {
-      if (coupon.type === 3 || coupon.type === 4) {
-        uni.navigateTo({ url: `/pages/coupon/verify-code?id=${coupon.id}` })
-      } else {
-        uni.switchTab({ url: '/pages/menu/index' })
-      }
-    },
-    goExchange() {
-      uni.navigateTo({ url: '/pages/coupon/center' })
-    }
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const tabs = ref([
+  { label: '到店堂食', value: 'instore' },
+  { label: '外卖配送', value: 'delivery' }
+])
+const activeTab = ref('instore')
+const loading = ref(false)
+const coupons = ref([])
+
+onShow(() => {
+  loadCoupons()
+})
+
+function formatTime(ts) {
+  if (!ts || ts === 0) return '不限'
+  const d = new Date(ts * 1000)
+  const y = d.getFullYear()
+  const M = String(d.getMonth() + 1).padStart(2, '0')
+  const D = String(d.getDate()).padStart(2, '0')
+  return `${y}.${M}.${D}`
+}
+
+function switchTab(value) {
+  activeTab.value = value
+  loadCoupons()
+}
+
+async function loadCoupons() {
+  loading.value = true
+  try {
+    const list = await couponApi.myCoupons(1) || []
+    coupons.value = list
+  } catch (e) {
+    coupons.value = []
+  } finally {
+    loading.value = false
   }
+}
+
+function getMockCoupons() {
+  return []
+}
+
+function useCoupon(coupon) {
+  if (coupon.type === 3 || coupon.type === 4) {
+    uni.navigateTo({ url: `/pages/coupon/verify-code?id=${coupon.id}` })
+  } else {
+    uni.switchTab({ url: '/pages/menu/index' })
+  }
+}
+
+function goExchange() {
+  uni.navigateTo({ url: '/pages/coupon/center' })
 }
 </script>
 

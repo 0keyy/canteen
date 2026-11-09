@@ -1,5 +1,5 @@
 <template>
-  <cube-scroll class="seller" :options="sellerScrollOptions">
+  <div class="seller">
     <div class="seller-content">
       <div class="overview">
         <h1 class="title">{{seller.name}}</h1>
@@ -53,7 +53,7 @@
       <split></split>
       <div class="pics">
         <h1 class="title">商家实景</h1>
-        <cube-scroll class="pic-wrapper" :options="picScrollOptions">
+        <div class="pic-wrapper">
           <ul class="pic-list">
             <li class="pic-item"
                 v-for="(pic,index) in seller.pics"
@@ -62,7 +62,7 @@
               <img :src="pic" width="120" height="90">
             </li>
           </ul>
-        </cube-scroll>
+        </div>
       </div>
       <split></split>
       <div class="info">
@@ -78,14 +78,14 @@
         </ul>
       </div>
     </div>
-  </cube-scroll>
+  </div>
 </template>
 
 <script>
   import { saveToLocal, loadFromLocal } from 'common/js/storage'
-  import Star from 'components/star/star'
-  import Split from 'components/split/split'
-  import SupportIco from 'components/support-ico/support-ico'
+  import Star from 'components/star/star.vue'
+  import Split from 'components/split/split.vue'
+  import SupportIco from 'components/support-ico/support-ico.vue'
 
   export default {
     props: {
@@ -98,16 +98,7 @@
     },
     data() {
       return {
-        favorite: false,
-        sellerScrollOptions: {
-          directionLockThreshold: 0,
-          click: false
-        },
-        picScrollOptions: {
-          scrollX: true,
-          stopPropagation: true,
-          directionLockThreshold: 0
-        }
+        favorite: false
       }
     },
     computed: {
@@ -135,11 +126,13 @@
   }
 </script>
 
-<style lang="stylus" scoped>
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin"
+<style lang="sass" scoped>
+  @use "common/stylus/variable" as *
+  @use "common/stylus/mixin" as *
 
   .seller
+    height: 100%
+    overflow-y: auto
     height: 100%
     text-align: left
     .overview
@@ -219,7 +212,7 @@
           align-items: center
           padding: 16px 12px
           &:last-child
-            border-none()
+            @include border-none()
         .support-ico
           margin-right: 6px
         .text
@@ -234,6 +227,7 @@
         color: $color-dark-grey
         font-size: $fontsize-medium
       .pic-wrapper
+        overflow-x: auto
         display: flex
         align-items: center
         .pic-list
@@ -256,5 +250,5 @@
         line-height: 16px
         font-size: $fontsize-small
         &:last-child
-          border-none()
+          @include border-none()
 </style>

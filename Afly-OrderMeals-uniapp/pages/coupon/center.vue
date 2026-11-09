@@ -68,76 +68,74 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { couponApi } from '../../api/index'
 
-export default {
-  data() {
-    return {
-      loading: false,
-      coupons: []
+const loading = ref(false)
+const coupons = ref([])
+
+onShow(() => {
+  loadCoupons()
+})
+
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  // 将 2026-6-1 格式转为 2026.6.1
+  return String(dateStr).replace(/-/g, '.')
+}
+
+async function loadCoupons() {
+  loading.value = true
+  try {
+    const centerCoupons = await couponApi.center() || []
+    const myCoupons1 = await couponApi.myCoupons(1) || []
+    const myCoupons2 = await couponApi.myCoupons(2) || []
+    const myCoupons3 = await couponApi.myCoupons(3) || []
+    const allMyCoupons = [...myCoupons1, ...myCoupons2, ...myCoupons3]
+    coupons.value = centerCoupons
+
+    const myCouponTemplateIds = new Set()
+    allMyCoupons.forEach(c => {
+      if (c.templateId) myCouponTemplateIds.add(String(c.templateId))
+      if (c.couponTemplateId) myCouponTemplateIds.add(String(c.couponTemplateId))
+    })
+
+    const claimed = uni.getStorageSync('claimedCoupons') || {}
+
+    coupons.value.forEach(c => {
+      const centerCouponId = String(c.id)
+      const centerTemplateId = String(c.templateId || c.id)
+      const isClaimed =
+        c.claimed ||
+        c.status === 1 ||
+        !!claimed[centerCouponId] ||
+        !!claimed[centerTemplateId] ||
+        myCouponTemplateIds.has(centerCouponId) ||
+        myCouponTemplateIds.has(centerTemplateId)
+      c.claimed = isClaimed
+    })
+  } catch (e) {
+    uni.showToast({ title: e || '加载失败', icon: 'none' })
+  } finally {
+    loading.value = false
+  }
+}
+
+async function claimCoupon(coupon) {
+  try {
+    const result = await couponApi.claim(coupon.id)
+    const claimed = uni.getStorageSync('claimedCoupons') || {}
+    claimed[coupon.id] = true
+    if (coupon.templateId) {
+      claimed[coupon.templateId] = true
     }
-  },
-  onShow() {
-    this.loadCoupons()
-  },
-  methods: {
-    formatDate(dateStr) {
-      if (!dateStr) return ''
-      // 将 2026-6-1 格式转为 2026.6.1
-      return String(dateStr).replace(/-/g, '.')
-    },
-    async loadCoupons() {
-      this.loading = true
-      try {
-        const coupons = await couponApi.center() || []
-        const myCoupons1 = await couponApi.myCoupons(1) || []
-        const myCoupons2 = await couponApi.myCoupons(2) || []
-        const myCoupons3 = await couponApi.myCoupons(3) || []
-        const allMyCoupons = [...myCoupons1, ...myCoupons2, ...myCoupons3]
-        this.coupons = coupons
-
-        const myCouponTemplateIds = new Set()
-        allMyCoupons.forEach(c => {
-          if (c.templateId) myCouponTemplateIds.add(String(c.templateId))
-          if (c.couponTemplateId) myCouponTemplateIds.add(String(c.couponTemplateId))
-        })
-
-        const claimed = uni.getStorageSync('claimedCoupons') || {}
-
-        this.coupons.forEach(c => {
-          const centerCouponId = String(c.id)
-          const centerTemplateId = String(c.templateId || c.id)
-          const isClaimed =
-            c.claimed ||
-            c.status === 1 ||
-            !!claimed[centerCouponId] ||
-            !!claimed[centerTemplateId] ||
-            myCouponTemplateIds.has(centerCouponId) ||
-            myCouponTemplateIds.has(centerTemplateId)
-          c.claimed = isClaimed
-        })
-      } catch (e) {
-        uni.showToast({ title: e || '加载失败', icon: 'none' })
-      } finally {
-        this.loading = false
-      }
-    },
-    async claimCoupon(coupon) {
-      try {
-        const result = await couponApi.claim(coupon.id)
-        const claimed = uni.getStorageSync('claimedCoupons') || {}
-        claimed[coupon.id] = true
-        if (coupon.templateId) {
-          claimed[coupon.templateId] = true
-        }
-        uni.setStorageSync('claimedCoupons', claimed)
-        coupon.claimed = true
-        uni.showToast({ title: '领取成功！', icon: 'success' })
-      } catch (e) {
-        uni.showToast({ title: e || '领取失败', icon: 'none' })
-      }
-    }
+    uni.setStorageSync('claimedCoupons', claimed)
+    coupon.claimed = true
+    uni.showToast({ title: '领取成功！', icon: 'success' })
+  } catch (e) {
+    uni.showToast({ title: e || '领取失败', icon: 'none' })
   }
 }
 </script>

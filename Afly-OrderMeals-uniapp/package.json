@@ -4,12 +4,12 @@
   "description": "点餐UniApp客户端",
   "main": "main.js",
   "scripts": {
-    "dev:mp-weixin": "uni -p mp-weixin",
-    "build:mp-weixin": "uni build -p mp-weixin",
-    "dev:mp-alipay": "uni -p mp-alipay",
-    "build:mp-alipay": "uni build -p mp-alipay",
-    "dev:app": "uni -p app",
-    "build:app": "uni build -p app"
+    "dev:mp-weixin": "cross-env UNI_INPUT_DIR=. uni -p mp-weixin",
+    "build:mp-weixin": "cross-env UNI_INPUT_DIR=. uni build -p mp-weixin",
+    "dev:mp-alipay": "cross-env UNI_INPUT_DIR=. uni -p mp-alipay",
+    "build:mp-alipay": "cross-env UNI_INPUT_DIR=. uni build -p mp-alipay",
+    "dev:app": "cross-env UNI_INPUT_DIR=. uni -p app",
+    "build:app": "cross-env UNI_INPUT_DIR=. uni build -p app"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-4010520240507001",
@@ -26,6 +26,7 @@
     "@dcloudio/uni-automator": "3.0.0-4010520240507001",
     "@dcloudio/uni-cli-shared": "3.0.0-4010520240507001",
     "@dcloudio/vite-plugin-uni": "3.0.0-4010520240507001",
+    "cross-env": "7.0.3",
     "sass": "^1.101.0",
     "vite": "^5.2.8"
   }

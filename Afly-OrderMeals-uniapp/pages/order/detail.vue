@@ -123,110 +123,109 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { orderApi } from '../../api/index'
 import { payOrder, DEFAULT_PAY_CHANNEL } from '../../utils/pay/index'
 import PayMethodPicker from '../../components/pay-method-picker/pay-method-picker.vue'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
-export default {
-  components: { PayMethodPicker },
-  data() {
-    return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      orderId: 0,
-      order: null,
-      payChannel: DEFAULT_PAY_CHANNEL,
-      showPayPicker: false,
-      payMethodList: []
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const orderId = ref(0)
+const order = ref(null)
+const payChannel = ref(DEFAULT_PAY_CHANNEL)
+const showPayPicker = ref(false)
+const payMethodList = ref([])
+
+const isCalled = computed(() => order.value && Number(order.value.calledTime) > 0)
+
+const isPendingPay = computed(() => order.value && (order.value.payStatus === 0 || order.value.status === 4))
+
+const statusText = computed(() => {
+  if (!order.value) return ''
+  if (order.value.payStatus === 0 || order.value.status === 4) return '待支付'
+  if (order.value.status === 1 && isCalled.value) return '请取餐'
+  if (order.value.status === 1) return '制作中'
+  if (order.value.status === 2) return '已完成'
+  if (order.value.status === 3) return '已取消'
+  return '未知'
+})
+
+const payChannelText = computed(() => {
+  const m = payMethodList.value.find((item) => item.channel === payChannel.value)
+  return m ? m.name : '请选择'
+})
+
+onLoad((options) => {
+  orderId.value = Number(options.orderId)
+  loadDetail()
+})
+
+onShow(() => {
+  if (orderId.value) loadDetail()
+})
+
+function formatOrderTime(time) {
+  if (!time) return ''
+  try {
+    const date = new Date(time)
+    if (isNaN(date.getTime())) {
+      return time
     }
-  },
-  computed: {
-    isCalled() {
-      return this.order && Number(this.order.calledTime) > 0
-    },
-    isPendingPay() {
-      return this.order && (this.order.payStatus === 0 || this.order.status === 4)
-    },
-    
-    statusText() {
-      if (!this.order) return ''
-      if (this.order.payStatus === 0 || this.order.status === 4) return '待支付'
-      if (this.order.status === 1 && this.isCalled) return '请取餐'
-      if (this.order.status === 1) return '制作中'
-      if (this.order.status === 2) return '已完成'
-      if (this.order.status === 3) return '已取消'
-      return '未知'
-    },
-    payChannelText() {
-      const m = this.payMethodList.find((item) => item.channel === this.payChannel)
-      return m ? m.name : '请选择'
-    }
-  },
-  onLoad(options) {
-    this.orderId = Number(options.orderId)
-    this.loadDetail()
-  },
-  onShow() {
-    if (this.orderId) this.loadDetail()
-  },
-  methods: {
-    formatOrderTime(time) {
-      if (!time) return ''
-      try {
-        const date = new Date(time)
-        if (isNaN(date.getTime())) {
-          return time
-        }
-        const year = date.getFullYear()
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        const hour = String(date.getHours()).padStart(2, '0')
-        const minute = String(date.getMinutes()).padStart(2, '0')
-        const second = String(date.getSeconds()).padStart(2, '0')
-        return `${year}-${month}-${day} ${hour}:${minute}:${second}`
-      } catch (e) {
-        return time
-      }
-    },
-    lineAmount(dish) {
-      return (Number(dish.amount || 0) * Number(dish.quantity || 1)).toFixed(2)
-    },
-    formatAddress(snapshot) {
-      try {
-        const obj = JSON.parse(snapshot)
-        return `${obj.province || ''}${obj.city || ''}${obj.district || ''}${obj.detail || ''}`
-      } catch (e) {
-        return snapshot
-      }
-    },
-    async loadDetail() {
-      this.order = await orderApi.detail(this.orderId)
-    },
-    async payNow() {
-      try {
-        await payOrder(this.orderId, this.payChannel, 'mp')
-        uni.showToast({ title: '支付成功', icon: 'success' })
-        // 支付成功后延迟刷新，让用户先看到成功提示
-        setTimeout(() => {
-          this.loadDetail()
-        }, 500)
-      } catch (e) {
-        uni.showToast({ title: e.message || e, icon: 'none' })
-      }
-    },
-    
-    onPayMethodChange(channel) {
-      this.payChannel = channel
-      this.showPayPicker = false
-    },
-    onPayMethodsLoaded(list) {
-      this.payMethodList = list || []
-    },
-    goBack() {
-      uni.navigateBack()
-    }
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hour = String(date.getHours()).padStart(2, '0')
+    const minute = String(date.getMinutes()).padStart(2, '0')
+    const second = String(date.getSeconds()).padStart(2, '0')
+    return `${year}-${month}-${day} ${hour}:${minute}:${second}`
+  } catch (e) {
+    return time
   }
+}
+
+function lineAmount(dish) {
+  return (Number(dish.amount || 0) * Number(dish.quantity || 1)).toFixed(2)
+}
+
+function formatAddress(snapshot) {
+  try {
+    const obj = JSON.parse(snapshot)
+    return `${obj.province || ''}${obj.city || ''}${obj.district || ''}${obj.detail || ''}`
+  } catch (e) {
+    return snapshot
+  }
+}
+
+async function loadDetail() {
+  order.value = await orderApi.detail(orderId.value)
+}
+
+async function payNow() {
+  try {
+    await payOrder(orderId.value, payChannel.value, 'mp')
+    uni.showToast({ title: '支付成功', icon: 'success' })
+    // 支付成功后延迟刷新，让用户先看到成功提示
+    setTimeout(() => {
+      loadDetail()
+    }, 500)
+  } catch (e) {
+    uni.showToast({ title: e.message || e, icon: 'none' })
+  }
+}
+
+function onPayMethodChange(channel) {
+  payChannel.value = channel
+  showPayPicker.value = false
+}
+
+function onPayMethodsLoaded(list) {
+  payMethodList.value = list || []
+}
+
+function goBack() {
+  uni.navigateBack()
 }
 </script>
 

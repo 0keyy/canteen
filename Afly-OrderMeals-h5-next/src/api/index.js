@@ -25,3 +25,13 @@ export {
   toEmpty,
   submit
 }
+
+// The ratings panel uses the legacy demo endpoint.
+export async function getRatings() {
+  const response = await fetch('/api/ratings')
+  const payload = await response.json()
+  if (!response.ok || payload.errno !== 0) {
+    throw new Error(payload.msg || '获取评价失败')
+  }
+  return payload.data
+}

@@ -90,7 +90,9 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { getCurrentInstance, nextTick, ref } from 'vue'
+import { onLoad, onUnload } from '@dcloudio/uni-app'
 import { STATIC_IMAGE_PREFIX } from '../../../utils/image'
 import { chatApi } from '../../../api/index'
 
@@ -105,252 +107,249 @@ function genId() {
   return Date.now() + '_' + Math.floor(Math.random() * 1000)
 }
 
-export default {
-  data() {
-    return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      inputText: '',
-      currentTime: formatChatTime(),
-      messageList: [],
-      scrollTop: 0,
-      chatInnerHeight: 0,
-      // WebSocket 实例（预留）
-      ws: null,
-      // 轮询定时器（预留）
-      pollTimer: null,
-      // 是否连接中
-      isConnected: false
+const pageInstance = getCurrentInstance().proxy
+
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const inputText = ref('')
+const currentTime = ref(formatChatTime())
+const messageList = ref([])
+const scrollTop = ref(0)
+const chatInnerHeight = ref(0)
+// WebSocket 实例（预留）
+const ws = ref(null)
+// 轮询定时器（预留）
+const pollTimer = ref(null)
+// 是否连接中
+const isConnected = ref(false)
+
+onLoad(() => {
+  initChat()
+})
+
+onUnload(() => {
+  disconnect()
+})
+
+// ========== 初始化聊天 ==========
+async function initChat() {
+  // 1. 加载历史消息（预留接口）
+  // await loadHistory()
+
+  // 2. 显示欢迎消息 + 猜你想问
+  showWelcomeMessage()
+
+  // 3. 建立 WebSocket 连接（预留）
+  // connectWebSocket()
+
+  // 4. 启动轮询（预留，作为 WebSocket 降级方案）
+  // startPolling()
+}
+
+// 显示欢迎消息（mock 数据）
+function showWelcomeMessage() {
+  messageList.value.push({
+    id: genId(),
+    sender: 'service',
+    type: 'text',
+    content: '您好，我是粮兴坊客服，请问有什么可以帮您？',
+    time: Date.now(),
+    showName: true
+  })
+  messageList.value.push({
+    id: genId(),
+    sender: 'service',
+    type: 'guess',
+    guessList: [
+      '修改订单信息/备注信息',
+      '取消订单/退款',
+      '会员注册',
+      '少餐/错修',
+      '如何查找门店联系方式'
+    ],
+    time: Date.now(),
+    showName: false
+  })
+  scrollToBottom()
+}
+
+// ========== 加载历史记录（预留接口）==========
+async function loadHistory() {
+  try {
+    const res = await chatApi.history({ page: 1, pageSize: 20 })
+    const list = Array.isArray(res) ? res : (res.list || res.data || [])
+    if (list.length > 0) {
+      messageList.value = list.map(item => ({
+        id: item.id || genId(),
+        sender: item.senderType === 1 ? 'user' : 'service',
+        type: item.msgType || 'text',
+        content: item.content,
+        time: item.createTime || Date.now(),
+        showName: item.senderType !== 1
+      }))
+      scrollToBottom()
     }
-  },
-  onLoad() {
-    this.initChat()
-  },
-  onUnload() {
-    this.disconnect()
-  },
-  methods: {
-    // ========== 初始化聊天 ==========
-    async initChat() {
-      // 1. 加载历史消息（预留接口）
-      // await this.loadHistory()
-
-      // 2. 显示欢迎消息 + 猜你想问
-      this.showWelcomeMessage()
-
-      // 3. 建立 WebSocket 连接（预留）
-      // this.connectWebSocket()
-
-      // 4. 启动轮询（预留，作为 WebSocket 降级方案）
-      // this.startPolling()
-    },
-
-    // 显示欢迎消息（mock 数据）
-    showWelcomeMessage() {
-      this.messageList.push({
-        id: genId(),
-        sender: 'service',
-        type: 'text',
-        content: '您好，我是粮兴坊客服，请问有什么可以帮您？',
-        time: Date.now(),
-        showName: true
-      })
-      this.messageList.push({
-        id: genId(),
-        sender: 'service',
-        type: 'guess',
-        guessList: [
-          '修改订单信息/备注信息',
-          '取消订单/退款',
-          '会员注册',
-          '少餐/错修',
-          '如何查找门店联系方式'
-        ],
-        time: Date.now(),
-        showName: false
-      })
-      this.scrollToBottom()
-    },
-
-    // ========== 加载历史记录（预留接口）==========
-    async loadHistory() {
-      try {
-        const res = await chatApi.history({ page: 1, pageSize: 20 })
-        const list = Array.isArray(res) ? res : (res.list || res.data || [])
-        if (list.length > 0) {
-          this.messageList = list.map(item => ({
-            id: item.id || genId(),
-            sender: item.senderType === 1 ? 'user' : 'service',
-            type: item.msgType || 'text',
-            content: item.content,
-            time: item.createTime || Date.now(),
-            showName: item.senderType !== 1
-          }))
-          this.scrollToBottom()
-        }
-      } catch (e) {
-        console.log('[chat] 加载历史记录失败:', e)
-      }
-    },
-
-    // ========== 发送消息 ==========
-    onSend() {
-      const content = this.inputText.trim()
-      if (!content) return
-
-      // 1. 本地添加用户消息
-      const userMsg = {
-        id: genId(),
-        sender: 'user',
-        type: 'text',
-        content: content,
-        time: Date.now()
-      }
-      this.messageList.push(userMsg)
-      this.inputText = ''
-      this.scrollToBottom()
-
-      // 2. 调用发送接口（预留）
-      // this.sendToServer(userMsg)
-
-      // 3. 模拟客服回复（mock，后期删除）
-      this.mockServiceReply(content)
-    },
-
-    // 发送消息到服务器（预留）
-    async sendToServer(msg) {
-      try {
-        await chatApi.send({
-          content: msg.content,
-          type: msg.type,
-          // extra: {} // 扩展字段
-        })
-      } catch (e) {
-        console.log('[chat] 发送失败:', e)
-        uni.showToast({ title: '发送失败，请重试', icon: 'none' })
-      }
-    },
-
-    // 模拟客服回复（mock 数据，后期对接后端后删除）
-    mockServiceReply(userContent) {
-      setTimeout(() => {
-        const replies = [
-          '收到您的问题，请稍等，正在为您查询...',
-          '好的，已记录您的问题，客服会尽快处理。',
-          '关于您的问题，可以拨打我们的服务热线：400-xxx-xxxx',
-          '您可以在"我的订单"中查看订单详情并申请退款。',
-          '请问还有其他可以帮助您的吗？'
-        ]
-        const randomReply = replies[Math.floor(Math.random() * replies.length)]
-        this.messageList.push({
-          id: genId(),
-          sender: 'service',
-          type: 'text',
-          content: randomReply,
-          time: Date.now(),
-          showName: true
-        })
-        this.scrollToBottom()
-      }, 1000)
-    },
-
-    // ========== 接收消息（预留 WebSocket/polling 回调）==========
-    onReceiveMessage(msgData) {
-      // msgData 结构：{ id, senderType, msgType, content, createTime }
-      this.messageList.push({
-        id: msgData.id || genId(),
-        sender: msgData.senderType === 1 ? 'user' : 'service',
-        type: msgData.msgType || 'text',
-        content: msgData.content,
-        time: msgData.createTime || Date.now(),
-        showName: msgData.senderType !== 1
-      })
-      this.scrollToBottom()
-    },
-
-    // ========== WebSocket 连接（预留）==========
-    connectWebSocket() {
-      // const token = uni.getStorageSync('token')
-      // this.ws = uni.connectSocket({
-      //   url: 'wss://backend.zhongtang-group.com/ws/chat?token=' + token,
-      //   success: () => {
-      //     console.log('[chat] WebSocket 连接成功')
-      //     this.isConnected = true
-      //   }
-      // })
-      // this.ws.onMessage((res) => {
-      //   const msg = JSON.parse(res.data)
-      //   this.onReceiveMessage(msg)
-      // })
-      // this.ws.onClose(() => {
-      //   this.isConnected = false
-      //   // 自动重连
-      //   setTimeout(() => this.connectWebSocket(), 3000)
-      // })
-    },
-
-    // ========== 轮询获取消息（预留降级方案）==========
-    startPolling() {
-      // this.pollTimer = setInterval(async () => {
-      //   try {
-      //     const res = await chatApi.history({ page: 1, pageSize: 10 })
-      //     // 处理新消息...
-      //   } catch (e) {}
-      // }, 5000)
-    },
-
-    // ========== 断开连接 ==========
-    disconnect() {
-      // if (this.ws) {
-      //   this.ws.close()
-      //   this.ws = null
-      // }
-      // if (this.pollTimer) {
-      //   clearInterval(this.pollTimer)
-      //   this.pollTimer = null
-      // }
-      // this.isConnected = false
-    },
-
-    // ========== 界面交互 ==========
-    onInput(e) {
-      this.inputText = e.detail.value
-    },
-
-    onQuestionTap(question) {
-      // 将问题作为用户消息发送
-      this.inputText = question
-      this.onSend()
-    },
-
-    scrollToBottom() {
-      this.$nextTick(() => {
-        const query = uni.createSelectorQuery().in(this)
-        query.select('#chat-inner').boundingClientRect((rect) => {
-          if (rect) {
-            this.scrollTop = rect.height + 100
-          }
-        }).exec()
-      })
-    },
-
-    onScroll() {
-      // 可以在这里做滚动监听，比如显示"有新消息"提示
-    },
-
-    previewImage(url) {
-      uni.previewImage({ urls: [url] })
-    },
-
-    onVoiceTap() {
-      uni.showToast({ title: '语音功能开发中', icon: 'none' })
-      // 预留：调用 chatApi.upload 上传语音文件
-    },
-
-    onMoreTap() {
-      uni.showToast({ title: '更多功能开发中', icon: 'none' })
-      // 预留：图片选择 -> chatApi.upload
-    }
+  } catch (e) {
+    console.log('[chat] 加载历史记录失败:', e)
   }
+}
+
+// ========== 发送消息 ==========
+function onSend() {
+  const content = inputText.value.trim()
+  if (!content) return
+
+  // 1. 本地添加用户消息
+  const userMsg = {
+    id: genId(),
+    sender: 'user',
+    type: 'text',
+    content: content,
+    time: Date.now()
+  }
+  messageList.value.push(userMsg)
+  inputText.value = ''
+  scrollToBottom()
+
+  // 2. 调用发送接口（预留）
+  // sendToServer(userMsg)
+
+  // 3. 模拟客服回复（mock，后期删除）
+  mockServiceReply(content)
+}
+
+// 发送消息到服务器（预留）
+async function sendToServer(msg) {
+  try {
+    await chatApi.send({
+      content: msg.content,
+      type: msg.type,
+      // extra: {} // 扩展字段
+    })
+  } catch (e) {
+    console.log('[chat] 发送失败:', e)
+    uni.showToast({ title: '发送失败，请重试', icon: 'none' })
+  }
+}
+
+// 模拟客服回复（mock 数据，后期对接后端后删除）
+function mockServiceReply(userContent) {
+  setTimeout(() => {
+    const replies = [
+      '收到您的问题，请稍等，正在为您查询...',
+      '好的，已记录您的问题，客服会尽快处理。',
+      '关于您的问题，可以拨打我们的服务热线：400-xxx-xxxx',
+      '您可以在"我的订单"中查看订单详情并申请退款。',
+      '请问还有其他可以帮助您的吗？'
+    ]
+    const randomReply = replies[Math.floor(Math.random() * replies.length)]
+    messageList.value.push({
+      id: genId(),
+      sender: 'service',
+      type: 'text',
+      content: randomReply,
+      time: Date.now(),
+      showName: true
+    })
+    scrollToBottom()
+  }, 1000)
+}
+
+// ========== 接收消息（预留 WebSocket/polling 回调）==========
+function onReceiveMessage(msgData) {
+  // msgData 结构：{ id, senderType, msgType, content, createTime }
+  messageList.value.push({
+    id: msgData.id || genId(),
+    sender: msgData.senderType === 1 ? 'user' : 'service',
+    type: msgData.msgType || 'text',
+    content: msgData.content,
+    time: msgData.createTime || Date.now(),
+    showName: msgData.senderType !== 1
+  })
+  scrollToBottom()
+}
+
+// ========== WebSocket 连接（预留）==========
+function connectWebSocket() {
+  // const token = uni.getStorageSync('token')
+  // ws.value = uni.connectSocket({
+  //   url: 'wss://backend.zhongtang-group.com/ws/chat?token=' + token,
+  //   success: () => {
+  //     console.log('[chat] WebSocket 连接成功')
+  //     isConnected.value = true
+  //   }
+  // })
+  // ws.value.onMessage((res) => {
+  //   const msg = JSON.parse(res.data)
+  //   onReceiveMessage(msg)
+  // })
+  // ws.value.onClose(() => {
+  //   isConnected.value = false
+  //   // 自动重连
+  //   setTimeout(() => connectWebSocket(), 3000)
+  // })
+}
+
+// ========== 轮询获取消息（预留降级方案）==========
+function startPolling() {
+  // pollTimer.value = setInterval(async () => {
+  //   try {
+  //     const res = await chatApi.history({ page: 1, pageSize: 10 })
+  //     // 处理新消息...
+  //   } catch (e) {}
+  // }, 5000)
+}
+
+// ========== 断开连接 ==========
+function disconnect() {
+  // if (ws.value) {
+  //   ws.value.close()
+  //   ws.value = null
+  // }
+  // if (pollTimer.value) {
+  //   clearInterval(pollTimer.value)
+  //   pollTimer.value = null
+  // }
+  // isConnected.value = false
+}
+
+// ========== 界面交互 ==========
+function onInput(e) {
+  inputText.value = e.detail.value
+}
+
+function onQuestionTap(question) {
+  // 将问题作为用户消息发送
+  inputText.value = question
+  onSend()
+}
+
+function scrollToBottom() {
+  nextTick(() => {
+    const query = uni.createSelectorQuery().in(pageInstance)
+    query.select('#chat-inner').boundingClientRect((rect) => {
+      if (rect) {
+        scrollTop.value = rect.height + 100
+      }
+    }).exec()
+  })
+}
+
+function onScroll() {
+  // 可以在这里做滚动监听，比如显示"有新消息"提示
+}
+
+function previewImage(url) {
+  uni.previewImage({ urls: [url] })
+}
+
+function onVoiceTap() {
+  uni.showToast({ title: '语音功能开发中', icon: 'none' })
+  // 预留：调用 chatApi.upload 上传语音文件
+}
+
+function onMoreTap() {
+  uni.showToast({ title: '更多功能开发中', icon: 'none' })
+  // 预留：图片选择 -> chatApi.upload
 }
 </script>
 

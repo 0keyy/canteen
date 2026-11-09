@@ -31,46 +31,43 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { integralApi } from '../../api/index'
 import { resolveImageUrl } from '../../utils/image'
 
-export default {
-  data() {
-    return {
-      loading: false,
-      list: []
+const loading = ref(false)
+const list = ref([])
+
+onShow(() => {
+  loadList()
+})
+
+function goBack() {
+  uni.navigateBack()
+}
+
+async function loadList() {
+  loading.value = true
+  try {
+    const data = await integralApi.exchangeList()
+    const arr = data?.list || data?.data || data || []
+    if (Array.isArray(arr) && arr.length) {
+      list.value = arr.map(item => ({
+        id: item.id || item.exchangeId,
+        name: item.name || item.title || item.goodsName || '商品',
+        image: resolveImageUrl(item.image || item.img || item.goodsImage || ''),
+        points: item.points || item.integral || item.costPoints || 0,
+        time: item.createTime || item.time || item.updateTime || ''
+      }))
+    } else {
+      list.value = []
     }
-  },
-  onShow() {
-    this.loadList()
-  },
-  methods: {
-    goBack() {
-      uni.navigateBack()
-    },
-    async loadList() {
-      this.loading = true
-      try {
-        const data = await integralApi.exchangeList()
-        const arr = data?.list || data?.data || data || []
-        if (Array.isArray(arr) && arr.length) {
-          this.list = arr.map(item => ({
-            id: item.id || item.exchangeId,
-            name: item.name || item.title || item.goodsName || '商品',
-            image: resolveImageUrl(item.image || item.img || item.goodsImage || ''),
-            points: item.points || item.integral || item.costPoints || 0,
-            time: item.createTime || item.time || item.updateTime || ''
-          }))
-        } else {
-          this.list = []
-        }
-      } catch (e) {
-        this.list = []
-      } finally {
-        this.loading = false
-      }
-    }
+  } catch (e) {
+    list.value = []
+  } finally {
+    loading.value = false
   }
 }
 </script>

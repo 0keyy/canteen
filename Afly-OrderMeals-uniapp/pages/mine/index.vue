@@ -121,9 +121,11 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { authApi, couponApi, serviceApi, walletApi, payApi } from '../../api/index'
-import tabbarPageMixin from '../../mixins/tabbar-page'
+import { usePageTabbar } from '../../composables/use-page-tabbar'
 import { getNavMetrics } from '../../utils/navbar'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
@@ -147,269 +149,285 @@ const SECONDARY_ACTIONS = [
   { title: '安全退出', icon: 'logout', iconImg: STATIC_IMAGE_PREFIX + '/tabbar/退出 1.svg' }
 ]
 
-export default {
-  mixins: [tabbarPageMixin],
-  data() {
-    return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      navMetrics: getNavMetrics(),
-      nickname: '',
-      mobile: '',
-      companyVerified: false,
-      companyDeptName: '',
-      balance: 0,
-      couponCount: 0,
-      pointCount: 0,
-      primaryActions: PRIMARY_ACTIONS,
-      secondaryActions: SECONDARY_ACTIONS,
-      avatarKey: '',
-      showAvatarPicker: false,
-      showServicePicker: false,
-      servicePhones: [{ phone: '400-800-1234', name: '客服热线' }],
-      showRechargePicker: false,
-      rechargeAmounts: [10, 20, 50, 100, 200, 500],
-      rechargeSelected: 10,
-      rechargeIsCustom: false,
-      rechargeCustomAmount: ''
+const {
+  tabbarSelected,
+  tabbarDefaultColor,
+  tabbarSelectedColor,
+  tabbarList,
+  setupTabbar,
+  switchTabbar
+} = usePageTabbar()
+
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const navMetrics = ref(getNavMetrics())
+const nickname = ref('')
+const mobile = ref('')
+const companyVerified = ref(false)
+const companyDeptName = ref('')
+const balance = ref(0)
+const couponCount = ref(0)
+const pointCount = ref(0)
+const primaryActions = ref(PRIMARY_ACTIONS)
+const secondaryActions = ref(SECONDARY_ACTIONS)
+const avatarKey = ref('')
+const showAvatarPicker = ref(false)
+const showServicePicker = ref(false)
+const servicePhones = ref([{ phone: '400-800-1234', name: '客服热线' }])
+const showRechargePicker = ref(false)
+const rechargeAmounts = ref([10, 20, 50, 100, 200, 500])
+const rechargeSelected = ref(10)
+const rechargeIsCustom = ref(false)
+const rechargeCustomAmount = ref('')
+
+const heroPaddingStyle = computed(() => ({ paddingTop: `${navMetrics.value.statusBarHeight + 8}px` }))
+
+const avatarSrc = computed(() => {
+  if (avatarKey.value) return STATIC_IMAGE_PREFIX + `/${avatarKey.value}.png`
+  return STATIC_IMAGE_PREFIX + '/1.png'
+})
+
+onShow(() => {
+  navMetrics.value = getNavMetrics()
+  setupTabbar(3)
+  nickname.value = uni.getStorageSync('nickname')
+  mobile.value = uni.getStorageSync('mobile')
+  avatarKey.value = uni.getStorageSync('avatarKey') || '1'
+  loadProfile()
+})
+
+async function loadProfile() {
+  try {
+    const profile = await authApi.profile()
+    if (profile) {
+      nickname.value = profile.companyNickName || profile.nickname || nickname.value
+      mobile.value = profile.mobile || mobile.value
+      companyVerified.value = !!profile.companyVerified
+      companyDeptName.value = profile.companyDeptName || ''
+      // 核心：后端返回最新余额直接赋值给页面展示变量
+      balance.value = profile.balance != null ? profile.balance : 0
+      pointCount.value = profile.point ?? profile.points ?? profile.integral ?? 0
+      // 同步存入本地缓存备用
+      uni.setStorageSync('balance', balance.value)
+      uni.setStorageSync('companyVerified', companyVerified.value)
+      uni.setStorageSync('companyDeptName', companyDeptName.value)
     }
-  },
-  computed: {
-    heroPaddingStyle() {
-      return { paddingTop: `${this.navMetrics.statusBarHeight + 8}px` }
-    },
-    avatarSrc() {
-      if (this.avatarKey) return STATIC_IMAGE_PREFIX + `/${this.avatarKey}.png`
-      return STATIC_IMAGE_PREFIX + '/1.png'
-    }
-  },
-  onShow() {
-    this.navMetrics = getNavMetrics()
-    this.setupTabbar(3)
-    this.nickname = uni.getStorageSync('nickname')
-    this.mobile = uni.getStorageSync('mobile')
-    this.avatarKey = uni.getStorageSync('avatarKey') || '1'
-    this.loadProfile()
-  },
-  methods: {
-    async loadProfile() {
-      try {
-        const profile = await authApi.profile()
-        if (profile) {
-          this.nickname = profile.companyNickName || profile.nickname || this.nickname
-          this.mobile = profile.mobile || this.mobile
-          this.companyVerified = !!profile.companyVerified
-          this.companyDeptName = profile.companyDeptName || ''
-          // 核心：后端返回最新余额直接赋值给页面展示变量
-          this.balance = profile.balance != null ? profile.balance : 0
-          this.pointCount = profile.point ?? profile.points ?? profile.integral ?? 0
-          // 同步存入本地缓存备用
-          uni.setStorageSync('balance', this.balance)
-          uni.setStorageSync('companyVerified', this.companyVerified)
-          uni.setStorageSync('companyDeptName', this.companyDeptName)
-        }
-      } catch (e) {
-        // 接口失败就读缓存兜底
-        this.balance = uni.getStorageSync('balance') || 0
-        this.companyVerified = !!uni.getStorageSync('companyVerified')
-        this.companyDeptName = uni.getStorageSync('companyDeptName') || ''
-      }
-    
-      // 加载优惠券数量
-      try {
-        const myCoupons = await couponApi.myCoupons(1) || []
-        this.couponCount = myCoupons.length
-      } catch (e) {
-        this.couponCount = 0
-      }
-    },
-    onActionTap(item) {
-      if (item.title === '待支付') {
-        uni.navigateTo({ url: '/pages/order/list?tab=1' })
-        return
-      }
-      if (item.title === '待发货') {
-        uni.navigateTo({ url: '/pages/order/list?tab=2' })
-        return
-      }
-      if (item.title === '待收货') {
-        uni.navigateTo({ url: '/pages/order/list?tab=3' })
-        return
-      }
-      if (item.title === '退款售后') {
-        uni.navigateTo({ url: '/pages/order/list?tab=4' })
-        return
-      }
-      if (item.title === '我的订单') {
-        uni.navigateTo({ url: '/pages/order/list' })
-        return
-      }
-      if (item.title === '地址管理') {
-        uni.navigateTo({ url: '/pages/address/list' })
-        return
-      }
-      if (item.title === '客服中心') {
-        uni.navigateTo({ url: '/pages/mine/service/index' })
-        return
-      }
-      if (item.title === '联系客服') {
-        this.callService()
-        return
-      }
-      if (item.title === '会员码') {
-        uni.navigateTo({ url: '/pages/mine/memberCode/index' })
-        return
-      }
-      if (item.title === '公司认证') {
-        uni.navigateTo({ url: '/pages/mine/company-auth' })
-        return
-      }
-      if (item.title === '领券中心') {
-        uni.navigateTo({ url: '/pages/coupon/center' })
-        return
-      }
-      if (item.title === '优惠券包' || item.title === '红包卡券') {
-        uni.navigateTo({ url: '/pages/coupon/wallet' })
-        return
-      }
-      if (item.title === '充值中心') {
-        uni.navigateTo({ url: '/pages/coupon/recharge' })
-        return
-      }
-      if (item.title === '签到中心') {
-        uni.navigateTo({ url: '/pages/signin/index' })
-        return
-      }
-      if (item.title === '积分抽奖') {
-        uni.navigateTo({ url: '/pages/lottery/index' })
-        return
-      }
-      if (item.title === '积分商城') {
-        uni.switchTab({ url: '/pages/points/index' })
-        return
-      }
-      if (item.title === '会员日') {
-        uni.navigateTo({ url: '/pages/mine/memberDay/index' })
-        return
-      }
-      if (item.title === '退出登录' || item.title === '安全退出') {
-        this.logout()
-        return
-      }
-      this.onFeatureTap(item.title)
-    },
-    goOrderList() {
-      uni.navigateTo({ url: '/pages/order/list' })
-    },
-    goMemberCode() {
-      uni.navigateTo({ url: '/pages/mine/memberCode/index' })
-    },
-    onFeatureTap(title) {
-      uni.showToast({ title: `${title}功能开发中`, icon: 'none' })
-    },
-    goProfile() {
-      uni.navigateTo({ url: '/pages/mine/profile' })
-    },
-    goPointsMall() {
-      uni.switchTab({ url: '/pages/points/index' })
-    },
-    goCouponWallet() {
-      uni.navigateTo({ url: '/pages/coupon/wallet' })
-    },
-    async callService() {
-      try {
-        const data = await serviceApi.hotline()
-        if (data && Array.isArray(data.list) && data.list.length) {
-          this.servicePhones = data.list
-        } else if (data && data.phone) {
-          this.servicePhones = [{ phone: data.phone, name: data.name || '客服热线' }]
-        }
-      } catch (e) {}
-      this.showServicePicker = true
-    },
-    makeCall(phone) {
-      if (!phone) return
-      this.showServicePicker = false
-      setTimeout(() => {
-        uni.makePhoneCall({
-          phoneNumber: phone,
-          fail: (err) => {
-            if (err.errMsg && err.errMsg.includes('cancel')) return
-            uni.showToast({ title: '拨打失败', icon: 'none' })
-          }
-        })
-      }, 200)
-    },
-    selectAvatar(key) {
-      this.avatarKey = key
-      uni.setStorageSync('avatarKey', key)
-      this.showAvatarPicker = false
-    },
-    selectRechargePreset(amount) {
-      this.rechargeIsCustom = false
-      this.rechargeSelected = amount
-    },
-    selectRechargeCustom() {
-      this.rechargeIsCustom = true
-    },
-    onRechargeCustomBlur() {
-      if (!this.rechargeCustomAmount || parseFloat(this.rechargeCustomAmount) <= 0) {
-        this.rechargeIsCustom = false
-        this.rechargeCustomAmount = ''
-      }
-    },
-    getRechargeAmount() {
-      if (this.rechargeIsCustom) {
-        const n = parseFloat(this.rechargeCustomAmount)
-        return (!isNaN(n) && n > 0) ? n : 0
-      }
-      return this.rechargeSelected
-    },
-    async doRecharge() {
-      const amount = this.getRechargeAmount()
-      if (!amount || amount <= 0) {
-        uni.showToast({ title: '请选择或输入充值金额', icon: 'none' })
-        return
-      }
-      try {
-        uni.showLoading({ title: '充值中...' })
-        const res = await walletApi.rechargeCreate(amount)
-        if (res && res.outTradeNo) {
-          const payInfo = await payApi.create({
-            outTradeNo: res.outTradeNo,
-            payChannel: 'balance',
-            payScene: 'mp'
-          })
-          if (payInfo.completed) {
-            uni.showToast({ title: '充值成功', icon: 'success' })
-            this.showRechargePicker = false
-            this.loadProfile()
-            return
-          }
-          if (payInfo.mockPay) {
-            await payApi.mockSuccess(payInfo.outTradeNo)
-            uni.showToast({ title: '充值成功', icon: 'success' })
-            this.showRechargePicker = false
-            this.loadProfile()
-            return
-          }
-          uni.showToast({ title: '充值成功', icon: 'success' })
-          this.showRechargePicker = false
-          this.loadProfile()
-        }
-      } catch (e) {
-        uni.showToast({ title: e.message || e || '充值失败', icon: 'none' })
-      } finally {
-        uni.hideLoading()
-      }
-    },
-    async logout() {
-      try {
-        await authApi.logout()
-      } catch (e) {}
-      uni.clearStorageSync()
-      uni.reLaunch({ url: '/pages/login/index' })
-    }
+  } catch (e) {
+    // 接口失败就读缓存兜底
+    balance.value = uni.getStorageSync('balance') || 0
+    companyVerified.value = !!uni.getStorageSync('companyVerified')
+    companyDeptName.value = uni.getStorageSync('companyDeptName') || ''
   }
+
+  // 加载优惠券数量
+  try {
+    const myCoupons = await couponApi.myCoupons(1) || []
+    couponCount.value = myCoupons.length
+  } catch (e) {
+    couponCount.value = 0
+  }
+}
+
+function onActionTap(item) {
+  if (item.title === '待支付') {
+    uni.navigateTo({ url: '/pages/order/list?tab=1' })
+    return
+  }
+  if (item.title === '待发货') {
+    uni.navigateTo({ url: '/pages/order/list?tab=2' })
+    return
+  }
+  if (item.title === '待收货') {
+    uni.navigateTo({ url: '/pages/order/list?tab=3' })
+    return
+  }
+  if (item.title === '退款售后') {
+    uni.navigateTo({ url: '/pages/order/list?tab=4' })
+    return
+  }
+  if (item.title === '我的订单') {
+    uni.navigateTo({ url: '/pages/order/list' })
+    return
+  }
+  if (item.title === '地址管理') {
+    uni.navigateTo({ url: '/pages/address/list' })
+    return
+  }
+  if (item.title === '客服中心') {
+    uni.navigateTo({ url: '/pages/mine/service/index' })
+    return
+  }
+  if (item.title === '联系客服') {
+    callService()
+    return
+  }
+  if (item.title === '会员码') {
+    uni.navigateTo({ url: '/pages/mine/memberCode/index' })
+    return
+  }
+  if (item.title === '公司认证') {
+    uni.navigateTo({ url: '/pages/mine/company-auth' })
+    return
+  }
+  if (item.title === '领券中心') {
+    uni.navigateTo({ url: '/pages/coupon/center' })
+    return
+  }
+  if (item.title === '优惠券包' || item.title === '红包卡券') {
+    uni.navigateTo({ url: '/pages/coupon/wallet' })
+    return
+  }
+  if (item.title === '充值中心') {
+    uni.navigateTo({ url: '/pages/coupon/recharge' })
+    return
+  }
+  if (item.title === '签到中心') {
+    uni.navigateTo({ url: '/pages/signin/index' })
+    return
+  }
+  if (item.title === '积分抽奖') {
+    uni.navigateTo({ url: '/pages/lottery/index' })
+    return
+  }
+  if (item.title === '积分商城') {
+    uni.switchTab({ url: '/pages/points/index' })
+    return
+  }
+  if (item.title === '会员日') {
+    uni.navigateTo({ url: '/pages/mine/memberDay/index' })
+    return
+  }
+  if (item.title === '退出登录' || item.title === '安全退出') {
+    logout()
+    return
+  }
+  onFeatureTap(item.title)
+}
+
+function goOrderList() {
+  uni.navigateTo({ url: '/pages/order/list' })
+}
+
+function goMemberCode() {
+  uni.navigateTo({ url: '/pages/mine/memberCode/index' })
+}
+
+function onFeatureTap(title) {
+  uni.showToast({ title: `${title}功能开发中`, icon: 'none' })
+}
+
+function goProfile() {
+  uni.navigateTo({ url: '/pages/mine/profile' })
+}
+
+function goPointsMall() {
+  uni.switchTab({ url: '/pages/points/index' })
+}
+
+function goCouponWallet() {
+  uni.navigateTo({ url: '/pages/coupon/wallet' })
+}
+
+async function callService() {
+  try {
+    const data = await serviceApi.hotline()
+    if (data && Array.isArray(data.list) && data.list.length) {
+      servicePhones.value = data.list
+    } else if (data && data.phone) {
+      servicePhones.value = [{ phone: data.phone, name: data.name || '客服热线' }]
+    }
+  } catch (e) {}
+  showServicePicker.value = true
+}
+
+function makeCall(phone) {
+  if (!phone) return
+  showServicePicker.value = false
+  setTimeout(() => {
+    uni.makePhoneCall({
+      phoneNumber: phone,
+      fail: (err) => {
+        if (err.errMsg && err.errMsg.includes('cancel')) return
+        uni.showToast({ title: '拨打失败', icon: 'none' })
+      }
+    })
+  }, 200)
+}
+
+function selectAvatar(key) {
+  avatarKey.value = key
+  uni.setStorageSync('avatarKey', key)
+  showAvatarPicker.value = false
+}
+
+function selectRechargePreset(amount) {
+  rechargeIsCustom.value = false
+  rechargeSelected.value = amount
+}
+
+function selectRechargeCustom() {
+  rechargeIsCustom.value = true
+}
+
+function onRechargeCustomBlur() {
+  if (!rechargeCustomAmount.value || parseFloat(rechargeCustomAmount.value) <= 0) {
+    rechargeIsCustom.value = false
+    rechargeCustomAmount.value = ''
+  }
+}
+
+function getRechargeAmount() {
+  if (rechargeIsCustom.value) {
+    const n = parseFloat(rechargeCustomAmount.value)
+    return (!isNaN(n) && n > 0) ? n : 0
+  }
+  return rechargeSelected.value
+}
+
+async function doRecharge() {
+  const amount = getRechargeAmount()
+  if (!amount || amount <= 0) {
+    uni.showToast({ title: '请选择或输入充值金额', icon: 'none' })
+    return
+  }
+  try {
+    uni.showLoading({ title: '充值中...' })
+    const res = await walletApi.rechargeCreate(amount)
+    if (res && res.outTradeNo) {
+      const payInfo = await payApi.create({
+        outTradeNo: res.outTradeNo,
+        payChannel: 'balance',
+        payScene: 'mp'
+      })
+      if (payInfo.completed) {
+        uni.showToast({ title: '充值成功', icon: 'success' })
+        showRechargePicker.value = false
+        loadProfile()
+        return
+      }
+      if (payInfo.mockPay) {
+        await payApi.mockSuccess(payInfo.outTradeNo)
+        uni.showToast({ title: '充值成功', icon: 'success' })
+        showRechargePicker.value = false
+        loadProfile()
+        return
+      }
+      uni.showToast({ title: '充值成功', icon: 'success' })
+      showRechargePicker.value = false
+      loadProfile()
+    }
+  } catch (e) {
+    uni.showToast({ title: e.message || e || '充值失败', icon: 'none' })
+  } finally {
+    uni.hideLoading()
+  }
+}
+
+async function logout() {
+  try {
+    await authApi.logout()
+  } catch (e) {}
+  uni.clearStorageSync()
+  uni.reLaunch({ url: '/pages/login/index' })
 }
 </script>
 

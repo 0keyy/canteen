@@ -33,99 +33,99 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
+import { onUnload } from '@dcloudio/uni-app'
 import { authApi } from '../../api/index'
 import { saveLoginResult } from '../../utils/auth/index'
 
-export default {
-  data() {
-    return {
-      loading: false,
-      mobile: '',
-      smsCode: '',
-      countdown: 0,
-      timer: null
+const loading = ref(false)
+const mobile = ref('')
+const smsCode = ref('')
+const countdown = ref(0)
+const timer = ref(null)
+
+onUnload(() => {
+  if (timer.value) {
+    clearInterval(timer.value)
+  }
+})
+
+function goHome() {
+  uni.switchTab({ url: '/pages/index/index' })
+}
+
+async function handleWxLogin() {
+  loading.value = true
+  try {
+    const loginRes = await new Promise((resolve, reject) => {
+      uni.login({ provider: 'weixin', success: resolve, fail: reject })
+    })
+    if (!loginRes.code) {
+      throw new Error('微信授权失败，请重试')
     }
-  },
-  methods: {
-    goHome() {
-      uni.switchTab({ url: '/pages/index/index' })
-    },
-    async handleWxLogin() {
-      this.loading = true
-      try {
-        const loginRes = await new Promise((resolve, reject) => {
-          uni.login({ provider: 'weixin', success: resolve, fail: reject })
-        })
-        if (!loginRes.code) {
-          throw new Error('微信授权失败，请重试')
-        }
-        const result = await authApi.wxLogin(loginRes.code)
-        if (!result.token) {
-          throw new Error('登录失败，请检查小程序 AppID 与后端配置是否一致')
-        }
-        saveLoginResult(result)
-        this.goHome()
-      } catch (err) {
-        uni.showToast({ title: err.message || err, icon: 'none' })
-      } finally {
-        this.loading = false
-      }
-    },
-    async handleAliLogin() {
-      this.loading = true
-      try {
-        const authCode = await new Promise((resolve, reject) => {
-          my.getAuthCode({ scopes: ['auth_user'], success: (res) => resolve(res.authCode), fail: reject })
-        })
-        let result = await authApi.aliLogin(authCode)
-        if (result.needBindPhone) {
-          result = await authApi.aliPhone(authCode)
-        }
-        saveLoginResult(result)
-        this.goHome()
-      } catch (e) {
-        uni.showToast({ title: e.message || e, icon: 'none' })
-      } finally {
-        this.loading = false
-      }
-    },
-    async sendSms() {
-      if (!/^1\d{10}$/.test(this.mobile)) {
-        uni.showToast({ title: '请输入正确手机号', icon: 'none' })
-        return
-      }
-      await authApi.smsSend(this.mobile)
-      this.countdown = 60
-      this.timer = setInterval(() => {
-        this.countdown -= 1
-        if (this.countdown <= 0) {
-          clearInterval(this.timer)
-        }
-      }, 1000)
-      uni.showToast({ title: '验证码已发送', icon: 'none' })
-    },
-    async handleSmsLogin() {
-      if (!this.mobile || !this.smsCode) {
-        uni.showToast({ title: '请填写手机号和验证码', icon: 'none' })
-        return
-      }
-      this.loading = true
-      try {
-        const result = await authApi.smsLogin(this.mobile, this.smsCode)
-        saveLoginResult(result)
-        this.goHome()
-      } catch (e) {
-        uni.showToast({ title: e.message || e, icon: 'none' })
-      } finally {
-        this.loading = false
-      }
+    const result = await authApi.wxLogin(loginRes.code)
+    if (!result.token) {
+      throw new Error('登录失败，请检查小程序 AppID 与后端配置是否一致')
     }
-  },
-  onUnload() {
-    if (this.timer) {
-      clearInterval(this.timer)
+    saveLoginResult(result)
+    goHome()
+  } catch (err) {
+    uni.showToast({ title: err.message || err, icon: 'none' })
+  } finally {
+    loading.value = false
+  }
+}
+
+async function handleAliLogin() {
+  loading.value = true
+  try {
+    const authCode = await new Promise((resolve, reject) => {
+      my.getAuthCode({ scopes: ['auth_user'], success: (res) => resolve(res.authCode), fail: reject })
+    })
+    let result = await authApi.aliLogin(authCode)
+    if (result.needBindPhone) {
+      result = await authApi.aliPhone(authCode)
     }
+    saveLoginResult(result)
+    goHome()
+  } catch (e) {
+    uni.showToast({ title: e.message || e, icon: 'none' })
+  } finally {
+    loading.value = false
+  }
+}
+
+async function sendSms() {
+  if (!/^1\d{10}$/.test(mobile.value)) {
+    uni.showToast({ title: '请输入正确手机号', icon: 'none' })
+    return
+  }
+  await authApi.smsSend(mobile.value)
+  countdown.value = 60
+  timer.value = setInterval(() => {
+    countdown.value -= 1
+    if (countdown.value <= 0) {
+      clearInterval(timer.value)
+    }
+  }, 1000)
+  uni.showToast({ title: '验证码已发送', icon: 'none' })
+}
+
+async function handleSmsLogin() {
+  if (!mobile.value || !smsCode.value) {
+    uni.showToast({ title: '请填写手机号和验证码', icon: 'none' })
+    return
+  }
+  loading.value = true
+  try {
+    const result = await authApi.smsLogin(mobile.value, smsCode.value)
+    saveLoginResult(result)
+    goHome()
+  } catch (e) {
+    uni.showToast({ title: e.message || e, icon: 'none' })
+  } finally {
+    loading.value = false
   }
 }
 </script>

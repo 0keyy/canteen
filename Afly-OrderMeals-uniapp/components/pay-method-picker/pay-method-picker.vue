@@ -21,83 +21,80 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref, watch } from 'vue'
 import { payApi } from '../../api/index'
 import { DEFAULT_PAY_CHANNEL } from '../../utils/pay/channels'
 
-export default {
-  name: 'PayMethodPicker',
-  props: {
-    orderId: {
-      type: Number,
-      required: true
-    },
-    modelValue: {
-      type: String,
-      default: DEFAULT_PAY_CHANNEL
-    }
+defineOptions({ name: 'PayMethodPicker' })
+
+const props = defineProps({
+  orderId: {
+    type: Number,
+    required: true
   },
-  emits: ['update:modelValue', 'change', 'loaded'],
-  data() {
-    return {
-      methods: [],
-      selected: this.modelValue || DEFAULT_PAY_CHANNEL
-    }
-  },
-  watch: {
-    orderId: {
-      immediate: true,
-      handler(val) {
-        if (val) this.loadMethods()
-      }
-    },
-    modelValue(val) {
-      this.selected = val || DEFAULT_PAY_CHANNEL
-    }
-  },
-  methods: {
-    itemDesc(item) {
-      if (item.channel === 'balance' && item.balance !== undefined) {
-        return `可用余额 ${item.balance}，本次需 ${item.requiredBalance || 0}`
-      }
-      if (item.channel === 'credit') {
-        const limit = item.creditLimit ?? 0
-        const used = item.creditUsed ?? 0
-        const remain = item.creditRemain ?? 0
-        return `本月额度 ${limit}，已用 ${used}，剩余 ${remain}`
-      }
-      return item.desc || ''
-    },
-    async loadMethods() {
-      if (!this.orderId) return
-      try {
-        const list = await payApi.methods(this.orderId)
-        this.methods = Array.isArray(list) ? list : []
-        const enabled = this.methods.find((m) => m.channel === this.selected && m.enabled)
-        if (!enabled) {
-          const fallback = this.methods.find((m) => m.enabled)
-          if (fallback) {
-            this.selectChannel(fallback.channel)
-          }
-        }
-        this.$emit('loaded', this.methods)
-      } catch (e) {
-        this.methods = []
-      }
-    },
-    onSelect(item) {
-      if (!item.enabled) {
-        uni.showToast({ title: item.disabledReason || '该支付方式不可用', icon: 'none' })
-        return
-      }
-      this.selectChannel(item.channel)
-    },
-    selectChannel(channel) {
-      this.selected = channel
-      this.$emit('update:modelValue', channel)
-      this.$emit('change', channel)
-    }
+  modelValue: {
+    type: String,
+    default: DEFAULT_PAY_CHANNEL
   }
+})
+
+const emit = defineEmits(['update:modelValue', 'change', 'loaded'])
+
+const methods = ref([])
+const selected = ref(props.modelValue || DEFAULT_PAY_CHANNEL)
+
+watch(() => props.orderId, (val) => {
+  if (val) loadMethods()
+}, { immediate: true })
+
+watch(() => props.modelValue, (val) => {
+  selected.value = val || DEFAULT_PAY_CHANNEL
+})
+
+function itemDesc(item) {
+  if (item.channel === 'balance' && item.balance !== undefined) {
+    return `可用余额 ${item.balance}，本次需 ${item.requiredBalance || 0}`
+  }
+  if (item.channel === 'credit') {
+    const limit = item.creditLimit ?? 0
+    const used = item.creditUsed ?? 0
+    const remain = item.creditRemain ?? 0
+    return `本月额度 ${limit}，已用 ${used}，剩余 ${remain}`
+  }
+  return item.desc || ''
+}
+
+async function loadMethods() {
+  if (!props.orderId) return
+  try {
+    const list = await payApi.methods(props.orderId)
+    methods.value = Array.isArray(list) ? list : []
+    const enabled = methods.value.find((m) => m.channel === selected.value && m.enabled)
+    if (!enabled) {
+      const fallback = methods.value.find((m) => m.enabled)
+      if (fallback) {
+        selectChannel(fallback.channel)
+      }
+    }
+    emit('loaded', methods.value)
+  } catch (e) {
+    methods.value = []
+  }
+}
+
+function onSelect(item) {
+  if (!item.enabled) {
+    uni.showToast({ title: item.disabledReason || '该支付方式不可用', icon: 'none' })
+    return
+  }
+  selectChannel(item.channel)
+}
+
+function selectChannel(channel) {
+  selected.value = channel
+  emit('update:modelValue', channel)
+  emit('change', channel)
 }
 </script>
 

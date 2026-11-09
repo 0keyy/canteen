@@ -1,297 +1,140 @@
 <template>
-  <div>
+  <div class="cart">
+    <ShopCartList
+      :open="listOpen"
+      :foods="foods"
+      :disabled="disabled"
+      @add="(...args) => $emit('add', ...args)"
+      @decrease="$emit('decrease', $event)"
+      @empty="confirmation = 'empty'"
+      @close="listOpen = false"
+    />
     <div class="shopcart">
-      <div class="content" @click="toggleList">
-        <div class="content-left">
+      <div class="content">
+        <button type="button" class="content-left" aria-label="查看购物车" :aria-expanded="listOpen" @click="toggleList">
           <div class="logo-wrapper">
-            <div class="logo" :class="{ 'highlight': totalCount > 0 }">
-              <i class="icon-shopping_cart" :class="{ 'highlight': totalCount > 0 }"></i>
+            <div class="logo" :class="{ highlight: totalCount > 0 }">
+              <i class="icon-shopping_cart" :class="{ highlight: totalCount > 0 }"></i>
             </div>
-            <div class="num" v-show="totalCount > 0">
-              <bubble :num="totalCount"></bubble>
-            </div>
+            <div v-if="totalCount > 0" class="num"><Bubble :num="totalCount" /></div>
           </div>
-          <div class="price" :class="{ 'highlight': totalPrice > 0 }">￥{{ totalPrice }}</div>
-          <!-- <div class="desc">另需配送费￥{{deliveryPrice}}元</div> -->
-        </div>
-        <div class="content-right" @click="pay">
-          <div class="pay" :class="payClass">
-            {{ payDesc }}
-          </div>
-        </div>
+          <div class="price" :class="{ highlight: totalPrice > 0 }">￥{{ totalPrice }}</div>
+        </button>
+        <button
+          type="button"
+          class="pay"
+          :class="{ enough: canOrder }"
+          :disabled="disabled || !canOrder"
+          @click="confirmation = 'submit'"
+        >
+          {{ totalCount > 0 ? '下单' : '请添加菜品' }}
+        </button>
       </div>
-      <div class="ball-container">
-        <div v-for="(ball, index) in balls" :key="index">
-          <transition @before-enter="beforeDrop" @enter="dropping" @after-enter="afterDrop">
-            <div class="ball" v-show="ball.show">
-              <div class="inner inner-hook"></div>
-            </div>
-          </transition>
-        </div>
+      <div class="ball-container" aria-hidden="true">
+        <TransitionGroup :css="false" @enter="animateDrop" @after-enter="removeBall">
+          <div
+            v-for="ball in balls"
+            :key="ball.id"
+            class="ball"
+            :data-id="ball.id"
+            :data-x="ball.x"
+            :data-y="ball.y"
+          ><div class="inner"></div></div>
+        </TransitionGroup>
       </div>
     </div>
+
+    <OrderDialog v-if="confirmation === 'submit'" title="确定下单？">
+      <form id="order-confirm" @submit.prevent="confirmOrder">
+        <p>当前订单金额为{{ totalPrice }}元</p>
+        <input v-model="remark" placeholder="订单备注（选填）" aria-label="订单备注">
+      </form>
+      <template #actions>
+        <button type="button" @click="confirmation = ''">取消</button>
+        <button type="submit" form="order-confirm" :disabled="disabled || !canOrder">确定</button>
+      </template>
+    </OrderDialog>
+    <OrderDialog v-else-if="confirmation === 'empty'" title="清空购物车？">
+      <template #actions>
+        <button type="button" @click="confirmation = ''">取消</button>
+        <button type="button" :disabled="disabled" @click="confirmEmpty">确定</button>
+      </template>
+    </OrderDialog>
   </div>
 </template>
 
-<script>
-import Bubble from 'components/bubble/bubble'
-import { submit } from 'api'
-import { socketClient } from '../../socket'
+<script setup>
+import { computed, ref, watch } from 'vue'
+import Bubble from 'components/bubble/bubble.vue'
+import OrderDialog from 'components/order-dialog/order-dialog.vue'
+import ShopCartList from 'components/shop-cart-list/shop-cart-list.vue'
 
-const BALL_LEN = 10
-const innerClsHook = 'inner-hook'
+const props = defineProps({
+  foods: { type: Array, required: true },
+  minPrice: { type: Number, default: 0 },
+  disabled: Boolean
+})
+const emit = defineEmits(['add', 'decrease', 'empty', 'submit'])
 
-function createBalls() {
-  let balls = []
-  for (let i = 0; i < BALL_LEN; i++) {
-    balls.push({ show: false })
-  }
-  return balls
+const totalCount = computed(() => props.foods.reduce((total, food) => total + food.count, 0))
+const totalPrice = computed(() => props.foods.reduce((total, food) => total + food.price * food.count, 0))
+const canOrder = computed(() => totalCount.value > 0 && totalPrice.value >= props.minPrice)
+const listOpen = ref(false)
+const confirmation = ref('')
+const remark = ref('')
+const balls = ref([])
+let nextBallId = 0
+
+watch(totalCount, (count) => {
+  if (!count) listOpen.value = false
+})
+
+function toggleList() {
+  if (totalCount.value > 0) listOpen.value = !listOpen.value
 }
 
-export default {
-  name: 'shop-cart',
-  props: {
-    selectFoods: {
-      type: Array,
-      default() {
-        return []
-      }
-    },
-    deliveryPrice: {
-      type: Number,
-      default: 0
-    },
-    minPrice: {
-      type: Number,
-      default: 0
-    },
-    sticky: {
-      type: Boolean,
-      default: false
-    },
-    fold: {
-      type: Boolean,
-      default: true
-    }
-  },
-  data() {
-    return {
-      balls: createBalls(),
-      listFold: this.fold,
-      params: {
-        number: '',
-        remark: ''
-      }
-    }
-  },
-  created() {
-    this.dropBalls = []
-  },
-  computed: {
-    totalPrice() {
-      let total = 0
-      this.selectFoods.forEach((food) => {
-        total += food.price * food.count
-      })
-      return total
-    },
-    totalCount() {
-      let count = 0
-      this.selectFoods.forEach((food) => {
-        count += food.count
-      })
-      return count
-    },
-    payDesc() {
-      if (this.totalPrice === 0) {
-        return `请添加菜品`
-      } else {
-        return '下单'
-      }
-    },
-    payClass() {
-      if (!this.totalCount) {
-        return 'not-enough'
-      } else {
-        return 'enough'
-      }
-    }
-  },
-  methods: {
-    toggleList() {
-      if (this.listFold) {
-        if (!this.totalCount) {
-          return
-        }
-        this.listFold = false
-        this._showShopCartList()
-        this._showShopCartSticky()
-      } else {
-        this.listFold = true
-        this._hideShopCartList()
-      }
-    },
-    pay(e) {
-      if (this.totalPrice < this.minPrice) {
-        return
-      }
-      this.$createDialog({
-        type: 'prompt',
-        title: '确定下单？',
-        content: `当前订单金额为${this.totalPrice}元`,
-        prompt: {
-          value: this.params.remark,
-          placeholder: '订单备注（选填）'
-        },
-        confirmBtn: {
-          text: '确定',
-          active: true,
-          disabled: false,
-          href: 'javascript:;'
-        },
-        cancelBtn: {
-          text: '取消',
-          active: false,
-          disabled: false,
-          href: 'javascript:;'
-        },
-        $events: {
-          confirm: (e, promptValue) => {
-            const toast = this.$createToast({
-              type: 'loading',
-              time: 1500,
-              txt: ''
-            })
-            toast.show()
-            this.params.remark = promptValue
-            this.params.number = sessionStorage.getItem('oid')
-            submit(this.params).then(() => {
-              socketClient.socket.send(JSON.stringify({type: 'sub'}))
-              toast.hide()
-              this.$createDialog({
-                type: 'alert',
-                title: '下单成功',
-                content: '商家正在努力备菜中',
-                icon: 'cubeic-alert',
-                confirmBtn: {
-                  text: '继续点餐',
-                  active: true,
-                  disabled: false,
-                  href: 'javascript:;'
-                },
-                $events: {
-                  confirm: () => {
-                    location.reload()
-                  }
-                }
-              }).show()
-            })
-          },
-          cancel: () => {
-
-          }
-        }
-
-      }).show()
-      e.stopPropagation()
-    },
-    drop(el) {
-      for (let i = 0; i < this.balls.length; i++) {
-        const ball = this.balls[i]
-        if (!ball.show) {
-          ball.show = true
-          ball.el = el
-          this.dropBalls.push(ball)
-          return
-        }
-      }
-    },
-    beforeDrop(el) {
-      const ball = this.dropBalls[this.dropBalls.length - 1]
-      const rect = ball.el.getBoundingClientRect()
-      const x = rect.left - 32
-      const y = -(window.innerHeight - rect.top - 22)
-      el.style.display = ''
-      el.style.transform = el.style.webkitTransform = `translate3d(0,${y}px,0)`
-      const inner = el.getElementsByClassName(innerClsHook)[0]
-      inner.style.transform = inner.style.webkitTransform = `translate3d(${x}px,0,0)`
-    },
-    dropping(el, done) {
-      this._reflow = document.body.offsetHeight
-      el.style.transform = el.style.webkitTransform = `translate3d(0,0,0)`
-      const inner = el.getElementsByClassName(innerClsHook)[0]
-      inner.style.transform = inner.style.webkitTransform = `translate3d(0,0,0)`
-      el.addEventListener('transitionend', done)
-    },
-    afterDrop(el) {
-      const ball = this.dropBalls.shift()
-      if (ball) {
-        ball.show = false
-        el.style.display = 'none'
-      }
-    },
-    _showShopCartList() {
-      this.shopCartListComp = this.shopCartListComp || this.$createShopCartList({
-        $props: {
-          selectFoods: 'selectFoods'
-        },
-        $events: {
-          leave: () => {
-            this._hideShopCartSticky()
-          },
-          hide: () => {
-            this.listFold = true
-          },
-          add: (el) => {
-            this.shopCartStickyComp.drop(el)
-          }
-        }
-      })
-      this.shopCartListComp.show()
-    },
-    _showShopCartSticky() {
-      this.shopCartStickyComp = this.shopCartStickyComp || this.$createShopCartSticky({
-        $props: {
-          selectFoods: 'selectFoods',
-          deliveryPrice: 'deliveryPrice',
-          minPrice: 'minPrice',
-          fold: 'listFold',
-          list: this.shopCartListComp
-        }
-      })
-      this.shopCartStickyComp.show()
-    },
-    _hideShopCartList() {
-      const list = this.sticky ? this.$parent.list : this.shopCartListComp
-      list.hide && list.hide()
-    },
-    _hideShopCartSticky() {
-      this.shopCartStickyComp.hide()
-    }
-  },
-  watch: {
-    fold(newVal) {
-      this.listFold = newVal
-    },
-    totalCount(count) {
-      if (!this.fold && count === 0) {
-        this._hideShopCartList()
-      }
-    }
-  },
-  components: {
-    Bubble
-  }
+function confirmEmpty() {
+  confirmation.value = ''
+  emit('empty')
 }
+
+function confirmOrder() {
+  if (props.disabled || !canOrder.value) return
+  confirmation.value = ''
+  emit('submit', remark.value)
+}
+
+function drop(rect) {
+  balls.value.push({ id: nextBallId++, x: rect.left - 32, y: rect.top - window.innerHeight + 22 })
+}
+
+function animateDrop(element, done) {
+  const { x, y } = element.dataset
+  element.firstElementChild.animate(
+    [{ transform: `translateX(${x}px)` }, { transform: 'translateX(0)' }],
+    { duration: 400, easing: 'linear' }
+  )
+  const animation = element.animate(
+    [{ transform: `translateY(${y}px)` }, { transform: 'translateY(0)' }],
+    { duration: 400, easing: 'cubic-bezier(0.49, -0.29, 0.75, 0.41)' }
+  )
+  animation.finished.then(done, done)
+}
+
+function removeBall(element) {
+  balls.value = balls.value.filter((ball) => ball.id !== Number(element.dataset.id))
+}
+
+defineExpose({ drop })
 </script>
 
-<style lang="stylus" scoped>
-  @import "~common/stylus/mixin"
-  @import "~common/stylus/variable"
+<style lang="sass" scoped>
+  @use "common/stylus/variable" as *
 
-  .shopcart
+  .cart, .shopcart
     height: 100%
+  .shopcart
+    position: relative
     .content
       display: flex
       background: $color-background
@@ -299,6 +142,13 @@ export default {
       color: $color-light-grey
       .content-left
         flex: 1
+        height: 48px
+        padding: 0
+        border: 0
+        background: none
+        color: inherit
+        font-size: 0
+        text-align: left
         .logo-wrapper
           display: inline-block
           vertical-align: top
@@ -347,31 +197,28 @@ export default {
           margin: 12px 0 0 12px
           line-height: 24px
           font-size: $fontsize-small-s
-      .content-right
+      .pay
         flex: 0 0 105px
-        width: 105px
-        .pay
-          height: 48px
-          line-height: 48px
-          text-align: center
-          font-weight: 700
-          font-size: $fontsize-small
-          &.not-enough
-            background: $color-dark-grey
-          &.enough
-            background: $color-green
-            color: $color-white
+        height: 48px
+        padding: 0
+        border: 0
+        background: $color-dark-grey
+        color: inherit
+        font-weight: 700
+        font-size: $fontsize-small
+        &.enough
+          background: $color-green
+          color: $color-white
     .ball-container
       .ball
         position: fixed
         left: 32px
         bottom: 22px
         z-index: 200
-        transition: all 0.4s cubic-bezier(0.49, -0.29, 0.75, 0.41)
+        pointer-events: none
         .inner
           width: 16px
           height: 16px
           border-radius: 50%
           background: $color-blue
-          transition: all 0.4s linear
 </style>

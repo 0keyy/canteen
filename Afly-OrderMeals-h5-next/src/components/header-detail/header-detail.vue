@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-show="visible" class="header-detail" @touchmove.stop.prevent>
+    <div v-show="visible" class="header-detail">
       <div class="detail-wrapper clear-fix">
         <div class="detail-main">
           <h1 class="name">{{seller.name}}</h1>
@@ -36,39 +36,24 @@
           </div>
         </div>
       </div>
-      <div class="detail-close" @click="hide">
+      <div class="detail-close" @click="$emit('close')">
         <i class="icon-close"></i>
       </div>
     </div>
   </transition>
 </template>
 
-<script>
-  import popupMixin from 'common/mixins/popup'
-  import Star from 'components/star/star'
-  import SupportIco from 'components/support-ico/support-ico'
+<script setup>
+defineProps({
+  seller: { type: Object, default: () => ({}) },
+  visible: Boolean
+})
 
-  export default {
-    name: 'header-detail',
-    mixins: [popupMixin],
-    props: {
-      seller: {
-        type: Object,
-        default() {
-          return {}
-        }
-      }
-    },
-    components: {
-      SupportIco,
-      Star
-    }
-  }
+defineEmits(['close'])
 </script>
 
-<style lang="stylus" scoped>
-  @import "~common/stylus/mixin"
-  @import "~common/stylus/variable"
+<style lang="sass" scoped>
+  @use "common/stylus/variable" as *
 
   .header-detail
     position: fixed
@@ -84,7 +69,7 @@
     background: $color-background-s
     &.fade-enter-active, &.fade-leave-active
       transition: all 0.5s
-    &.fade-enter, &.fade-leave-active
+    &.fade-enter-from, &.fade-leave-to
       opacity: 0
       background: $color-background
     .detail-wrapper

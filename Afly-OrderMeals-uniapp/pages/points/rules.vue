@@ -12,67 +12,65 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { integralApi } from '../../api/index'
 
-export default {
-  data() {
-    return {
-      loading: false,
-      rulesContent: ''
-    }
-  },
-  onShow() {
-    this.loadRules()
-  },
-  methods: {
-    goBack() {
-      uni.navigateBack()
-    },
-    async loadRules() {
-      this.loading = true
-      try {
-        const res = await integralApi.rules()
-        if (res && (res.code === 200 || res.code === 0)) {
-          const data = res.data || res.result || res
-          if (typeof data === 'string') {
-            this.rulesContent = data
-          } else if (data && typeof data === 'object') {
-            this.rulesContent = data.content || data.text || data.rules || ''
-          }
-        }
-      } catch (e) {
-        console.log('[rules] 接口报错:', e)
-      } finally {
-        this.loading = false
-        if (!this.rulesContent) {
-          this.rulesContent = this.getDefaultRules()
-        }
+const loading = ref(false)
+const rulesContent = ref('')
+
+onShow(() => {
+  loadRules()
+})
+
+function goBack() {
+  uni.navigateBack()
+}
+
+async function loadRules() {
+  loading.value = true
+  try {
+    const res = await integralApi.rules()
+    if (res && (res.code === 200 || res.code === 0)) {
+      const data = res.data || res.result || res
+      if (typeof data === 'string') {
+        rulesContent.value = data
+      } else if (data && typeof data === 'object') {
+        rulesContent.value = data.content || data.text || data.rules || ''
       }
-    },
-    getDefaultRules() {
-      return `
-        <div style="padding: 32rpx; font-size: 28rpx; color: #333333; line-height: 1.8;">
-          <h3 style="font-size: 32rpx; font-weight: 600; color: #333333; margin-bottom: 20rpx;">一、积分获取规则</h3>
-          <p style="margin-bottom: 16rpx;">1. 每日签到可获得积分，连续签到积分翻倍。</p>
-          <p style="margin-bottom: 16rpx;">2. 每消费1元可获得1积分。</p>
-          <p style="margin-bottom: 16rpx;">3. 邀请好友注册可获得积分奖励。</p>
-          <p style="margin-bottom: 16rpx;">4. 参与活动可获得额外积分奖励。</p>
-          <h3 style="font-size: 32rpx; font-weight: 600; color: #333333; margin-bottom: 20rpx; margin-top: 32rpx;">二、积分使用规则</h3>
-          <p style="margin-bottom: 16rpx;">1. 积分可用于兑换积分商城商品。</p>
-          <p style="margin-bottom: 16rpx;">2. 积分可用于抵扣消费金额。</p>
-          <p style="margin-bottom: 16rpx;">3. 积分不可兑换现金。</p>
-          <p style="margin-bottom: 16rpx;">4. 积分有效期为获得之日起一年内。</p>
-          <h3 style="font-size: 32rpx; font-weight: 600; color: #333333; margin-bottom: 20rpx; margin-top: 32rpx;">三、积分查询</h3>
-          <p style="margin-bottom: 16rpx;">1. 用户可在"我的"页面查看当前积分。</p>
-          <p style="margin-bottom: 16rpx;">2. 用户可在"积分明细"页面查看积分变动记录。</p>
-          <h3 style="font-size: 32rpx; font-weight: 600; color: #333333; margin-bottom: 20rpx; margin-top: 32rpx;">四、注意事项</h3>
-          <p style="margin-bottom: 16rpx;">1. 如有违规获取积分行为，平台有权扣除相应积分。</p>
-          <p style="margin-bottom: 16rpx;">2. 本规则最终解释权归平台所有。</p>
-        </div>
-      `
+    }
+  } catch (e) {
+    console.log('[rules] 接口报错:', e)
+  } finally {
+    loading.value = false
+    if (!rulesContent.value) {
+      rulesContent.value = getDefaultRules()
     }
   }
+}
+
+function getDefaultRules() {
+  return `
+    <div style="padding: 32rpx; font-size: 28rpx; color: #333333; line-height: 1.8;">
+      <h3 style="font-size: 32rpx; font-weight: 600; color: #333333; margin-bottom: 20rpx;">一、积分获取规则</h3>
+      <p style="margin-bottom: 16rpx;">1. 每日签到可获得积分，连续签到积分翻倍。</p>
+      <p style="margin-bottom: 16rpx;">2. 每消费1元可获得1积分。</p>
+      <p style="margin-bottom: 16rpx;">3. 邀请好友注册可获得积分奖励。</p>
+      <p style="margin-bottom: 16rpx;">4. 参与活动可获得额外积分奖励。</p>
+      <h3 style="font-size: 32rpx; font-weight: 600; color: #333333; margin-bottom: 20rpx; margin-top: 32rpx;">二、积分使用规则</h3>
+      <p style="margin-bottom: 16rpx;">1. 积分可用于兑换积分商城商品。</p>
+      <p style="margin-bottom: 16rpx;">2. 积分可用于抵扣消费金额。</p>
+      <p style="margin-bottom: 16rpx;">3. 积分不可兑换现金。</p>
+      <p style="margin-bottom: 16rpx;">4. 积分有效期为获得之日起一年内。</p>
+      <h3 style="font-size: 32rpx; font-weight: 600; color: #333333; margin-bottom: 20rpx; margin-top: 32rpx;">三、积分查询</h3>
+      <p style="margin-bottom: 16rpx;">1. 用户可在"我的"页面查看当前积分。</p>
+      <p style="margin-bottom: 16rpx;">2. 用户可在"积分明细"页面查看积分变动记录。</p>
+      <h3 style="font-size: 32rpx; font-weight: 600; color: #333333; margin-bottom: 20rpx; margin-top: 32rpx;">四、注意事项</h3>
+      <p style="margin-bottom: 16rpx;">1. 如有违规获取积分行为，平台有权扣除相应积分。</p>
+      <p style="margin-bottom: 16rpx;">2. 本规则最终解释权归平台所有。</p>
+    </div>
+  `
 }
 </script>
 

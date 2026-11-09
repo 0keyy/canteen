@@ -1,144 +1,62 @@
 <template>
-  <transition
-    name="move"
-    @after-leave="afterLeave"
-  >
-    <div class="food" v-show="visible">
-      <cube-scroll ref="scroll">
-        <div class="food-content">
-          <div class="image-header">
-            <img :src="'http://qiniu.89kj.top'+food.image">
-            <div class="back" @click="hide">
-              <i class="icon-arrow_lift"></i>
-            </div>
-          </div>
-          <div class="content">
-            <h1 class="title">{{food.title}}</h1>
-            <!-- <div class="detail">
-              <span class="sell-count">月售{{food.sellCount}}份</span>
-              <span class="rating">好评率{{food.rating}}%</span>
-            </div> -->
-            <div class="price">
-              <span class="now">￥{{food.price}}</span>
-            </div>
-            <div class="cart-control-wrapper">
-              <cart-control @add="addFood" :food="food"></cart-control>
-            </div>
-            <transition name="fade">
-              <div @click="addFirst" class="buy" v-show="!food.count">
-                加入购物车
-              </div>
-            </transition>
-          </div>
-          <split v-show="food.intro"></split>
-          <div class="info" v-show="food.intro">
-            <h1 class="title">商品信息</h1>
-            <p class="text">{{food.intro}}</p>
-          </div>
-          <!-- <split></split> -->
-          <!-- <div class="rating">
-            <h1 class="title">商品评价</h1>
-            <rating-select
-              @select="onSelect"
-              @toggle="onToggle"
-              :selectType="selectType"
-              :onlyContent="onlyContent"
-              :desc="desc"
-              :ratings="ratings">
-            </rating-select>
-            <div class="rating-wrapper">
-              <ul v-show="computedRatings && computedRatings.length">
-                <li
-                  v-for="(rating,index) in computedRatings"
-                  class="rating-item border-bottom-1px"
-                  :key="index"
-                >
-                  <div class="user">
-                    <span class="name">{{rating.username}}</span>
-                    <img class="avatar" width="12" height="12" :src="rating.avatar">
-                  </div>
-                  <div class="time">{{format(rating.rateTime)}}</div>
-                  <p class="text">
-                    <span :class="{'icon-thumb_up':rating.rateType===0,'icon-thumb_down':rating.rateType===1}"></span>{{rating.text}}
-                  </p>
-                </li>
-              </ul>
-              <div class="no-rating" v-show="!computedRatings || !computedRatings.length">暂无评价</div>
-            </div>
-          </div> -->
+  <div class="food">
+    <div class="food-content">
+      <div class="image-header">
+        <img :src="'http://qiniu.89kj.top'+food.image">
+        <button type="button" class="back" aria-label="返回菜单" @click="$emit('close')">
+          <i class="icon-arrow_lift"></i>
+        </button>
+      </div>
+      <div class="content">
+        <h1 class="title">{{food.title}}</h1>
+        <!-- <div class="detail">
+          <span class="sell-count">月售{{food.sellCount}}份</span>
+          <span class="rating">好评率{{food.rating}}%</span>
+        </div> -->
+        <div class="price">
+          <span class="now">￥{{food.price}}</span>
         </div>
-      </cube-scroll>
+        <div class="cart-control-wrapper">
+          <CartControl
+            :food="food"
+            :disabled="disabled"
+            @add="$emit('add', $event)"
+            @decrease="$emit('decrease')"
+          />
+        </div>
+        <transition name="fade">
+          <button
+            v-show="!food.count"
+            type="button"
+            class="buy"
+            :disabled="disabled"
+            @click="$emit('add', $event.currentTarget.getBoundingClientRect())"
+          >加入购物车</button>
+        </transition>
+      </div>
+      <split v-show="food.intro"></split>
+      <div class="info" v-show="food.intro">
+        <h1 class="title">商品信息</h1>
+        <p class="text">{{food.intro}}</p>
+      </div>
     </div>
-  </transition>
+  </div>
 </template>
 
-<script type="text/ecmascript-6">
-  import moment from 'moment'
-  import CartControl from 'components/cart-control/cart-control'
-  import RatingSelect from 'components/rating-select/rating-select'
-  import Split from 'components/split/split'
-  import ratingMixin from 'common/mixins/rating'
-  import popupMixin from 'common/mixins/popup'
+<script setup>
+import CartControl from 'components/cart-control/cart-control.vue'
+import Split from 'components/split/split.vue'
 
-  const EVENT_SHOW = 'show'
-  const EVENT_ADD = 'add'
-  const EVENT_LEAVE = 'leave'
-
-  export default {
-    name: 'food',
-    mixins: [ratingMixin, popupMixin],
-    props: {
-      food: {
-        type: Object
-      }
-    },
-    data() {
-      return {
-        desc: {
-          all: '全部',
-          positive: '推荐',
-          negative: '吐槽'
-        }
-      }
-    },
-    computed: {
-      ratings() {
-        return this.food.ratings
-      }
-    },
-    created() {
-      this.$on(EVENT_SHOW, () => {
-        this.$nextTick(() => {
-          this.$refs.scroll.refresh()
-        })
-      })
-    },
-    methods: {
-      afterLeave() {
-        this.$emit(EVENT_LEAVE)
-      },
-      addFirst(event) {
-        this.$set(this.food, 'count', 1)
-        this.$emit(EVENT_ADD, event.target)
-      },
-      addFood(target) {
-        this.$emit(EVENT_ADD, target)
-      },
-      format(time) {
-        return moment(time).format('YYYY-MM-DD hh:mm')
-      }
-    },
-    components: {
-      CartControl,
-      RatingSelect,
-      Split
-    }
-  }
+defineProps({
+  food: { type: Object, required: true },
+  disabled: Boolean
+})
+defineEmits(['close', 'add', 'decrease'])
 </script>
 
-<style lang="stylus" scoped>
-  @import "~common/stylus/variable"
-  @import "~common/stylus/mixin.styl"
+<style lang="sass" scoped>
+  @use "common/stylus/variable" as *
+  @use "common/stylus/mixin" as *
 
   .food
     position: fixed
@@ -147,10 +65,11 @@
     bottom: 48px
     z-index: 30
     width: 100%
+    overflow-y: auto
     background: $color-white
     &.move-enter-active, &.move-leave-active
       transition: all 0.3s linear
-    &.move-enter, &.move-leave-active
+    &.move-enter-from, &.move-leave-to
       transform: translate3d(100%, 0, 0)
     .image-header
       position: relative
@@ -167,6 +86,9 @@
         position: absolute
         top: 10px
         left: 0
+        padding: 0
+        border: 0
+        background: none
         .icon-arrow_lift
           display: block
           padding: 10px
@@ -219,10 +141,11 @@
         font-size: $fontsize-small-s
         color: $color-white
         background: $color-blue
+        border: 0
         opacity: 1
         &.fade-enter-active, &.fade-leave-active
           transition: all 0.3s
-        &.fade-enter, &.fade-leave-active
+        &.fade-enter-from, &.fade-leave-to
           opacity: 0
           z-index: -1
     .info
@@ -250,7 +173,7 @@
           position: relative
           padding: 16px 0
           &:last-child
-            border-none()
+            @include border-none()
           .user
             position: absolute
             right: 0

@@ -4,7 +4,7 @@
       v-for="(cate, index) in menu"
       :key="cate.id || cate.name || index"
       :class="['sidebar__item', activeIndex === index ? 'sidebar__item--active' : '']"
-      @tap="$emit('select', index)"
+      @tap="emit('select', index)"
     >
       <view v-if="activeIndex === index" class="sidebar__indicator"></view>
       <view class="sidebar__name-wrap">
@@ -23,29 +23,27 @@
   </view>
 </template>
 
-<script>
-export default {
-  props: {
-    menu: {
-      type: Array,
-      default: () => []
-    },
-    activeIndex: {
-      type: Number,
-      default: 0
-    },
-    cartMap: {
-      type: Object,
-      default: () => ({})
-    }
+<script setup>
+const props = defineProps({
+  menu: {
+    type: Array,
+    default: () => []
   },
-  emits: ['select'],
-  methods: {
-    badgeCount(index) {
-      const foods = this.menu[index]?.foods || []
-      return foods.reduce((sum, food) => sum + (this.cartMap[String(food.id)]?.count || 0), 0)
-    }
+  activeIndex: {
+    type: Number,
+    default: 0
+  },
+  cartMap: {
+    type: Object,
+    default: () => ({})
   }
+})
+
+const emit = defineEmits(['select'])
+
+function badgeCount(index) {
+  const foods = props.menu[index]?.foods || []
+  return foods.reduce((sum, food) => sum + (props.cartMap[String(food.id)]?.count || 0), 0)
 }
 </script>
 

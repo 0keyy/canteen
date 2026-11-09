@@ -65,94 +65,91 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 import { companyApi } from '../../api/index'
 import DeptTreePicker from '../../components/dept-tree-picker/dept-tree-picker.vue'
 
-export default {
-  components: { DeptTreePicker },
-  data() {
-    return {
-      verified: false,
-      authInfo: {},
-      deptList: [],
-      form: {
-        deptId: null,
-        username: '',
-        password: ''
-      },
-      submitting: false
+const verified = ref(false)
+const authInfo = ref({})
+const deptList = ref([])
+const form = ref({
+  deptId: null,
+  username: '',
+  password: ''
+})
+const submitting = ref(false)
+
+onLoad(async () => {
+  await loadData()
+})
+
+async function loadData() {
+  try {
+    uni.showLoading({ title: '加载中', mask: true })
+    const status = await companyApi.status()
+    authInfo.value = status || {}
+    verified.value = !!status?.verified
+    if (!verified.value) {
+      deptList.value = await companyApi.deptList() || []
     }
-  },
-  async onLoad() {
-    await this.loadData()
-  },
-  methods: {
-    async loadData() {
-      try {
-        uni.showLoading({ title: '加载中', mask: true })
-        const status = await companyApi.status()
-        this.authInfo = status || {}
-        this.verified = !!status?.verified
-        if (!this.verified) {
-          this.deptList = await companyApi.deptList() || []
-        }
-      } catch (e) {
-        const message = typeof e === 'string' ? e : (e?.msg || e?.message || '加载失败')
-        uni.showToast({ title: message, icon: 'none' })
-      } finally {
-        uni.hideLoading()
-      }
-    },
-    onDeptSelect(dept) {
-      this.form.deptId = dept ? dept.deptId : null
-    },
-    async submit() {
-      if (this.verified) {
-        uni.showToast({ title: '您已完成公司认证', icon: 'none' })
-        return
-      }
-      if (this.form.deptId == null) {
-        uni.showToast({ title: '请选择部门', icon: 'none' })
-        return
-      }
-      if (!this.form.username.trim()) {
-        uni.showToast({ title: '请输入用户名', icon: 'none' })
-        return
-      }
-      if (!this.form.password) {
-        uni.showToast({ title: '请输入密码', icon: 'none' })
-        return
-      }
-      if (this.submitting) return
-      this.submitting = true
-      try {
-        const result = await companyApi.auth({
-          deptId: this.form.deptId,
-          username: this.form.username.trim(),
-          password: this.form.password
-        })
-        this.authInfo = result || {}
-        this.verified = true
-        this.form.password = ''
-        uni.setStorageSync('companyVerified', true)
-        uni.setStorageSync('companyDeptName', result?.deptName || '')
-        const granted = result?.balanceGranted || 0
-        uni.showToast({
-          title: granted > 0 ? `认证成功，余额+${granted}` : '认证成功',
-          icon: 'success'
-        })
-      } catch (e) {
-        const message = typeof e === 'string' ? e : (e?.msg || e?.message || '认证失败')
-        uni.showModal({
-          title: '认证失败',
-          content: message,
-          showCancel: false
-        })
-      } finally {
-        this.submitting = false
-      }
-    }
+  } catch (e) {
+    const message = typeof e === 'string' ? e : (e?.msg || e?.message || '加载失败')
+    uni.showToast({ title: message, icon: 'none' })
+  } finally {
+    uni.hideLoading()
+  }
+}
+
+function onDeptSelect(dept) {
+  form.value.deptId = dept ? dept.deptId : null
+}
+
+async function submit() {
+  if (verified.value) {
+    uni.showToast({ title: '您已完成公司认证', icon: 'none' })
+    return
+  }
+  if (form.value.deptId == null) {
+    uni.showToast({ title: '请选择部门', icon: 'none' })
+    return
+  }
+  if (!form.value.username.trim()) {
+    uni.showToast({ title: '请输入用户名', icon: 'none' })
+    return
+  }
+  if (!form.value.password) {
+    uni.showToast({ title: '请输入密码', icon: 'none' })
+    return
+  }
+  if (submitting.value) return
+  submitting.value = true
+  try {
+    const result = await companyApi.auth({
+      deptId: form.value.deptId,
+      username: form.value.username.trim(),
+      password: form.value.password
+    })
+    authInfo.value = result || {}
+    verified.value = true
+    form.value.password = ''
+    uni.setStorageSync('companyVerified', true)
+    uni.setStorageSync('companyDeptName', result?.deptName || '')
+    const granted = result?.balanceGranted || 0
+    uni.showToast({
+      title: granted > 0 ? `认证成功，余额+${granted}` : '认证成功',
+      icon: 'success'
+    })
+  } catch (e) {
+    const message = typeof e === 'string' ? e : (e?.msg || e?.message || '认证失败')
+    uni.showModal({
+      title: '认证失败',
+      content: message,
+      showCancel: false
+    })
+  } finally {
+    submitting.value = false
   }
 }
 </script>

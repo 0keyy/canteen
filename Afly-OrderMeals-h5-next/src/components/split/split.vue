@@ -8,8 +8,8 @@
   }
 </script>
 
-<style lang="stylus" scoped>
-  @import "~common/stylus/variable"
+<style lang="sass" scoped>
+  @use "common/stylus/variable" as *
   .split
     width: 100%
     height: 16px

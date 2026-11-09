@@ -50,7 +50,9 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { orderApi } from '../../api/index'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
@@ -62,210 +64,212 @@ const TABS = [
   { key: 'refund', name: '退款/售后', status: '退款中' }
 ]
 
-export default {
-  data() {
-    return {
-      tabs: TABS,
-      activeTab: 0,
-      allList: [],
-      staticImgPrefix: STATIC_IMAGE_PREFIX
+const tabs = ref(TABS)
+const activeTab = ref(0)
+const allList = ref([])
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+
+const currentList = computed(() => {
+  if (activeTab.value === 0) return allList.value
+  const key = TABS[activeTab.value].key
+  return allList.value.filter(o => o.statusKey === key)
+})
+
+onLoad((options) => {
+  if (options && options.tab !== undefined) {
+    const tabIdx = parseInt(options.tab)
+    if (!isNaN(tabIdx) && tabIdx >= 0 && tabIdx < TABS.length) {
+      activeTab.value = tabIdx
     }
-  },
-  computed: {
-    currentList() {
-      if (this.activeTab === 0) return this.allList
-      const key = TABS[this.activeTab].key
-      return this.allList.filter(o => o.statusKey === key)
+  }
+  loadList()
+})
+
+onShow(() => {
+  loadList()
+})
+
+async function loadList() {
+  try {
+    const status = TABS[activeTab.value].status
+    const data = await orderApi.list(status)
+    let list = []
+    if (Array.isArray(data)) {
+      list = data
+    } else if (data && Array.isArray(data.list)) {
+      list = data.list
+    } else if (data && Array.isArray(data.data)) {
+      list = data.data
     }
-  },
-  onLoad(options) {
-    if (options && options.tab !== undefined) {
-      const tabIdx = parseInt(options.tab)
-      if (!isNaN(tabIdx) && tabIdx >= 0 && tabIdx < TABS.length) {
-        this.activeTab = tabIdx
-      }
+    if (list.length > 0) {
+      console.log('[order list] 后端返回订单数据:', JSON.stringify(list[0]))
+      allList.value = list.map(item => normalizeOrder(item))
+    } else {
+      allList.value = getMockList()
     }
-    this.loadList()
-  },
-  onShow() {
-    this.loadList()
-  },
-  methods: {
-    async loadList() {
-      try {
-        const status = TABS[this.activeTab].status
-        const data = await orderApi.list(status)
-        let list = []
-        if (Array.isArray(data)) {
-          list = data
-        } else if (data && Array.isArray(data.list)) {
-          list = data.list
-        } else if (data && Array.isArray(data.data)) {
-          list = data.data
-        }
-        if (list.length > 0) {
-          console.log('[order list] 后端返回订单数据:', JSON.stringify(list[0]))
-          this.allList = list.map(item => this.normalizeOrder(item))
-        } else {
-          this.allList = this.getMockList()
-        }
-      } catch (e) {
-        console.log('[order list] 接口报错，使用mock数据:', e)
-        this.allList = this.getMockList()
-      }
-    },
-    normalizeOrder(item) {
-      const statusInfo = this.getStatusInfo(item)
-      let dishes = []
-      if (Array.isArray(item.dishes)) {
-        dishes = item.dishes
-      } else if (item.dish) {
-        dishes = [item.dish]
-      } else if (Array.isArray(item.goodsList)) {
-        dishes = item.goodsList
-      } else if (Array.isArray(item.orderDishes)) {
-        dishes = item.orderDishes
-      } else if (Array.isArray(item.items)) {
-        dishes = item.items
-      } else if (Array.isArray(item.orderItems)) {
-        dishes = item.orderItems
-      } else if (Array.isArray(item.details)) {
-        dishes = item.details
-      }
+  } catch (e) {
+    console.log('[order list] 接口报错，使用mock数据:', e)
+    allList.value = getMockList()
+  }
+}
 
-      const dishList = dishes.length > 0 ? dishes.slice(0, 2).map(d => ({
-        id: d.id || d.dishId || d.goodsId || d.itemId,
-        name: d.name || d.dishName || d.goodsName || d.itemName || d.productName || '',
-        image: d.image || d.img || d.cover || d.goodsImage || d.dishImage || d.itemImage || d.productImage || '',
-        price: d.price || d.dishPrice || d.goodsPrice || d.itemPrice || d.productPrice || 0,
-        quantity: d.quantity || d.count || d.dishQuantity || d.num || d.itemQuantity || 1
-      })) : []
+function normalizeOrder(item) {
+  const statusInfo = getStatusInfo(item)
+  let dishes = []
+  if (Array.isArray(item.dishes)) {
+    dishes = item.dishes
+  } else if (item.dish) {
+    dishes = [item.dish]
+  } else if (Array.isArray(item.goodsList)) {
+    dishes = item.goodsList
+  } else if (Array.isArray(item.orderDishes)) {
+    dishes = item.orderDishes
+  } else if (Array.isArray(item.items)) {
+    dishes = item.items
+  } else if (Array.isArray(item.orderItems)) {
+    dishes = item.orderItems
+  } else if (Array.isArray(item.details)) {
+    dishes = item.details
+  }
 
-      if (dishList.length === 0) {
-        const modeName = item.diningMode === 3 ? '外卖' : (item.diningMode === 1 ? '堂食' : '订单')
-        dishList.push({
-          id: item.id,
-          name: item.dishName || `${modeName}订单`,
-          image: item.image || '',
-          price: item.amount || 0,
-          quantity: 1
-        })
-      }
+  const dishList = dishes.length > 0 ? dishes.slice(0, 2).map(d => ({
+    id: d.id || d.dishId || d.goodsId || d.itemId,
+    name: d.name || d.dishName || d.goodsName || d.itemName || d.productName || '',
+    image: d.image || d.img || d.cover || d.goodsImage || d.dishImage || d.itemImage || d.productImage || '',
+    price: d.price || d.dishPrice || d.goodsPrice || d.itemPrice || d.productPrice || 0,
+    quantity: d.quantity || d.count || d.dishQuantity || d.num || d.itemQuantity || 1
+  })) : []
 
-      return {
-        id: item.id || item.orderId || item.oid,
-        createTime: this.formatOrderTime(item.createTime || item.time || item.orderTime || ''),
-        amount: item.amount || item.totalAmount || item.totalPrice || 0,
-        statusKey: statusInfo.key,
-        statusText: statusInfo.text,
-        dishes: dishList
-      }
-    },
-    getStatusInfo(item) {
-      const status = item.status
-      const payStatus = item.payStatus
-      const orderStatus = item.orderStatus
-      const statusText = item.statusText || item.statusName || ''
+  if (dishList.length === 0) {
+    const modeName = item.diningMode === 3 ? '外卖' : (item.diningMode === 1 ? '堂食' : '订单')
+    dishList.push({
+      id: item.id,
+      name: item.dishName || `${modeName}订单`,
+      image: item.image || '',
+      price: item.amount || 0,
+      quantity: 1
+    })
+  }
 
-      if (payStatus === 0 || status === 0 || status === 4 || orderStatus === 0) {
-        return { key: 'paying', text: '待支付' }
-      }
-      if (status === 1 || status === 'pending' || status === 'preparing' ||
-          orderStatus === 1 || orderStatus === 2 ||
-          statusText.includes('制作') || statusText.includes('备餐') ||
-          statusText.includes('接单') || statusText.includes('待发货')) {
-        if (item.shippingStatus === 1 || statusText.includes('配送') || statusText.includes('已发货')) {
-          return { key: 'delivering', text: '待收货' }
-        }
-        return { key: 'shipping', text: statusText || '制作中' }
-      }
-      if (status === 2 || status === 'completed' || status === 'finished' ||
-          orderStatus === 3 || statusText.includes('完成') || statusText.includes('已完成')) {
-        return { key: 'completed', text: '已完成' }
-      }
-      if (status === 3 || status === 'refunded' || statusText.includes('已退款')) {
-        return { key: 'refund', text: '已退款' }
-      }
-      if (status === 5 || status === 'refunding' || statusText.includes('退款中') || statusText.includes('退款申请')) {
-        return { key: 'refund', text: '退款中' }
-      }
-      if (item.shippingStatus === 1 || statusText.includes('配送') || statusText.includes('发货')) {
-        return { key: 'delivering', text: '待收货' }
-      }
-      if (statusText) {
-        if (statusText.includes('支付')) return { key: 'paying', text: statusText }
-        if (statusText.includes('制作') || statusText.includes('备餐') || statusText.includes('接单')) return { key: 'shipping', text: statusText }
-        if (statusText.includes('配送') || statusText.includes('发货')) return { key: 'delivering', text: statusText }
-        if (statusText.includes('完成')) return { key: 'completed', text: statusText }
-        if (statusText.includes('退款')) return { key: 'refund', text: statusText }
-      }
-      return { key: 'completed', text: statusText || '已完成' }
-    },
-    formatOrderTime(time) {
-      if (!time) return ''
-      try {
-        const date = new Date(time)
-        if (isNaN(date.getTime())) {
-          return time
-        }
-        const year = date.getFullYear()
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        const hour = String(date.getHours()).padStart(2, '0')
-        const minute = String(date.getMinutes()).padStart(2, '0')
-        const second = String(date.getSeconds()).padStart(2, '0')
-        return `${year}-${month}-${day} ${hour}:${minute}:${second}`
-      } catch (e) {
-        return time
-      }
-    },
-    getMockList() {
-      return [
-        {
-          id: 1,
-          createTime: '2026-06-01 18:11:31',
-          amount: 3,
-          statusKey: 'completed',
-          statusText: '已完成',
-          dishes: [
-            { id: 1, name: '可口可乐', image: this.staticImgPrefix + '/首页广告.png', price: '3', quantity: 1 }
-          ]
-        },
-        {
-          id: 2,
-          createTime: '2026-06-01 18:11:31',
-          amount: 15,
-          statusKey: 'delivering',
-          statusText: '待收货',
-          dishes: [
-            { id: 2, name: '红烧牛肉面', image: this.staticImgPrefix + '/首页广告.png', price: '15', quantity: 1 }
-          ]
-        }
+  return {
+    id: item.id || item.orderId || item.oid,
+    createTime: formatOrderTime(item.createTime || item.time || item.orderTime || ''),
+    amount: item.amount || item.totalAmount || item.totalPrice || 0,
+    statusKey: statusInfo.key,
+    statusText: statusInfo.text,
+    dishes: dishList
+  }
+}
+
+function getStatusInfo(item) {
+  const status = item.status
+  const payStatus = item.payStatus
+  const orderStatus = item.orderStatus
+  const statusText = item.statusText || item.statusName || ''
+
+  if (payStatus === 0 || status === 0 || status === 4 || orderStatus === 0) {
+    return { key: 'paying', text: '待支付' }
+  }
+  if (status === 1 || status === 'pending' || status === 'preparing' ||
+      orderStatus === 1 || orderStatus === 2 ||
+      statusText.includes('制作') || statusText.includes('备餐') ||
+      statusText.includes('接单') || statusText.includes('待发货')) {
+    if (item.shippingStatus === 1 || statusText.includes('配送') || statusText.includes('已发货')) {
+      return { key: 'delivering', text: '待收货' }
+    }
+    return { key: 'shipping', text: statusText || '制作中' }
+  }
+  if (status === 2 || status === 'completed' || status === 'finished' ||
+      orderStatus === 3 || statusText.includes('完成') || statusText.includes('已完成')) {
+    return { key: 'completed', text: '已完成' }
+  }
+  if (status === 3 || status === 'refunded' || statusText.includes('已退款')) {
+    return { key: 'refund', text: '已退款' }
+  }
+  if (status === 5 || status === 'refunding' || statusText.includes('退款中') || statusText.includes('退款申请')) {
+    return { key: 'refund', text: '退款中' }
+  }
+  if (item.shippingStatus === 1 || statusText.includes('配送') || statusText.includes('发货')) {
+    return { key: 'delivering', text: '待收货' }
+  }
+  if (statusText) {
+    if (statusText.includes('支付')) return { key: 'paying', text: statusText }
+    if (statusText.includes('制作') || statusText.includes('备餐') || statusText.includes('接单')) return { key: 'shipping', text: statusText }
+    if (statusText.includes('配送') || statusText.includes('发货')) return { key: 'delivering', text: statusText }
+    if (statusText.includes('完成')) return { key: 'completed', text: statusText }
+    if (statusText.includes('退款')) return { key: 'refund', text: statusText }
+  }
+  return { key: 'completed', text: statusText || '已完成' }
+}
+
+function formatOrderTime(time) {
+  if (!time) return ''
+  try {
+    const date = new Date(time)
+    if (isNaN(date.getTime())) {
+      return time
+    }
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hour = String(date.getHours()).padStart(2, '0')
+    const minute = String(date.getMinutes()).padStart(2, '0')
+    const second = String(date.getSeconds()).padStart(2, '0')
+    return `${year}-${month}-${day} ${hour}:${minute}:${second}`
+  } catch (e) {
+    return time
+  }
+}
+
+function getMockList() {
+  return [
+    {
+      id: 1,
+      createTime: '2026-06-01 18:11:31',
+      amount: 3,
+      statusKey: 'completed',
+      statusText: '已完成',
+      dishes: [
+        { id: 1, name: '可口可乐', image: staticImgPrefix.value + '/首页广告.png', price: '3', quantity: 1 }
       ]
     },
-    switchTab(idx) {
-      this.activeTab = idx
-    },
-    goDetail(orderId) {
-      uni.navigateTo({ url: `/pages/order/detail?orderId=${orderId}` })
-    },
-    reorder(order) {
-      uni.switchTab({ url: '/pages/menu/index' })
-    },
-    async confirmReceive(order) {
-      const { confirm } = await uni.showModal({
-        title: '确认收货',
-        content: '确认已收到商品？'
-      })
-      if (!confirm) return
-      try {
-        await orderApi.confirmReceive(order.id)
-        uni.showToast({ title: '确认收货成功', icon: 'success' })
-        this.loadList()
-      } catch (e) {
-        uni.showToast({ title: e.message || '确认收货失败', icon: 'none' })
-      }
+    {
+      id: 2,
+      createTime: '2026-06-01 18:11:31',
+      amount: 15,
+      statusKey: 'delivering',
+      statusText: '待收货',
+      dishes: [
+        { id: 2, name: '红烧牛肉面', image: staticImgPrefix.value + '/首页广告.png', price: '15', quantity: 1 }
+      ]
     }
+  ]
+}
+
+function switchTab(idx) {
+  activeTab.value = idx
+}
+
+function goDetail(orderId) {
+  uni.navigateTo({ url: `/pages/order/detail?orderId=${orderId}` })
+}
+
+function reorder(order) {
+  uni.switchTab({ url: '/pages/menu/index' })
+}
+
+async function confirmReceive(order) {
+  const { confirm } = await uni.showModal({
+    title: '确认收货',
+    content: '确认已收到商品？'
+  })
+  if (!confirm) return
+  try {
+    await orderApi.confirmReceive(order.id)
+    uni.showToast({ title: '确认收货成功', icon: 'success' })
+    loadList()
+  } catch (e) {
+    uni.showToast({ title: e.message || '确认收货失败', icon: 'none' })
   }
 }
 </script>

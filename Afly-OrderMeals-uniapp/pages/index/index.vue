@@ -150,250 +150,268 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue'
+import { onLoad, onReady, onShow } from '@dcloudio/uni-app'
 import { orderApi, decorateApi, authApi, couponApi } from '../../api/index'
 import { DEFAULT_SHOP_ID } from '../../utils/config'
 import { resolveImageUrl } from '../../utils/image'
-import tabbarPageMixin from '../../mixins/tabbar-page'
+import { usePageTabbar } from '../../composables/use-page-tabbar'
 import { getMenuButtonMarginRight, getNavMetrics } from '../../utils/navbar'
 import PageLoading from '../../components/page-loading/page-loading.vue'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
-export default {
-  mixins: [tabbarPageMixin],
-  components: { PageLoading },
-  data() {
-    return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      navMetrics: getNavMetrics(),
-      menuButtonRight: 96,
-      shop: null,
-      aid: DEFAULT_SHOP_ID,
-      banners: [],
-      recommendDishes: [],
-      recommendLoading: false,
-      pageLoading: false,
-      pageLoadingTip: '',
-      nickname: '',
-      pointCount: 0,
-      couponCount: 0,
-      shortcuts: [
-        { name: '充值中心', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/储值 1.svg' },
-        { name: '红包卡券', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.svg' },
-        { name: '订单详情', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/全部订单 1.svg' },
-        { name: '客服中心', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/客服 1.svg' }
-      ]
-    }
-  },
-  computed: {
-    heroPaddingStyle() {
-      const { statusBarHeight } = this.navMetrics
-      return {
-        paddingTop: `${statusBarHeight - 55}px`
-      }
-    },
-    searchRowStyle() {
-      return { paddingRight: `${this.menuButtonRight}px` }
-    },
-    displayBanners() {
-      if (this.banners.length) return this.banners
-      return [{ image: '' }]
-    },
-    homeRecommendDishes() {
-      return this.recommendDishes.slice(0, 4)
-    }
-  },
-  onLoad() {
-    this.updateNavPadding()
-  },
-  onReady() {
-    this.updateNavPadding()
-  },
-  onShow() {
-    this.updateNavPadding()
-    this.setupTabbar(0)
-    this.loadCustomFonts()
-    this.loadPageContent()
-  },
-  methods: {
-    updateNavPadding() {
-      this.navMetrics = getNavMetrics()
-      this.menuButtonRight = getMenuButtonMarginRight(96)
-    },
-    async loadPageContent() {
-      this.pageLoading = true
-      this.pageLoadingTip = '加载中...'
-      try {
-        await this.loadShop()
-        await this.loadDecoration()
-        await this.loadRecommend()
-        await this.loadUserInfo()
-      } finally {
-        this.pageLoading = false
-      }
-    },
-    loadCustomFonts() {
-      if (typeof wx !== 'undefined' && wx.loadFontFace) {
-        wx.loadFontFace({
-          family: 'Alimama ShuHei Ti',
-          source: 'url("https://canteen.zhongtang-group.com/api/uploads/font/AlimamaShuHeiTi.ttf")',
-          version: 'v1',
-          success: () => {
-            this.$forceUpdate()
-          },
-          fail: (err) => {
-            console.error('数黑体字体加载失败', err)
-          }
-        })
-      }
-    },
-    async loadUserInfo() {
-      try {
-        const profile = await authApi.profile()
-        if (profile) {
-          this.nickname = profile.companyNickName || profile.nickname || uni.getStorageSync('nickname') || ''
-          this.pointCount = profile.point ?? 0
-          uni.setStorageSync('nickname', this.nickname)
-        } else {
-          this.nickname = uni.getStorageSync('nickname') || ''
-          this.pointCount = parseInt(uni.getStorageSync('pointCount')) || 0
-        }
-      } catch (e) {
-        this.nickname = uni.getStorageSync('nickname') || ''
-        this.pointCount = parseInt(uni.getStorageSync('pointCount')) || 0
-      }
+const {
+  tabbarSelected,
+  tabbarDefaultColor,
+  tabbarSelectedColor,
+  tabbarList,
+  setupTabbar,
+  switchTabbar
+} = usePageTabbar()
 
-      try {
-        const myCoupons = await couponApi.myCoupons(1) || []
-        this.couponCount = myCoupons.length
-      } catch (e) {
-        this.couponCount = 0
-      }
-    },
-    parsePageWidgets(pageData) {
-      if (!pageData) return []
-      if (Array.isArray(pageData)) return pageData
-      try {
-        const parsed = JSON.parse(pageData)
-        return Array.isArray(parsed) ? parsed : []
-      } catch (e) {
-        return []
-      }
-    },
-    isWidgetEnabled(enabled) {
-      if (enabled === undefined || enabled === null) return true
-      return enabled !== 0 && enabled !== false && enabled !== '0'
-    },
-    normalizeBannerItem(item) {
-      const rawImage = item?.image || item?.img || item?.url || ''
-      const image = resolveImageUrl(rawImage)
-      return image ? { ...item, image } : null
-    },
-    async loadShop() {
-      try {
-        const shop = await orderApi.shop(this.aid)
-        if (shop?.image) {
-          shop.image = resolveImageUrl(shop.image)
-        }
-        this.shop = shop
-      } catch (e) {
-        uni.showToast({ title: e.message || e, icon: 'none' })
-      }
-    },
-    async loadDecoration() {
-      try {
-        const page = await decorateApi.page(1)
-        const widgets = this.parsePageWidgets(page?.pageData)
-        const bannerWidget = widgets.find((item) => item.name === 'banner')
-        const data = bannerWidget?.content?.data
-        if (bannerWidget && this.isWidgetEnabled(bannerWidget.content?.enabled) && Array.isArray(data)) {
-          this.banners = data
-            .map((item) => this.normalizeBannerItem(item))
-            .filter(Boolean)
-        } else {
-          this.banners = []
-        }
-      } catch (e) {
-        this.banners = []
-      }
-    },
-    async loadRecommend() {
-      this.recommendLoading = true
-      try {
-        const list = await orderApi.menu(this.aid)
-        const foods = []
-        ;(Array.isArray(list) ? list : []).forEach((cate) => {
-          ;(cate.foods || []).forEach((food) => {
-            foods.push({
-              ...food,
-              image: resolveImageUrl(food.image)
-            })
-          })
-        })
-        this.recommendDishes = foods.slice(0, 5).map((food, index) => ({
-          ...food,
-          badge: index === 0 ? '招牌' : index === 1 ? '热卖' : ''
-        }))
-      } catch (e) {
-        this.recommendDishes = []
-      } finally {
-        this.recommendLoading = false
-      }
-    },
-    selectMode(mode) {
-      if (mode === 3 && this.shop && this.shop.deliveryEnable !== 1) {
-        uni.showToast({ title: '暂未开启外卖', icon: 'none' })
-        return
-      }
-      uni.setStorageSync('diningMode', mode)
-      if (mode === 3) {
-        uni.navigateTo({ url: '/pages/address/list?select=1' })
-        return
-      }
-      uni.switchTab({ url: '/pages/menu/index' })
-    },
-    goMenu() {
-      uni.setStorageSync('diningMode', 1)
-      uni.switchTab({ url: '/pages/menu/index' })
-    },
-    selectSpec() {
-      this.goMenu()
-    },
-    goSearch() {
-      uni.showToast({ title: '搜索功能开发中', icon: 'none' })
-    },
-    onShortcutTap(item) {
-      if (item?.name === '充值中心') {
-        uni.navigateTo({ url: '/pages/coupon/recharge' })
-        return
-      }
-      if (item?.name === '红包卡券') {
-        uni.navigateTo({ url: '/pages/coupon/wallet' })
-        return
-      }
-      if (item?.name === '订单详情') {
-        uni.navigateTo({ url: '/pages/order/list' })
-        return
-      }
-      if (item?.name === '客服中心') {
-        uni.navigateTo({ url: '/pages/mine/service/index' })
-        return
-      }
-      uni.showToast({ title: '功能开发中', icon: 'none' })
-    },
-    goCouponCenter() {
-      uni.navigateTo({ url: '/pages/coupon/center' })
-    },
-    goMine() {
-      uni.switchTab({ url: '/pages/mine/index' })
-    },
-    goIntegralShop() {
-      uni.switchTab({ url: '/pages/points/index' })
-    },
-    goCouponWallet() {
-      uni.navigateTo({ url: '/pages/coupon/wallet' })
-    }
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const navMetrics = ref(getNavMetrics())
+const menuButtonRight = ref(96)
+const shop = ref(null)
+const aid = ref(DEFAULT_SHOP_ID)
+const banners = ref([])
+const recommendDishes = ref([])
+const recommendLoading = ref(false)
+const pageLoading = ref(false)
+const pageLoadingTip = ref('')
+const nickname = ref('')
+const pointCount = ref(0)
+const couponCount = ref(0)
+const shortcuts = ref([
+  { name: '充值中心', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/储值 1.svg' },
+  { name: '红包卡券', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/卡券 1.svg' },
+  { name: '订单详情', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/全部订单 1.svg' },
+  { name: '客服中心', desc: '', iconPath: STATIC_IMAGE_PREFIX + '/tabbar/客服 1.svg' }
+])
+
+const heroPaddingStyle = computed(() => {
+  const { statusBarHeight } = navMetrics.value
+  return {
+    paddingTop: `${statusBarHeight - 55}px`
   }
+})
+
+const searchRowStyle = computed(() => ({ paddingRight: `${menuButtonRight.value}px` }))
+
+const displayBanners = computed(() => {
+  if (banners.value.length) return banners.value
+  return [{ image: '' }]
+})
+
+const homeRecommendDishes = computed(() => recommendDishes.value.slice(0, 4))
+
+onLoad(() => {
+  updateNavPadding()
+})
+
+onReady(() => {
+  updateNavPadding()
+})
+
+onShow(() => {
+  updateNavPadding()
+  setupTabbar(0)
+  loadCustomFonts()
+  loadPageContent()
+})
+
+function updateNavPadding() {
+  navMetrics.value = getNavMetrics()
+  menuButtonRight.value = getMenuButtonMarginRight(96)
+}
+
+async function loadPageContent() {
+  pageLoading.value = true
+  pageLoadingTip.value = '加载中...'
+  try {
+    await loadShop()
+    await loadDecoration()
+    await loadRecommend()
+    await loadUserInfo()
+  } finally {
+    pageLoading.value = false
+  }
+}
+
+function loadCustomFonts() {
+  if (typeof wx !== 'undefined' && wx.loadFontFace) {
+    wx.loadFontFace({
+      family: 'Alimama ShuHei Ti',
+      source: 'url("https://canteen.zhongtang-group.com/api/uploads/font/AlimamaShuHeiTi.ttf")',
+      version: 'v1',
+      fail: (err) => {
+        console.error('数黑体字体加载失败', err)
+      }
+    })
+  }
+}
+
+async function loadUserInfo() {
+  try {
+    const profile = await authApi.profile()
+    if (profile) {
+      nickname.value = profile.companyNickName || profile.nickname || uni.getStorageSync('nickname') || ''
+      pointCount.value = profile.point ?? 0
+      uni.setStorageSync('nickname', nickname.value)
+    } else {
+      nickname.value = uni.getStorageSync('nickname') || ''
+      pointCount.value = parseInt(uni.getStorageSync('pointCount')) || 0
+    }
+  } catch (e) {
+    nickname.value = uni.getStorageSync('nickname') || ''
+    pointCount.value = parseInt(uni.getStorageSync('pointCount')) || 0
+  }
+
+  try {
+    const myCoupons = await couponApi.myCoupons(1) || []
+    couponCount.value = myCoupons.length
+  } catch (e) {
+    couponCount.value = 0
+  }
+}
+
+function parsePageWidgets(pageData) {
+  if (!pageData) return []
+  if (Array.isArray(pageData)) return pageData
+  try {
+    const parsed = JSON.parse(pageData)
+    return Array.isArray(parsed) ? parsed : []
+  } catch (e) {
+    return []
+  }
+}
+
+function isWidgetEnabled(enabled) {
+  if (enabled === undefined || enabled === null) return true
+  return enabled !== 0 && enabled !== false && enabled !== '0'
+}
+
+function normalizeBannerItem(item) {
+  const rawImage = item?.image || item?.img || item?.url || ''
+  const image = resolveImageUrl(rawImage)
+  return image ? { ...item, image } : null
+}
+
+async function loadShop() {
+  try {
+    const shopInfo = await orderApi.shop(aid.value)
+    if (shopInfo?.image) {
+      shopInfo.image = resolveImageUrl(shopInfo.image)
+    }
+    shop.value = shopInfo
+  } catch (e) {
+    uni.showToast({ title: e.message || e, icon: 'none' })
+  }
+}
+
+async function loadDecoration() {
+  try {
+    const page = await decorateApi.page(1)
+    const widgets = parsePageWidgets(page?.pageData)
+    const bannerWidget = widgets.find((item) => item.name === 'banner')
+    const data = bannerWidget?.content?.data
+    if (bannerWidget && isWidgetEnabled(bannerWidget.content?.enabled) && Array.isArray(data)) {
+      banners.value = data
+        .map((item) => normalizeBannerItem(item))
+        .filter(Boolean)
+    } else {
+      banners.value = []
+    }
+  } catch (e) {
+    banners.value = []
+  }
+}
+
+async function loadRecommend() {
+  recommendLoading.value = true
+  try {
+    const list = await orderApi.menu(aid.value)
+    const foods = []
+    ;(Array.isArray(list) ? list : []).forEach((cate) => {
+      ;(cate.foods || []).forEach((food) => {
+        foods.push({
+          ...food,
+          image: resolveImageUrl(food.image)
+        })
+      })
+    })
+    recommendDishes.value = foods.slice(0, 5).map((food, index) => ({
+      ...food,
+      badge: index === 0 ? '招牌' : index === 1 ? '热卖' : ''
+    }))
+  } catch (e) {
+    recommendDishes.value = []
+  } finally {
+    recommendLoading.value = false
+  }
+}
+
+function selectMode(mode) {
+  if (mode === 3 && shop.value && shop.value.deliveryEnable !== 1) {
+    uni.showToast({ title: '暂未开启外卖', icon: 'none' })
+    return
+  }
+  uni.setStorageSync('diningMode', mode)
+  if (mode === 3) {
+    uni.navigateTo({ url: '/pages/address/list?select=1' })
+    return
+  }
+  uni.switchTab({ url: '/pages/menu/index' })
+}
+
+function goMenu() {
+  uni.setStorageSync('diningMode', 1)
+  uni.switchTab({ url: '/pages/menu/index' })
+}
+
+function selectSpec() {
+  goMenu()
+}
+
+function goSearch() {
+  uni.showToast({ title: '搜索功能开发中', icon: 'none' })
+}
+
+function onShortcutTap(item) {
+  if (item?.name === '充值中心') {
+    uni.navigateTo({ url: '/pages/coupon/recharge' })
+    return
+  }
+  if (item?.name === '红包卡券') {
+    uni.navigateTo({ url: '/pages/coupon/wallet' })
+    return
+  }
+  if (item?.name === '订单详情') {
+    uni.navigateTo({ url: '/pages/order/list' })
+    return
+  }
+  if (item?.name === '客服中心') {
+    uni.navigateTo({ url: '/pages/mine/service/index' })
+    return
+  }
+  uni.showToast({ title: '功能开发中', icon: 'none' })
+}
+
+function goCouponCenter() {
+  uni.navigateTo({ url: '/pages/coupon/center' })
+}
+
+function goMine() {
+  uni.switchTab({ url: '/pages/mine/index' })
+}
+
+function goIntegralShop() {
+  uni.switchTab({ url: '/pages/points/index' })
+}
+
+function goCouponWallet() {
+  uni.navigateTo({ url: '/pages/coupon/wallet' })
 }
 </script>
 

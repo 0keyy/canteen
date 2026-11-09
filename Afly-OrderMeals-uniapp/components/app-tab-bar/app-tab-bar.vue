@@ -25,37 +25,37 @@
   </view>
 </template>
 
-<script>
-export default {
-  name: 'AppTabBar',
-  props: {
-    list: {
-      type: Array,
-      default: () => []
-    },
-    selected: {
-      type: Number,
-      default: 0
-    },
-    defaultColor: {
-      type: String,
-      default: '#999999'
-    },
-    selectedColor: {
-      type: String,
-      default: '#B10A0F'
-    }
+<script setup>
+defineOptions({ name: 'AppTabBar' })
+
+const props = defineProps({
+  list: {
+    type: Array,
+    default: () => []
   },
-  emits: ['switch'],
-  methods: {
-    iconSrc(item, index) {
-      const url = this.selected === index ? item.selected : item.unselected
-      return url || (this.selected === index ? item.unselected : item.selected) || ''
-    },
-    onTap(item, index) {
-      this.$emit('switch', item, index)
-    }
+  selected: {
+    type: Number,
+    default: 0
+  },
+  defaultColor: {
+    type: String,
+    default: '#999999'
+  },
+  selectedColor: {
+    type: String,
+    default: '#B10A0F'
   }
+})
+
+const emit = defineEmits(['switch'])
+
+function iconSrc(item, index) {
+  const url = props.selected === index ? item.selected : item.unselected
+  return url || (props.selected === index ? item.unselected : item.selected) || ''
+}
+
+function onTap(item, index) {
+  emit('switch', item, index)
 }
 </script>
 

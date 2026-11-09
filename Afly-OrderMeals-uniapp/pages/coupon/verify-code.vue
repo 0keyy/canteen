@@ -22,32 +22,28 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 import { couponApi } from '../../api/index'
 
-export default {
-  data() {
-    return {
-      loading: false,
-      code: '',
-      couponId: null
-    }
-  },
-  onLoad(options) {
-    this.couponId = options.id
-    this.loadCode()
-  },
-  methods: {
-    async loadCode() {
-      this.loading = true
-      try {
-        this.code = await couponApi.verifyCode(this.couponId) || ''
-      } catch (e) {
-        uni.showToast({ title: e || '获取核销码失败', icon: 'none' })
-      } finally {
-        this.loading = false
-      }
-    }
+const loading = ref(false)
+const code = ref('')
+const couponId = ref(null)
+
+onLoad((options) => {
+  couponId.value = options.id
+  loadCode()
+})
+
+async function loadCode() {
+  loading.value = true
+  try {
+    code.value = await couponApi.verifyCode(couponId.value) || ''
+  } catch (e) {
+    uni.showToast({ title: e || '获取核销码失败', icon: 'none' })
+  } finally {
+    loading.value = false
   }
 }
 </script>

@@ -60,7 +60,9 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { walletApi, payApi, authApi } from '../../api/index'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
@@ -72,101 +74,99 @@ import { wxPay } from '../../utils/pay/weixin'
 import { aliPay } from '../../utils/pay/alipay'
 // #endif
 
-export default {
-  data() {
-    return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      balance: 0,
-      selectedAmount: 10,
-      amountOptions: [10, 20, 50, 100, 200, 500],
-      isCustom: false,
-      customAmount: ''
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const balance = ref(0)
+const selectedAmount = ref(10)
+const amountOptions = ref([10, 20, 50, 100, 200, 500])
+const isCustom = ref(false)
+const customAmount = ref('')
+
+const formatBalance = computed(() => Number(balance.value || 0).toFixed(2))
+
+const finalAmount = computed(() => {
+  if (isCustom.value) {
+    const n = parseFloat(customAmount.value)
+    return (!isNaN(n) && n > 0) ? n : 0
+  }
+  return selectedAmount.value
+})
+
+onLoad(() => {
+  loadBalance()
+})
+
+onShow(() => {
+  loadBalance()
+})
+
+async function loadBalance() {
+  try {
+    const profile = await authApi.profile()
+    if (profile && profile.balance != null) {
+      balance.value = profile.balance
     }
-  },
-  computed: {
-    formatBalance() {
-      return Number(this.balance || 0).toFixed(2)
-    },
-    finalAmount() {
-      if (this.isCustom) {
-        const n = parseFloat(this.customAmount)
-        return (!isNaN(n) && n > 0) ? n : 0
-      }
-      return this.selectedAmount
-    }
-  },
-  onLoad() {
-    this.loadBalance()
-  },
-  onShow() {
-    this.loadBalance()
-  },
-  methods: {
-    async loadBalance() {
-      try {
-        const profile = await authApi.profile()
-        if (profile && profile.balance != null) {
-          this.balance = profile.balance
-        }
-      } catch (e) {
-        this.balance = 0
-      }
-    },
-    selectPreset(amount) {
-      this.isCustom = false
-      this.selectedAmount = amount
-    },
-    selectCustom() {
-      this.isCustom = true
-    },
-    onCustomBlur() {
-      if (!this.customAmount || parseFloat(this.customAmount) <= 0) {
-        this.isCustom = false
-        this.customAmount = ''
-      }
-    },
-    async onRecharge() {
-      const amount = this.finalAmount
-      if (!amount || amount <= 0) {
-        uni.showToast({ title: '请选择或输入充值金额', icon: 'none' })
+  } catch (e) {
+    balance.value = 0
+  }
+}
+
+function selectPreset(amount) {
+  isCustom.value = false
+  selectedAmount.value = amount
+}
+
+function selectCustom() {
+  isCustom.value = true
+}
+
+function onCustomBlur() {
+  if (!customAmount.value || parseFloat(customAmount.value) <= 0) {
+    isCustom.value = false
+    customAmount.value = ''
+  }
+}
+
+async function onRecharge() {
+  const amount = finalAmount.value
+  if (!amount || amount <= 0) {
+    uni.showToast({ title: '请选择或输入充值金额', icon: 'none' })
+    return
+  }
+  try {
+    const res = await walletApi.rechargeCreate(amount)
+    if (res && res.outTradeNo) {
+      const payInfo = await payApi.create({
+        outTradeNo: res.outTradeNo,
+        payChannel: 'balance',
+        payScene: 'mp'
+      })
+      if (payInfo.completed) {
+        uni.showToast({ title: '充值成功', icon: 'success' })
+        loadBalance()
         return
       }
-      try {
-        const res = await walletApi.rechargeCreate(amount)
-        if (res && res.outTradeNo) {
-          const payInfo = await payApi.create({
-            outTradeNo: res.outTradeNo,
-            payChannel: 'balance',
-            payScene: 'mp'
-          })
-          if (payInfo.completed) {
-            uni.showToast({ title: '充值成功', icon: 'success' })
-            this.loadBalance()
-            return
-          }
-          if (payInfo.mockPay) {
-            await payApi.mockSuccess(payInfo.outTradeNo)
-            uni.showToast({ title: '充值成功', icon: 'success' })
-            this.loadBalance()
-            return
-          }
-          // #ifdef MP-WEIXIN
-          await wxPay(payInfo)
-          // #endif
-          // #ifdef MP-ALIPAY
-          await aliPay(payInfo)
-          // #endif
-          uni.showToast({ title: '充值成功', icon: 'success' })
-          this.loadBalance()
-        }
-      } catch (e) {
-        uni.showToast({ title: e.message || e || '充值失败', icon: 'none' })
+      if (payInfo.mockPay) {
+        await payApi.mockSuccess(payInfo.outTradeNo)
+        uni.showToast({ title: '充值成功', icon: 'success' })
+        loadBalance()
+        return
       }
-    },
-    goRecord() {
-      uni.showToast({ title: '明细功能开发中', icon: 'none' })
+      // #ifdef MP-WEIXIN
+      await wxPay(payInfo)
+      // #endif
+      // #ifdef MP-ALIPAY
+      await aliPay(payInfo)
+      // #endif
+      uni.showToast({ title: '充值成功', icon: 'success' })
+      loadBalance()
     }
+  } catch (e) {
+    uni.showToast({ title: e.message || e || '充值失败', icon: 'none' })
   }
+}
+
+function goRecord() {
+  uni.showToast({ title: '明细功能开发中', icon: 'none' })
 }
 </script>
 

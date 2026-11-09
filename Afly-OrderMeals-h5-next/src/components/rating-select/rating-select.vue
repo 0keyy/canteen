@@ -24,6 +24,7 @@
   const EVENT_SELECT = 'select'
 
   export default {
+    emits: [EVENT_SELECT, EVENT_TOGGLE],
     props: {
       ratings: {
         type: Array,
@@ -73,8 +74,8 @@
   }
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
+<style lang="sass">
+  @use "common/stylus/variable" as *
 
   .rating-select
     .rating-type

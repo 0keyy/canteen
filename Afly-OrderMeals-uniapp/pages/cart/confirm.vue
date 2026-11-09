@@ -242,268 +242,278 @@
   </view>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { orderApi, couponApi, payApi } from '../../api/index'
 import { payOrder, DEFAULT_PAY_CHANNEL } from '../../utils/pay/index'
 import PageLoading from '../../components/page-loading/page-loading.vue'
 import { STATIC_IMAGE_PREFIX } from '../../utils/image'
 
-export default {
-  components: { PageLoading },
-  data() {
-    return {
-      staticImgPrefix: STATIC_IMAGE_PREFIX,
-      orderId: 0,
-      order: null,
-      remark: '',
-      loading: false,
-      pageLoading: false,
-      pageLoadingTip: '',
-      diningMode: 1,
-      payChannel: DEFAULT_PAY_CHANNEL,
-      couponDiscount: 0,
-      selectedCouponId: 0,
-      showPayPicker: false,
-      showTimePicker: false,
-      showCouponPicker: false,
-      payMethodList: [],
-      availableCoupons: [],
-      selectedCoupon: null,
-      selectedTimeDay: 0,
-      selectedTimeSlot: 0,
-      pickupTime: '立即取餐',
-      deliveryAddress: null
+const staticImgPrefix = ref(STATIC_IMAGE_PREFIX)
+const orderId = ref(0)
+const order = ref(null)
+const remark = ref('')
+const loading = ref(false)
+const pageLoading = ref(false)
+const pageLoadingTip = ref('')
+const diningMode = ref(1)
+const payChannel = ref(DEFAULT_PAY_CHANNEL)
+const couponDiscount = ref(0)
+const selectedCouponId = ref(0)
+const showPayPicker = ref(false)
+const showTimePicker = ref(false)
+const showCouponPicker = ref(false)
+const payMethodList = ref([])
+const availableCoupons = ref([])
+const selectedCoupon = ref(null)
+const selectedTimeDay = ref(0)
+const selectedTimeSlot = ref(0)
+const pickupTime = ref('立即取餐')
+const deliveryAddress = ref(null)
+
+const isDeliveryMode = computed(() => diningMode.value === 3)
+
+const diningModeText = computed(() => ({ 1: '堂食', 2: '打包', 3: '外卖' }[diningMode.value] || '堂食'))
+
+const payChannelText = computed(() => {
+  const m = payMethodList.value.find((item) => item.channel === payChannel.value)
+  return m ? m.name : '请选择'
+})
+
+const finalAmount = computed(() => {
+  const raw = Number(totalAmount.value)
+  return Math.max(0, raw - couponDiscount.value).toFixed(2)
+})
+
+const totalAmount = computed(() => {
+  if (!order.value) return '0.00'
+  return calcDishesAmount(order.value.dishes)
+})
+
+const pickupTimeText = computed(() => pickupTime.value)
+
+const timeDays = computed(() => {
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+  return [
+    { label: `今天（${weekdays[today.getDay()]}）` },
+    { label: `明天（${weekdays[tomorrow.getDay()]}）` }
+  ]
+})
+
+const currentTimeSlots = computed(() => {
+  const prefix = isDeliveryMode.value ? '送达' : '取餐'
+  const slots = [isDeliveryMode.value ? '立即出发' : '立即取餐']
+  const now = new Date()
+  const startHour = now.getHours() + 1
+  for (let i = 0; i < 8; i++) {
+    const hour = startHour + i
+    if (hour >= 24) break
+    slots.push(`${hour.toString().padStart(2, '0')}:20-${hour.toString().padStart(2, '0')}:40${prefix}`)
+  }
+  return slots
+})
+
+onLoad(async () => {
+  orderId.value = Number(uni.getStorageSync('orderId'))
+  diningMode.value = Number(uni.getStorageSync('diningMode') || 1)
+  loadDeliveryAddress()
+  await loadDetail()
+  await loadCoupons()
+  loadBestCoupon()
+  loadPayMethods()
+})
+
+onShow(() => {
+  loadDeliveryAddress()
+})
+
+function goToAddress() {
+  uni.navigateTo({ url: '/pages/address/list?select=1' })
+}
+
+function loadDeliveryAddress() {
+  const addr = uni.getStorageSync('selectedAddress')
+  if (addr) {
+    try {
+      deliveryAddress.value = typeof addr === 'string' ? JSON.parse(addr) : addr
+    } catch (e) {
+      deliveryAddress.value = null
     }
-  },
-  computed: {
-    isDeliveryMode() {
-      return this.diningMode === 3
-    },
-    diningModeText() {
-      return { 1: '堂食', 2: '打包', 3: '外卖' }[this.diningMode] || '堂食'
-    },
-    payChannelText() {
-      const m = this.payMethodList.find((item) => item.channel === this.payChannel)
-      return m ? m.name : '请选择'
-    },
-    finalAmount() {
-      const raw = Number(this.totalAmount)
-      return Math.max(0, raw - this.couponDiscount).toFixed(2)
-    },
-    totalAmount() {
-      if (!this.order) return '0.00'
-      return this.calcDishesAmount(this.order.dishes)
-    },
-    pickupTimeText() {
-      return this.pickupTime
-    },
-    timeDays() {
-      const today = new Date()
-      const tomorrow = new Date(today)
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-      return [
-        { label: `今天（${weekdays[today.getDay()]}）` },
-        { label: `明天（${weekdays[tomorrow.getDay()]}）` }
-      ]
-    },
-    currentTimeSlots() {
-      const prefix = this.isDeliveryMode ? '送达' : '取餐'
-      const slots = [this.isDeliveryMode ? '立即出发' : '立即取餐']
-      const now = new Date()
-      const startHour = now.getHours() + 1
-      for (let i = 0; i < 8; i++) {
-        const hour = startHour + i
-        if (hour >= 24) break
-        slots.push(`${hour.toString().padStart(2, '0')}:20-${hour.toString().padStart(2, '0')}:40${prefix}`)
-      }
-      return slots
-    }
-  },
-  async onLoad() {
-    this.orderId = Number(uni.getStorageSync('orderId'))
-    this.diningMode = Number(uni.getStorageSync('diningMode') || 1)
-    this.loadDeliveryAddress()
-    await this.loadDetail()
-    await this.loadCoupons()
-    this.loadBestCoupon()
-    this.loadPayMethods()
-  },
-  onShow() {
-    this.loadDeliveryAddress()
-  },
-  methods: {
-    goToAddress() {
-      uni.navigateTo({ url: '/pages/address/list?select=1' })
-    },
-    loadDeliveryAddress() {
-      const addr = uni.getStorageSync('selectedAddress')
-      if (addr) {
-        try {
-          this.deliveryAddress = typeof addr === 'string' ? JSON.parse(addr) : addr
-        } catch (e) {
-          this.deliveryAddress = null
-        }
-      }
-    },
-    selectDiningMode(mode) {
-      this.diningMode = mode
-      uni.setStorageSync('diningMode', mode)
-    },
-    confirmTime() {
-      if (this.currentTimeSlots.length > 0) {
-        this.pickupTime = this.currentTimeSlots[this.selectedTimeSlot]
-      }
-      this.showTimePicker = false
-    },
-    async loadCoupons() {
-      try {
-        const list = await couponApi.myCoupons(0)
-        const type = this.isDeliveryMode ? 'delivery' : 'instore'
-        this.availableCoupons = (list || []).filter(c => {
-          if (c.status !== 1) return false
-          if (type === 'instore' && c.type !== 3 && c.type !== 4) return false
-          if (type === 'delivery' && c.type !== 1 && c.type !== 2 && c.type !== 5) return false
-          const minAmount = Number(c.minAmount || 0)
-          return minAmount <= Number(this.totalAmount)
-        })
-      } catch (e) {
-        this.availableCoupons = []
-      }
-    },
-    selectCoupon(couponId) {
-      this.selectedCouponId = couponId
-      if (couponId === 0) {
-        this.selectedCoupon = null
-        this.couponDiscount = 0
-      } else {
-        const coupon = this.availableCoupons.find(c => c.id === couponId)
-        this.selectedCoupon = coupon
-        this.couponDiscount = Number(coupon?.discountAmount || 0)
-      }
-    },
-    calcDishesAmount(dishes) {
-      if (!Array.isArray(dishes) || dishes.length === 0) return '0.00'
-      const total = dishes.reduce((sum, dish) => {
-        return sum + Number(dish.amount || 0) * Number(dish.quantity || 1)
-      }, 0)
-      return total.toFixed(2)
-    },
-    lineAmount(dish) {
-      return (Number(dish.amount || 0) * Number(dish.quantity || 1)).toFixed(2)
-    },
-    async loadDetail() {
-      try {
-        this.order = await orderApi.detail(this.orderId)
-      } catch (e) {
-        this.order = { dishes: [], amount: '0.00' }
-      }
-    },
-    async loadPayMethods() {
-      try {
-        const list = await payApi.methods(this.orderId)
-        this.payMethodList = Array.isArray(list) ? list : []
-        const enabled = this.payMethodList.find((m) => m.channel === this.payChannel && m.enabled)
-        if (!enabled) {
-          const fallback = this.payMethodList.find((m) => m.enabled)
-          if (fallback) {
-            this.payChannel = fallback.channel
-          }
-        }
-      } catch (e) {
-        this.payMethodList = []
-      }
-    },
-    async loadBestCoupon() {
-      try {
-        const result = await couponApi.bestForOrder(this.orderId)
-        if (result && result.hasCoupon) {
-          this.selectedCouponId = result.userCouponId
-          let coupon = this.availableCoupons.find(c => c.id === result.userCouponId)
-          if (!coupon) {
-            coupon = {
-              id: result.userCouponId,
-              discountAmount: result.discountAmount,
-              minAmount: result.minAmount || 0,
-              name: result.name || '优惠券',
-              endTime: result.endTime
-            }
-            this.availableCoupons.unshift(coupon)
-          }
-          this.selectedCoupon = coupon
-          this.couponDiscount = Number(result.discountAmount || 0)
-        }
-      } catch (e) {
-        if (this.availableCoupons.length > 0) {
-          const best = this.availableCoupons.reduce((max, c) => 
-            Number(c.discountAmount || 0) > Number(max.discountAmount || 0) ? c : max
-          )
-          this.selectedCouponId = best.id
-          this.selectedCoupon = best
-          this.couponDiscount = Number(best.discountAmount || 0)
-        }
-      }
-    },
-    getPayMethodDesc(item) {
-      if (item.channel === 'balance' && item.balance !== undefined) {
-        return `可用余额 ${item.balance}，本次需 ${item.requiredBalance || 0}`
-      }
-      if (item.channel === 'credit') {
-        const limit = item.creditLimit ?? 0
-        const used = item.creditUsed ?? 0
-        const remain = item.creditRemain ?? 0
-        return `挂账支付，已用 ${used}，剩余 ${remain}`
-      }
-      if (item.channel === 'online') {
-        return '微信/支付宝等（聚合支付）'
-      }
-      if (item.channel === 'wechat') {
-        return '直连微信支付'
-      }
-      return item.desc || ''
-    },
-    formatTime(time) {
-      if (!time) return ''
-      const date = new Date(time)
-      const year = date.getFullYear()
-      const month = (date.getMonth() + 1).toString().padStart(2, '0')
-      const day = date.getDate().toString().padStart(2, '0')
-      const hour = date.getHours().toString().padStart(2, '0')
-      const minute = date.getMinutes().toString().padStart(2, '0')
-      return `${year}.${month}.${day} ${hour}:${minute}`
-    },
-    selectPayMethod(method) {
-      if (!method.enabled) {
-        uni.showToast({ title: method.disabledReason || '该支付方式不可用', icon: 'none' })
-        return
-      }
-      this.payChannel = method.channel
-      this.showPayPicker = false
-    },
-    async handleSubmit() {
-      if (this.loading) return
-      this.loading = true
-      this.pageLoading = true
-      this.pageLoadingTip = '提交中...'
-      try {
-        await orderApi.submit({
-          orderId: this.orderId,
-          remark: this.remark,
-          couponId: this.selectedCouponId || null
-        })
-        await payOrder(this.orderId, this.payChannel, 'mp')
-        uni.removeStorageSync('orderId')
-        uni.showToast({ title: '支付成功', icon: 'success' })
-        setTimeout(() => {
-          uni.redirectTo({ url: `/pages/order/detail?orderId=${this.orderId}` })
-        }, 500)
-      } catch (e) {
-        uni.showToast({ title: e.message || e, icon: 'none' })
-      } finally {
-        this.loading = false
-        this.pageLoading = false
+  }
+}
+
+function selectDiningMode(mode) {
+  diningMode.value = mode
+  uni.setStorageSync('diningMode', mode)
+}
+
+function confirmTime() {
+  if (currentTimeSlots.value.length > 0) {
+    pickupTime.value = currentTimeSlots.value[selectedTimeSlot.value]
+  }
+  showTimePicker.value = false
+}
+
+async function loadCoupons() {
+  try {
+    const list = await couponApi.myCoupons(0)
+    const type = isDeliveryMode.value ? 'delivery' : 'instore'
+    availableCoupons.value = (list || []).filter(c => {
+      if (c.status !== 1) return false
+      if (type === 'instore' && c.type !== 3 && c.type !== 4) return false
+      if (type === 'delivery' && c.type !== 1 && c.type !== 2 && c.type !== 5) return false
+      const minAmount = Number(c.minAmount || 0)
+      return minAmount <= Number(totalAmount.value)
+    })
+  } catch (e) {
+    availableCoupons.value = []
+  }
+}
+
+function selectCoupon(couponId) {
+  selectedCouponId.value = couponId
+  if (couponId === 0) {
+    selectedCoupon.value = null
+    couponDiscount.value = 0
+  } else {
+    const coupon = availableCoupons.value.find(c => c.id === couponId)
+    selectedCoupon.value = coupon
+    couponDiscount.value = Number(coupon?.discountAmount || 0)
+  }
+}
+
+function calcDishesAmount(dishes) {
+  if (!Array.isArray(dishes) || dishes.length === 0) return '0.00'
+  const total = dishes.reduce((sum, dish) => {
+    return sum + Number(dish.amount || 0) * Number(dish.quantity || 1)
+  }, 0)
+  return total.toFixed(2)
+}
+
+function lineAmount(dish) {
+  return (Number(dish.amount || 0) * Number(dish.quantity || 1)).toFixed(2)
+}
+
+async function loadDetail() {
+  try {
+    order.value = await orderApi.detail(orderId.value)
+  } catch (e) {
+    order.value = { dishes: [], amount: '0.00' }
+  }
+}
+
+async function loadPayMethods() {
+  try {
+    const list = await payApi.methods(orderId.value)
+    payMethodList.value = Array.isArray(list) ? list : []
+    const enabled = payMethodList.value.find((m) => m.channel === payChannel.value && m.enabled)
+    if (!enabled) {
+      const fallback = payMethodList.value.find((m) => m.enabled)
+      if (fallback) {
+        payChannel.value = fallback.channel
       }
     }
+  } catch (e) {
+    payMethodList.value = []
+  }
+}
+
+async function loadBestCoupon() {
+  try {
+    const result = await couponApi.bestForOrder(orderId.value)
+    if (result && result.hasCoupon) {
+      selectedCouponId.value = result.userCouponId
+      let coupon = availableCoupons.value.find(c => c.id === result.userCouponId)
+      if (!coupon) {
+        coupon = {
+          id: result.userCouponId,
+          discountAmount: result.discountAmount,
+          minAmount: result.minAmount || 0,
+          name: result.name || '优惠券',
+          endTime: result.endTime
+        }
+        availableCoupons.value.unshift(coupon)
+      }
+      selectedCoupon.value = coupon
+      couponDiscount.value = Number(result.discountAmount || 0)
+    }
+  } catch (e) {
+    if (availableCoupons.value.length > 0) {
+      const best = availableCoupons.value.reduce((max, c) =>
+        Number(c.discountAmount || 0) > Number(max.discountAmount || 0) ? c : max
+      )
+      selectedCouponId.value = best.id
+      selectedCoupon.value = best
+      couponDiscount.value = Number(best.discountAmount || 0)
+    }
+  }
+}
+
+function getPayMethodDesc(item) {
+  if (item.channel === 'balance' && item.balance !== undefined) {
+    return `可用余额 ${item.balance}，本次需 ${item.requiredBalance || 0}`
+  }
+  if (item.channel === 'credit') {
+    const limit = item.creditLimit ?? 0
+    const used = item.creditUsed ?? 0
+    const remain = item.creditRemain ?? 0
+    return `挂账支付，已用 ${used}，剩余 ${remain}`
+  }
+  if (item.channel === 'online') {
+    return '微信/支付宝等（聚合支付）'
+  }
+  if (item.channel === 'wechat') {
+    return '直连微信支付'
+  }
+  return item.desc || ''
+}
+
+function formatTime(time) {
+  if (!time) return ''
+  const date = new Date(time)
+  const year = date.getFullYear()
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+  const hour = date.getHours().toString().padStart(2, '0')
+  const minute = date.getMinutes().toString().padStart(2, '0')
+  return `${year}.${month}.${day} ${hour}:${minute}`
+}
+
+function selectPayMethod(method) {
+  if (!method.enabled) {
+    uni.showToast({ title: method.disabledReason || '该支付方式不可用', icon: 'none' })
+    return
+  }
+  payChannel.value = method.channel
+  showPayPicker.value = false
+}
+
+async function handleSubmit() {
+  if (loading.value) return
+  loading.value = true
+  pageLoading.value = true
+  pageLoadingTip.value = '提交中...'
+  try {
+    await orderApi.submit({
+      orderId: orderId.value,
+      remark: remark.value,
+      couponId: selectedCouponId.value || null
+    })
+    await payOrder(orderId.value, payChannel.value, 'mp')
+    uni.removeStorageSync('orderId')
+    uni.showToast({ title: '支付成功', icon: 'success' })
+    setTimeout(() => {
+      uni.redirectTo({ url: `/pages/order/detail?orderId=${orderId.value}` })
+    }, 500)
+  } catch (e) {
+    uni.showToast({ title: e.message || e, icon: 'none' })
+  } finally {
+    loading.value = false
+    pageLoading.value = false
   }
 }
 </script>
